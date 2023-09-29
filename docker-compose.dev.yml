@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+  search-service:
+    container_name: search-container
+    image: dhammanava-search-image
+    build:
+      context: ./search-esdb-service
+    environment:
+      CONNECTION_ESDBURL: ${ESDB_URL}
+      ESDB_USERNAME: ${ESDB_USERNAME}
+      ESDB_PASSWORD: ${ESDB_PASSWORD}
+      CORS_TARGET: ${WEB_CORS_TARGET}
+    working_dir: /app/search-esdb
+    ports:
+      - 8081:8081
+    depends_on:
+      - elastic-db
+    networks:
+      - backbone
+
+  elastic-db:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    container_name: elastic-container
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ESDB_PASSWORD}
+    ports:
+      - 9200:9200
+    networks:
+      - backbone
+
+  frontend:
+    image: dhammanava-frontend-image
+    container_name: frontend-container
+    build:
+      context: ./frontend
+    ports:
+      - 5173:5173
+    environment:
+      VITE_SEARCH_API_URL: ${VITE_SEARCH_API_URL}
+    networks:
+      - backbone
+
+  nginx:
+    image: dhammanava-nginx-image
+    container_name: nginx-container
+    build:
+      context: ./nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - elastic-db
+      - search-service
+      - frontend
+    networks:
+      - backbone
+      
+networks:
+  backbone:
+    driver: bridge

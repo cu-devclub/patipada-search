@@ -1,0 +1,8 @@
+connection:
+  appPort: 8081
+
+static:
+  data: './data'
+  path: './assets/public'
+  link: '/static/'
+  font: './assets/private/fonts'
