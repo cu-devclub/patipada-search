@@ -42,9 +42,9 @@ async function filterResults(term) {
 
 async function fetchingData(query: string) {
   try {
-    const response = await axios.get(
-      import.meta.env.VITE_SEARCH_API_URL + `/search?query=${query}`
-    );
+    // const path = "http://localhost:8081";
+    const path = import.meta.env.VITE_SEARCH_API_URL;
+    const response = await axios.get(path + `/search?query=${query}`);
     localStorage.setItem("response", JSON.stringify(response.data.results));
     return response.data.results;
   } catch (error) {

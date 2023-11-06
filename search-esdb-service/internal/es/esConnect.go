@@ -84,7 +84,7 @@ func checkClusterHealth(client *elasticsearch.Client) {
 	}
 
 	// Print the cluster health information
-	fmt.Println("Cluster Health:")
+	fmt.Println("Elastic Cluster Health:")
 	fmt.Println("---------------")
 	fmt.Printf("Status: %s\n", res.Status())
 
