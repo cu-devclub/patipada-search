@@ -1,0 +1,2 @@
+xpack.security.enabled: true
+xpack.security.enrollment.enabled: true

@@ -18,11 +18,10 @@ services:
       - backbone
 
   elastic-db:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+    image: dhammanava-elastic-image
     container_name: elastic-container
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ESDB_PASSWORD}
     ports:
       - 9200:9200
@@ -39,6 +38,17 @@ services:
     networks:
       - backbone
 
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.4
+    ports:
+      - 5601:5601
+    environment:
+      - ELASTICSEARCH_URL=http://elastic-db:9200
+    depends_on:
+      - elastic-db
+    networks:
+      - backbone
+      
   nginx:
     image: dhammanava-nginx-image
     container_name: nginx-container
