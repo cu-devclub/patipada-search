@@ -1,12 +1,13 @@
 package es
 
 import (
-	"fmt"
+	"log"
+	"strings"
 
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
-func createIndex(client *elasticsearch.Client, indexName string) error {
+func createRecordIndex(client *elasticsearch.Client, indexName string) error {
 	// Check if the index already exists
 	exists, err := indexExists(client, indexName)
 	if err != nil {
@@ -14,21 +15,68 @@ func createIndex(client *elasticsearch.Client, indexName string) error {
 	}
 
 	if !exists {
-		// Create the index using the Indices.Create API
-		res, err := client.Indices.Create(indexName)
+		index := indexName
+        mapping := `
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "analyzer": {
+          "analyzer_shingle": {
+            "tokenizer": "icu_tokenizer",
+            "filter": ["filter_shingle"]
+          }
+        },
+        "filter": {
+          "filter_shingle": {
+            "type": "shingle",
+            "max_shingle_size": 3,
+            "min_shingle_size": 2,
+            "output_unigrams": "true"
+          }
+        }
+      }
+    }
+  },
+    "mappings": {
+    "properties": {
+      "youtubeURL": {
+        "type": "text"
+      },
+      "question": {
+        "type": "text",
+        "analyzer": "analyzer_shingle"
+      },
+      "answer": {
+        "type": "text",
+        "analyzer": "analyzer_shingle"
+      },
+      "startTime": {
+        "type": "text"
+      },
+      "endTime": {
+        "type": "text"
+      }
+    }
+  }
+}
+`
+
+
+		res, err := client.Indices.Create(
+			index,
+			client.Indices.Create.WithBody(strings.NewReader(mapping)),
+		)
 		if err != nil {
 			return err
 		}
-		defer res.Body.Close()
-
-		// Check the response status
-		if res.IsError() {
-			return fmt.Errorf("Elasticsearch error: %s", res.Status())
-		}
+        log.Print(res)
 	}
 
 	return nil
 }
+
+
 
 func indexExists(client *elasticsearch.Client, indexName string) (bool, error) {
 	// Check if the index exists using the Indices.Exists API

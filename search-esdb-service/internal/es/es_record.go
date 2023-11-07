@@ -19,12 +19,12 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/esutil"
 )
 
-func BulkInsert(qars []*dto.QARecord) {
+func BulkInsertQARecords(qars []*dto.QARecord) {
 	es := GetESClient()
 	var countSuccessful uint64
 	bi, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
-		Index:  "record", // The default index name
-		Client: es,       // The Elasticsearch client
+		Index:  "record",
+		Client: es, // The Elasticsearch client
 	})
 	if err != nil {
 		log.Fatalf("Error creating the indexer: %s", err)
@@ -34,17 +34,16 @@ func BulkInsert(qars []*dto.QARecord) {
 
 	// Loop over the collection
 	for order, a := range qars {
-		// Prepare the data payload: encode article to JSON
-		//
 		data, err := json.Marshal(a)
+
 		if err != nil {
-			log.Fatalf("Cannot encode record")
+			log.Fatalf("Cannot encode data %v: %s", a.Question, err)
 		}
 
 		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		//
+
 		// Add an item to the BulkIndexer
-		//
+
 		err = bi.Add(
 			context.Background(),
 			esutil.BulkIndexerItem{
@@ -95,6 +94,7 @@ func BulkInsert(qars []*dto.QARecord) {
 	dur := time.Since(start)
 
 	if biStats.NumFailed > 0 {
+		fmt.Println(biStats.NumFlushed)
 		log.Fatalf(
 			"Indexed [%s] documents with [%s] errors in %s (%s docs/sec)",
 			humanize.Comma(int64(biStats.NumFlushed)),
@@ -114,24 +114,15 @@ func BulkInsert(qars []*dto.QARecord) {
 
 func InsertRecord(qar *dto.QARecord, documentID string) error {
 	client := GetESClient()
-	escapedYoutubeURL := util.EscapeText(qar.YoutubeURL)
-	escapedQuestion := util.EscapeText(qar.Question)
-	escapedAnswer := util.EscapeText(qar.Answer)
-	escapedStartTime := util.EscapeText(qar.StartTime)
-	escapedEndTime := util.EscapeText(qar.EndTime)
-
-	document := fmt.Sprintf(`{
-	    "youtubeURL": "%s",
-	    "question": "%s",
-	    "answer": "%s",
-	    "startTime": "%s",
-	    "endTime": "%s"
-	}`, escapedYoutubeURL, escapedQuestion, escapedAnswer, escapedStartTime, escapedEndTime)
+	data, err := json.Marshal(qar)
+	if err != nil {
+		log.Fatalf("Cannot encode data %v: %s", qar.Question, err)
+	}
 
 	req := esapi.IndexRequest{
 		Index:      "record",
 		DocumentID: documentID,
-		Body:       strings.NewReader(document),
+		Body:       bytes.NewReader(data),
 		Refresh:    "true",
 	}
 
@@ -148,15 +139,28 @@ func InsertRecord(qar *dto.QARecord, documentID string) error {
 	return nil
 }
 
-func SearchInIndex(searchQuery string,indexName string,field string) ([]map[string]interface{}, error) {
+func SearchInIndex(searchQuery string, indexName string) ([]map[string]interface{}, error) {
 	client := GetESClient()
-	searchQuery = "*" + searchQuery + "*"
-	// Create a search request
+
+	// Build the Elasticsearch query
 	query := map[string]interface{}{
 		"query": map[string]interface{}{
-			"query_string": map[string]interface{}{
-				"query":  searchQuery,
-				"fields": []string{field},
+			"bool": map[string]interface{}{
+				"should": []map[string]interface{}{
+					{
+						"multi_match": map[string]interface{}{
+							"query":  searchQuery,
+							"fields": []string{"question", "answer"},
+						},
+					},
+					{
+						"multi_match": map[string]interface{}{
+							"query":  searchQuery,
+							"type":   "phrase_prefix",
+							"fields": []string{"question", "answer"},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -217,3 +221,57 @@ func SearchInIndex(searchQuery string,indexName string,field string) ([]map[stri
 	}
 	return matchedDocuments, nil
 }
+
+
+func GetAllDocumentsFromIndex(indexName string) ([]map[string]interface{}, error) {
+	client := GetESClient()
+	// Create a search request to retrieve all documents
+	query := map[string]interface{}{
+		"query": map[string]interface{}{
+			"match_all": map[string]interface{}{},
+		},
+	}
+
+	// Convert the query to JSON
+	queryJSON, err := json.Marshal(query)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a search request
+	res, err := client.Search(
+		client.Search.WithContext(context.Background()),
+		client.Search.WithIndex(indexName),
+		client.Search.WithBody(strings.NewReader(string(queryJSON))))
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	// Check the response status
+	if res.IsError() {
+		return nil, fmt.Errorf("Elasticsearch error: %s", res.Status())
+	}
+
+	// Decode the response
+	var response map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	// Extract and iterate through the hits (documents) in the response
+	hits, found := response["hits"].(map[string]interface{})["hits"].([]interface{})
+	if !found {
+		return nil, fmt.Errorf("No hits found in the response")
+	}
+
+	// Extract and return the matched documents
+	var documents []map[string]interface{}
+	for _, hit := range hits {
+		doc := hit.(map[string]interface{})["_source"].(map[string]interface{})
+		documents = append(documents, doc)
+	}
+
+	return documents, nil
+}
+
