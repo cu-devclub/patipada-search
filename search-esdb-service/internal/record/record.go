@@ -7,7 +7,7 @@ func GenerateUniqueDocuments(duplicateDocument []map[string]interface{})  []map[
 	// Filter duplicates and store unique documents in the map
 	for _, doc := range duplicateDocument {
 		// Use a unique identifier as the key, e.g., the document's ID or another field
-		identifier := doc["id"].(string) // Replace "id" with your actual unique identifier field
+		identifier := doc["id"].(string)
 		uniqueDocuments[identifier] = doc
 	}
 

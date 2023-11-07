@@ -33,7 +33,6 @@ func BulkInsert(qars []*dto.QARecord) {
 	start := time.Now().UTC()
 
 	// Loop over the collection
-	//
 	for order, a := range qars {
 		// Prepare the data payload: encode article to JSON
 		//

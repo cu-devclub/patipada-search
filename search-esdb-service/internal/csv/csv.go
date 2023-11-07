@@ -86,6 +86,10 @@ func insertDataFromCSV(filePath string, fileName string) error {
 			record[i] = strings.ReplaceAll(record[i], "\n", " ")
 		}
 
+		// Escape . to : in record[2] and record[3] (starttime and endtime)
+		record[2] = strings.ReplaceAll(record[2], ".", ":")
+		record[3] = strings.ReplaceAll(record[3], ".", ":")
+
 		// Assuming your CSV columns are in the order: Question, Answe``r, StartTime, EndTime
 		qar := &dto.QARecord{
 			YoutubeURL: fileName,
