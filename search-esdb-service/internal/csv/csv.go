@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"search-esdb-service/internal/dto"
 	"search-esdb-service/internal/es"
-	"strconv"
+	"search-esdb-service/internal/util"
 	"strings"
 )
 
@@ -23,6 +23,7 @@ func ConvertCSVFilesInDirectory(directoryPath string) error {
 	if err != nil {
 		return err
 	}
+	var qaRecords []*dto.QARecord
 
 	for _, entry := range dir {
 		// Check if the entry is a regular file and has a .csv extension
@@ -35,20 +36,24 @@ func ConvertCSVFilesInDirectory(directoryPath string) error {
 		fileName := strings.TrimSuffix(entry.Name(), ".csv")
 
 		// Insert data from the CSV file
-		if err := insertDataFromCSV(csvFilePath, fileName); err != nil {
+		qa, err := generateDataFromCSV(csvFilePath, fileName)
+		if err != nil {
 			fmt.Printf("Error inserting data from CSV file %s: %s\n", csvFilePath, err)
 			continue // Continue to the next file if there's an error
 		}
+		qaRecords = append(qaRecords, qa...)
 	}
+	// fmt.Println(len(qaRecords))
+	es.BulkInsertQARecords(qaRecords)
 
 	return nil
 }
 
-func insertDataFromCSV(filePath string, fileName string) error {
+func generateDataFromCSV(filePath string, fileName string) ([]*dto.QARecord, error) {
 	// Open the CSV file
 	file, err := os.Open(filePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer file.Close()
 
@@ -57,7 +62,7 @@ func insertDataFromCSV(filePath string, fileName string) error {
 
 	// Read and discard the header line
 	if _, err := reader.Read(); err != nil {
-		return err
+		return nil, err
 	}
 	// FOR BULKING
 	var qaRecords []*dto.QARecord
@@ -83,7 +88,7 @@ func insertDataFromCSV(filePath string, fileName string) error {
 
 		// Remove newline characters from the fields
 		for i := range record {
-			record[i] = strings.ReplaceAll(record[i], "\n", " ")
+			record[i] = util.EscapeText(record[i])
 		}
 
 		// Escape . to : in record[2] and record[3] (starttime and endtime)
@@ -99,14 +104,9 @@ func insertDataFromCSV(filePath string, fileName string) error {
 			EndTime:    record[3],
 		}
 
-		documentID := fileName + "-" + strconv.Itoa(order)
-		if err = es.InsertRecord(qar, documentID); err != nil {
-			return err
-		}
 		qaRecords = append(qaRecords, qar) // FOR BULKING
 		order += 1
 	}
-	// es.BulkInsert(qaRecords)
 
-	return nil
+	return qaRecords, nil
 }

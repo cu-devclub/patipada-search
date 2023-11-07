@@ -1,20 +1,27 @@
 package record
 
-func GenerateUniqueDocuments(duplicateDocument []map[string]interface{})  []map[string]interface{} {
-	// Create a map to track unique documents
-	uniqueDocuments := make(map[string]map[string]interface{})
+import (
+	"net/http"
+	"search-esdb-service/internal/es"
+	"github.com/gin-gonic/gin"
+)
 
-	// Filter duplicates and store unique documents in the map
-	for _, doc := range duplicateDocument {
-		// Use a unique identifier as the key, e.g., the document's ID or another field
-		identifier := doc["id"].(string)
-		uniqueDocuments[identifier] = doc
+func DisplayAllRecords(c *gin.Context) {
+	documents,err := es.GetAllDocumentsFromIndex("record")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
+	c.JSON(http.StatusOK,gin.H{"Length":len(documents),"Documents":documents})
+}
 
-	// Convert the map back to a slice
-	uniqueDocumentSlice := make([]map[string]interface{}, 0, len(uniqueDocuments))
-	for _, doc := range uniqueDocuments {
-		uniqueDocumentSlice = append(uniqueDocumentSlice, doc)
+func Search(c *gin.Context) {
+	query := c.Query("query")
+
+	matchedDocuments, err := es.SearchInIndex(query,"record")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
-	return uniqueDocumentSlice
+	c.JSON(http.StatusOK, gin.H{"results": matchedDocuments})
 }

@@ -3,11 +3,11 @@ package dto
 import "fmt"
 
 type QARecord struct {
-	YoutubeURL string
-	Question   string
-	Answer     string
-	StartTime  string
-	EndTime    string
+	YoutubeURL string `json:"youtubeURL"`
+	Question   string `json:"question"`
+	Answer     string `json:"answer"`
+	StartTime  string `json:"startTime"`
+	EndTime    string `json:"endTime"`
 }
 
 func (q *QARecord) ToString() string {

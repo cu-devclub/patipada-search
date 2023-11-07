@@ -2,6 +2,7 @@ package es
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"time"
@@ -58,7 +59,14 @@ func InitESDB() {
 	// Check the Elasticsearch cluster health
 	checkClusterHealth(client)
 
-	if err = createIndex(client, "record"); err != nil {
+	//* Check plugins
+	if err = checkPlugins(client); err != nil {
+		log.Fatalf("Error checking Plugins: %s", err)
+
+	}
+
+	//* Creating Record Index
+	if err = createRecordIndex(client, "record"); err != nil {
 		log.Fatalf("Error creating index: %s", err)
 	}
 
@@ -88,4 +96,39 @@ func checkClusterHealth(client *elasticsearch.Client) {
 	fmt.Println("---------------")
 	fmt.Printf("Status: %s\n", res.Status())
 
+}
+
+func checkPlugins(client *elasticsearch.Client) error {
+	// Create a request to check the installed plugins
+	req := esapi.CatPluginsRequest{
+		Format: "json", // Use JSON format for the response
+	}
+
+	// Perform the request
+	res, err := req.Do(context.Background(), client)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	// Check the response status
+	if res.IsError() {
+		return fmt.Errorf("Elasticsearch error: %s", res.Status())
+	}
+
+	// Decode the JSON response
+	var plugins []map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&plugins); err != nil {
+		return err
+	}
+
+	if len(plugins) == 0 {
+		return fmt.Errorf("No plugins installed")
+	}
+	// Print the list of installed plugins
+	for _, plugin := range plugins {
+		fmt.Printf("Name: %s, Component: %s, Version: %s\n", plugin["name"], plugin["component"], plugin["version"])
+	}
+
+	return nil
 }
