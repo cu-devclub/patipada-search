@@ -17,7 +17,6 @@ import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import axios from "axios";
 
-const questions = [];
 
 interface SearchFieldProps {
   searchParam: string | null; // Define the searchParam prop
@@ -25,18 +24,28 @@ interface SearchFieldProps {
   performSearch: (searchParameter: string) => void;
 }
 
-async function filterResults(term) {
-  try {
-    const data = await fetchingData(term);
-    if (data == null) {
-      return [];
-    }
-    const questionsArray = data.map((item) => item.question);
+interface SearchOptions {
+  key : string;
+  question : string;
+}
 
-    return questionsArray;
+async function filterResults(term) {  
+  let data: SearchOptions[] = [];
+  try {
+    const response = await fetchingData(term);
+    // create variable where data type is SearchOptions
+    if (response.results != null) {
+      data = response.results.map((item) => ({
+        key: item.id,
+        question: item.question,
+      }));
+    }
+    console.log(data)
+    return data
+    
   } catch (error) {
     console.error("Error:", error);
-    return [];
+    return data;
   }
 }
 
@@ -45,8 +54,7 @@ async function fetchingData(query: string) {
     // const path = "http://localhost:8081";
     const path = import.meta.env.VITE_SEARCH_API_URL;
     const response = await axios.get(path + `/search?query=${query}`);
-    localStorage.setItem("response", JSON.stringify(response.data.results));
-    return response.data.results;
+    return response.data;
   } catch (error) {
     console.error("Error:", error);
     return [];
@@ -59,7 +67,7 @@ function SearchField({
   performSearch,
 }: SearchFieldProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [options, setOptions] = useState(questions);
+  const [options, setOptions] = useState<SearchOptions[]>();
 
   const onChangeInputHandler = (evt) => {
     setIsLoading(true);
@@ -68,12 +76,19 @@ function SearchField({
       setOptions(results);
       setIsLoading(false);
     });
+    
   };
 
-  const onSelectInputHandle = (evt) => {
+  async function onSelectInputHandle (evt) {
+    const response = await fetchingData(evt.item.value);
+    sessionStorage.setItem("response", JSON.stringify(response.results));
+
+    const tokens = [evt.item.value, ...response.tokens];
+    sessionStorage.setItem("tokens", JSON.stringify(tokens));
+
     setSearchParams(evt.item.value);
     performSearch(evt.item.value);
-  };
+  }
 
   return (
     <FormControl w={["90%", "70%", "50%"]}>
@@ -82,6 +97,7 @@ function SearchField({
         openOnFocus
         isLoading={isLoading}
         onSelectOption={onSelectInputHandle}
+        disableFilter
       >
         <InputGroup>
           <InputLeftElement pointerEvents="none" h={["50", "70", "90"]}>
@@ -147,27 +163,29 @@ function SearchField({
               </Flex>
             </AutoCompleteItem>
           )}
-          {options.map((question, cid) => (
-            <AutoCompleteItem
-              key={`option-${cid}`}
-              value={question}
-              textTransform="capitalize"
-              h={["50", "70", "90"]}
-              fontSize={["md", "lg", "xl"]}
-            >
-              <Flex alignItems="center">
-                <SearchIcon color="gray.500" boxSize={6} mr={4} />
-                <Tooltip
-                  hasArrow
-                  label={question}
-                  bg="gray.300"
-                  color="black"
-                  placement="right"
-                >
-                  <Text noOfLines={1}> {question}</Text>
-                </Tooltip>
-              </Flex>
-            </AutoCompleteItem>
+          {options && options.map((obj) => (
+            <>
+              <AutoCompleteItem
+                key={obj.key}
+                value={obj.key}
+                textTransform="capitalize"
+                h={["50", "70", "90"]}
+                fontSize={["md", "lg", "xl"]}
+              >
+                <Flex alignItems="center">
+                  <SearchIcon color="gray.500" boxSize={6} mr={4} />
+                  <Tooltip
+                    hasArrow
+                    label={obj.question}
+                    bg="gray.300"
+                    color="black"
+                    placement="right"
+                  >
+                    <Text noOfLines={1}> {obj.question}</Text>
+                  </Tooltip>
+                </Flex>
+              </AutoCompleteItem>
+            </>
           ))}
         </AutoCompleteList>
       </AutoComplete>
