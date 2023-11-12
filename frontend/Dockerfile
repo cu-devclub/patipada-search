@@ -1,9 +1,16 @@
-FROM node:17-alpine as build
+# Stage 1: Build stage
+FROM node:16.13.2-alpine3.14 as build
 WORKDIR /app
-COPY package.json .
-RUN npm i
+COPY package.json ./
+COPY yarn.lock ./
+RUN yarn install --frozen-lockfile
 COPY . .
-EXPOSE 5173
+RUN yarn build
 
-# Start service
-CMD ["npm", "run","dev"]
+# Step 2: Set up the production environment
+FROM nginx:stable-alpine
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY deploy/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]
