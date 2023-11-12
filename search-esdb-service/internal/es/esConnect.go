@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -53,7 +52,8 @@ func InitESDB() {
 	// Create an Elasticsearch client
 	client, err := elasticsearch.NewClient(cfg)
 	if err != nil {
-		log.Fatalf("Error creating Elasticsearch client: %s", err)
+		fmt.Printf("Error creating Elasticsearch client: %s", err)
+		return
 	}
 
 	// Check the Elasticsearch cluster health
@@ -61,13 +61,14 @@ func InitESDB() {
 
 	//* Check plugins
 	if err = checkPlugins(client); err != nil {
-		log.Fatalf("Error checking Plugins: %s", err)
-
+		fmt.Printf("Error checking Plugins: %s", err)
+		return
 	}
 
 	//* Creating Record Index
 	if err = createRecordIndex(client, "record"); err != nil {
-		log.Fatalf("Error creating index: %s", err)
+		fmt.Printf("Error creating index: %s", err)
+		return
 	}
 
 	es_Client = client
@@ -82,13 +83,15 @@ func checkClusterHealth(client *elasticsearch.Client) {
 	// Perform the request
 	res, err := req.Do(context.Background(), client)
 	if err != nil {
-		log.Fatalf("Error checking cluster health: %s", err)
+		fmt.Printf("Error checking cluster health: %s", err)
+		return
 	}
 	defer res.Body.Close()
 
 	// Check the response status
 	if res.IsError() {
-		log.Fatalf("Error: %s", res.Status())
+		fmt.Printf("Error: %s", res.Status())
+		return
 	}
 
 	// Print the cluster health information

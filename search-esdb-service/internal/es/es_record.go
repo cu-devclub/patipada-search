@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"search-esdb-service/internal/dto"
 	"search-esdb-service/internal/util"
@@ -112,32 +113,32 @@ func BulkInsertQARecords(qars []*dto.QARecord) {
 	}
 }
 
-func InsertRecord(qar *dto.QARecord, documentID string) error {
-	client := GetESClient()
-	data, err := json.Marshal(qar)
-	if err != nil {
-		log.Fatalf("Cannot encode data %v: %s", qar.Question, err)
-	}
+// func InsertRecord(qar *dto.QARecord, documentID string) error {
+// 	client := GetESClient()
+// 	data, err := json.Marshal(qar)
+// 	if err != nil {
+// 		log.Fatalf("Cannot encode data %v: %s", qar.Question, err)
+// 	}
 
-	req := esapi.IndexRequest{
-		Index:      "record",
-		DocumentID: documentID,
-		Body:       bytes.NewReader(data),
-		Refresh:    "true",
-	}
+// 	req := esapi.IndexRequest{
+// 		Index:      "record",
+// 		DocumentID: documentID,
+// 		Body:       bytes.NewReader(data),
+// 		Refresh:    "true",
+// 	}
 
-	res, err := req.Do(context.Background(), client)
-	if err != nil {
-		return err
-	}
-	defer res.Body.Close()
+// 	res, err := req.Do(context.Background(), client)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	defer res.Body.Close()
 
-	if res.IsError() {
-		return fmt.Errorf("Elasticsearch error: %s", res.Status())
-	}
+// 	if res.IsError() {
+// 		return fmt.Errorf("Elasticsearch error: %s", res.Status())
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 func SearchInIndex(searchQuery string, indexName string) ([]map[string]interface{}, error) {
 	client := GetESClient()
@@ -222,7 +223,6 @@ func SearchInIndex(searchQuery string, indexName string) ([]map[string]interface
 	return matchedDocuments, nil
 }
 
-
 func GetAllDocumentsFromIndex(indexName string) ([]map[string]interface{}, error) {
 	client := GetESClient()
 	// Create a search request to retrieve all documents
@@ -275,3 +275,48 @@ func GetAllDocumentsFromIndex(indexName string) ([]map[string]interface{}, error
 	return documents, nil
 }
 
+func AnalyzeQueryKeyword(query string) ([]string, error) {
+	client := GetESClient()
+	request := esapi.IndicesAnalyzeRequest{
+		Index: "record",
+		Body: strings.NewReader(`{
+            "tokenizer": "icu_tokenizer",
+            "text": "` + query + `"
+        }`),
+	}
+
+	// Perform the request
+	response, err := request.Do(context.Background(), client)
+	if err != nil {
+		return nil, err
+	}
+
+	responseBody, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	result, err := ExtractTokens(responseBody)
+
+	return result,err
+}
+
+// ExtractTokens extracts tokens from the analyze response JSON and returns them as an array of strings.
+func ExtractTokens(responseJSON []byte) ([]string, error) {
+	var analyzeResponse struct {
+		Tokens []dto.Token `json:"tokens"`
+	}
+
+	// Unmarshal the JSON response into the analyzeResponse struct
+	if err := json.Unmarshal(responseJSON, &analyzeResponse); err != nil {
+		return nil, err
+	}
+
+	// Extract tokens from the struct
+	var tokens []string
+	for _, token := range analyzeResponse.Tokens {
+		tokens = append(tokens, token.Token)
+	}
+
+	return tokens, nil
+}
