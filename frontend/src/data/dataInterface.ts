@@ -14,9 +14,11 @@ export interface DataProps {
 export interface QAProps {
     data: DataItem;
     query: string;
+    tokens: string[];
 }
 
 export interface SearchResultsProps {
     data: DataItem[]; // Ensure that the type matches your data structure
     query: string;
+    tokens: string[];
 }
