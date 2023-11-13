@@ -3,6 +3,8 @@ package record
 import (
 	"net/http"
 	"search-esdb-service/internal/es"
+	"search-esdb-service/internal/util"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,5 +25,13 @@ func Search(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"results": matchedDocuments})
+	tokens,err := es.AnalyzeQueryKeyword(query)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	tokens = util.DistinctArray(tokens)
+	
+	c.JSON(http.StatusOK, gin.H{"results": matchedDocuments,"tokens":tokens})
 }

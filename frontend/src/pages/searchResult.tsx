@@ -9,6 +9,8 @@ function SearchResultPage() {
   const navigate = useNavigate();
   const [queryMessage, SetQueryMessage] = useState("");
   const [data, SetData] = useState([]);
+  const [tokens, SetTokens] = useState([]);
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // Set the number of items per page here
   const { query } = useParams();
@@ -16,14 +18,19 @@ function SearchResultPage() {
     if (query) {
       SetQueryMessage(query);
       setCurrentPage(1);
-      const responseData = localStorage.getItem("response");
+      const responseData = sessionStorage.getItem("response");
       if (responseData != null) {
         SetData(JSON.parse(responseData));
+      }
+      const tokensData = sessionStorage.getItem("tokens");
+      if (tokensData != null) {
+        SetTokens(JSON.parse(tokensData));
       }
     }
   }, [query]);
 
   const SetSearchParams = (searchParameter: string) => {
+    console.log(searchParameter)
     SetQueryMessage(searchParameter);
   };
 
@@ -56,15 +63,16 @@ function SearchResultPage() {
       minH="100vh"
       p={8}
     >
-      <HeaderSearch
+      { query && <HeaderSearch
+        query={query}
         searchParam={queryMessage}
         setSearchParams={SetSearchParams}
         performSearch={performSearch}
-      />
+      /> }
       <Divider />
       {data != null && (
         <>
-          <SearchResults data={currentPageData} query={queryMessage} />
+          <SearchResults data={currentPageData} query={queryMessage} tokens={tokens} />
           <Flex w={{ base: "100%", md: "80%", xl: "70%" }} justify={"center"}>
             <Pagination
               current={currentPage}

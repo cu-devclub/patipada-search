@@ -16,6 +16,7 @@ func createRecordIndex(client *elasticsearch.Client, indexName string) error {
 
 	if !exists {
 		index := indexName
+    // TODO : change tokenizer 
         mapping := `
 {
   "settings": {

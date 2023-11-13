@@ -19,7 +19,8 @@ function SearchPage() {
     <Flex
       direction="column"
       gap={4}
-      justify={{ base: "center", sm: "space-between" }}
+      mt={{xl:"0",base:"10"}}
+      justify={{ md: "space-between", base: "flex-start" }}
       align="center"
       w="full"
       minH="100vh"
@@ -32,7 +33,7 @@ function SearchPage() {
         <Image
           boxSize="7xs"
           objectFit="cover"
-          src="Logo.svg"
+          src="Dhammanava.svg"
           alt="Dhammanava"
         />
       </Show>

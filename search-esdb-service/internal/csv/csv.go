@@ -66,7 +66,6 @@ func generateDataFromCSV(filePath string, fileName string) ([]*dto.QARecord, err
 	}
 	// FOR BULKING
 	var qaRecords []*dto.QARecord
-	order := 1
 	// Read CSV records and insert them into Elasticsearch
 	for {
 		record, err := reader.Read()
@@ -97,7 +96,8 @@ func generateDataFromCSV(filePath string, fileName string) ([]*dto.QARecord, err
 
 		// Assuming your CSV columns are in the order: Question, Answe``r, StartTime, EndTime
 		qar := &dto.QARecord{
-			YoutubeURL: fileName,
+			Index:      record[4],
+			YoutubeURL: record[5],
 			Question:   record[0],
 			Answer:     record[1],
 			StartTime:  record[2],
@@ -105,7 +105,6 @@ func generateDataFromCSV(filePath string, fileName string) ([]*dto.QARecord, err
 		}
 
 		qaRecords = append(qaRecords, qar) // FOR BULKING
-		order += 1
 	}
 
 	return qaRecords, nil

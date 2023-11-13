@@ -5,9 +5,9 @@ services:
     image: dhammanava-search-image:latest
     container_name: search-container
     environment:
-      CONNECTION_ESDBURL: ${ESDB_URL}
-      ESDB_USERNAME: ${ESDB_USERNAME}
-      ESDB_PASSWORD: ${ESDB_PASSWORD}
+      CONNECTION_ESDBURL: ${ELASTIC_URL}
+      ESDB_USERNAME: ${ELASTIC_USERNAME}
+      ESDB_PASSWORD: ${ELASTIC_PASSWORD}
       CORS_TARGET: ${WEB_CORS_TARGET}
     working_dir: /app/search-esdb
     ports:
@@ -22,7 +22,8 @@ services:
     container_name: elastic-container
     environment:
       - discovery.type=single-node
-      - ELASTIC_PASSWORD=${ESDB_PASSWORD}
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
     ports:
       - 9200:9200
     networks:
@@ -32,12 +33,11 @@ services:
     image: dhammanava-frontend-image:latest
     container_name: frontend-container
     ports:
-      - 5173:5173
-    environment:
-      VITE_SEARCH_API_URL: ${VITE_SEARCH_API_URL}
+      - 5173:8080
     networks:
       - backbone
 
+  #! Kibana still not working : need to config elastic TSL/SSL cert
   kibana:
     image: docker.elastic.co/kibana/kibana:8.10.4
     ports:
@@ -53,7 +53,7 @@ services:
     image: dhammanava-nginx-image
     container_name: nginx-container
     ports:
-      - "80:80"
+      - 80:80
     networks:
       - backbone
     depends_on:
