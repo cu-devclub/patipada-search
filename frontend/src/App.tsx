@@ -1,15 +1,10 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import SearchPage from "./pages/SearchPage";
-import SearchResultPage from "./pages/searchResult";
+import Wrapper from "./pages/Wrapper";
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<SearchPage />} />
-        <Route path="/result">
-          <Route index element={<SearchPage />} />
-          <Route path=":query" element={<SearchResultPage />} />
-        </Route>
+        <Route path="/" element={<Wrapper />} />
       </Routes>
     </BrowserRouter>
   );

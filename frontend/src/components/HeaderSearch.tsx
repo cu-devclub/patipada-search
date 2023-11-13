@@ -28,7 +28,7 @@ function HeaderSearch({
     SetSearchParams(searchParam);
   }, [searchParam]);
   return (
-    <Flex direction="row" gap={8} alignItems="center" w="full">
+    <Flex px={8} pt={8} direction="row" gap={8} alignItems="center" w="full">
       <Image
         boxSize="7xs"
         src="/Dhammanava.svg"

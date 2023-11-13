@@ -16,8 +16,6 @@ import {
 import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import axios from "axios";
-
-
 interface SearchFieldProps {
   searchParam: string | null; // Define the searchParam prop
   setSearchParams: (searchParameter: string) => void;
@@ -40,7 +38,6 @@ async function filterResults(term) {
         question: item.question,
       }));
     }
-    console.log(data)
     return data
     
   } catch (error) {

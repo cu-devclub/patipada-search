@@ -8,6 +8,7 @@ function SearchResults({ data,query, tokens }: SearchResultsProps) {
       flex={1}
       w="full"
       justifyContent={{ base: "center", lg: "flex-start" }}
+      px={8}
     >
       <VStack spacing={8} w={{ base: "100%", md: "80%", xl: "70%" }}>
         {data.map((item) => (

@@ -5,7 +5,7 @@ function Header() {
       <Image
         boxSize="7xs"
         objectFit="cover"
-        src="Dhammanava.svg"
+        src="/Dhammanava.svg"
         alt="Dhammanava"
       />
     </Center>
