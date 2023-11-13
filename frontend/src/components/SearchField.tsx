@@ -51,8 +51,8 @@ async function filterResults(term) {
 
 async function fetchingData(query: string) {
   try {
-    // const path = "http://localhost:8081";
-    const path = import.meta.env.VITE_SEARCH_API_URL;
+    // const path = "http://localhost:8081"; //* For local development
+    const path = import.meta.env.VITE_SEARCH_API_URL; //* For production
     const response = await axios.get(path + `/search?query=${query}`);
     return response.data;
   } catch (error) {
@@ -80,14 +80,22 @@ function SearchField({
   };
 
   async function onSelectInputHandle (evt) {
-    const response = await fetchingData(evt.item.value);
+    let query = evt.item.value;
+    let response = await fetchingData(query);
+    if (!response.result && options) {
+      const q = options.find((o) => o.key === query);      
+      if (q) {
+        response = await fetchingData(q?.question);
+        query = q?.question
+      }
+    }
     sessionStorage.setItem("response", JSON.stringify(response.results));
 
-    const tokens = [evt.item.value, ...response.tokens];
+    const tokens = [query, ...response.tokens];
     sessionStorage.setItem("tokens", JSON.stringify(tokens));
 
-    setSearchParams(evt.item.value);
-    performSearch(evt.item.value);
+    setSearchParams(query);
+    performSearch(query);
   }
 
   return (
