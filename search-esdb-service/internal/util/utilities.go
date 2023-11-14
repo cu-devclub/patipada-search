@@ -32,3 +32,15 @@ func UnescapeDoubleQuotes(input string) string {
 	// Replace the special character (e.g., '@@') with double quotes (") for unescaping
 	return strings.ReplaceAll(input, `@@`, `"`)
 }
+
+func DistinctArray(arr []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range arr {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}

@@ -5,7 +5,7 @@ import useMaxChars from "../hook/useMaxChar.ts"; // Import the custom hook
 
 interface AnswerProps {
   text: string;
-  query: string;
+  query: string[];
 }
 
 function Answer({ text, query }: AnswerProps) {

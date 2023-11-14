@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	// "search-esdb-service/internal/csv"
+
 	"search-esdb-service/internal/csv"
 	"search-esdb-service/internal/es"
 	"search-esdb-service/internal/router"
@@ -14,6 +15,7 @@ import (
 func main() {
 	util.InitViper()
 	es.InitESDB()
+	//! Only first time to insert data
 	csv.ConvertCSVFilesInDirectory(viper.GetString("static.data"))
 	r := router.RouterEngine()
 

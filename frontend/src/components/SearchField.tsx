@@ -16,37 +16,42 @@ import {
 import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import axios from "axios";
-
-const questions = [];
-
 interface SearchFieldProps {
   searchParam: string | null; // Define the searchParam prop
   setSearchParams: (searchParameter: string) => void;
   performSearch: (searchParameter: string) => void;
 }
 
-async function filterResults(term) {
-  try {
-    const data = await fetchingData(term);
-    if (data == null) {
-      return [];
-    }
-    const questionsArray = data.map((item) => item.question);
+interface SearchOptions {
+  key : string;
+  question : string;
+}
 
-    return questionsArray;
+async function filterResults(term) {  
+  let data: SearchOptions[] = [];
+  try {
+    const response = await fetchingData(term);
+    // create variable where data type is SearchOptions
+    if (response.results != null) {
+      data = response.results.map((item) => ({
+        key: item.id,
+        question: item.question,
+      }));
+    }
+    return data
+    
   } catch (error) {
     console.error("Error:", error);
-    return [];
+    return data;
   }
 }
 
 async function fetchingData(query: string) {
   try {
-    const response = await axios.get(
-      import.meta.env.VITE_SEARCH_API_URL + `/search?query=${query}`
-    );
-    localStorage.setItem("response", JSON.stringify(response.data.results));
-    return response.data.results;
+    // const path = "http://localhost:8081"; //* For local development
+    const path = import.meta.env.VITE_SEARCH_API_URL; //* For production
+    const response = await axios.get(path + `/search?query=${query}`);
+    return response.data;
   } catch (error) {
     console.error("Error:", error);
     return [];
@@ -59,7 +64,7 @@ function SearchField({
   performSearch,
 }: SearchFieldProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [options, setOptions] = useState(questions);
+  const [options, setOptions] = useState<SearchOptions[]>();
 
   const onChangeInputHandler = (evt) => {
     setIsLoading(true);
@@ -68,12 +73,27 @@ function SearchField({
       setOptions(results);
       setIsLoading(false);
     });
+    
   };
 
-  const onSelectInputHandle = (evt) => {
-    setSearchParams(evt.item.value);
-    performSearch(evt.item.value);
-  };
+  async function onSelectInputHandle (evt) {
+    let query = evt.item.value;
+    let response = await fetchingData(query);
+    if (!response.result && options) {
+      const q = options.find((o) => o.key === query);      
+      if (q) {
+        response = await fetchingData(q?.question);
+        query = q?.question
+      }
+    }
+    sessionStorage.setItem("response", JSON.stringify(response.results));
+
+    const tokens = [query, ...response.tokens];
+    sessionStorage.setItem("tokens", JSON.stringify(tokens));
+
+    setSearchParams(query);
+    performSearch(query);
+  }
 
   return (
     <FormControl w={["90%", "70%", "50%"]}>
@@ -82,6 +102,7 @@ function SearchField({
         openOnFocus
         isLoading={isLoading}
         onSelectOption={onSelectInputHandle}
+        disableFilter
       >
         <InputGroup>
           <InputLeftElement pointerEvents="none" h={["50", "70", "90"]}>
@@ -147,27 +168,29 @@ function SearchField({
               </Flex>
             </AutoCompleteItem>
           )}
-          {options.map((question, cid) => (
-            <AutoCompleteItem
-              key={`option-${cid}`}
-              value={question}
-              textTransform="capitalize"
-              h={["50", "70", "90"]}
-              fontSize={["md", "lg", "xl"]}
-            >
-              <Flex alignItems="center">
-                <SearchIcon color="gray.500" boxSize={6} mr={4} />
-                <Tooltip
-                  hasArrow
-                  label={question}
-                  bg="gray.300"
-                  color="black"
-                  placement="right"
-                >
-                  <Text noOfLines={1}> {question}</Text>
-                </Tooltip>
-              </Flex>
-            </AutoCompleteItem>
+          {options && options.map((obj) => (
+            <>
+              <AutoCompleteItem
+                key={obj.key}
+                value={obj.key}
+                textTransform="capitalize"
+                h={["50", "70", "90"]}
+                fontSize={["md", "lg", "xl"]}
+              >
+                <Flex alignItems="center">
+                  <SearchIcon color="gray.500" boxSize={6} mr={4} />
+                  <Tooltip
+                    hasArrow
+                    label={obj.question}
+                    bg="gray.300"
+                    color="black"
+                    placement="right"
+                  >
+                    <Text noOfLines={1}> {obj.question}</Text>
+                  </Tooltip>
+                </Flex>
+              </AutoCompleteItem>
+            </>
           ))}
         </AutoCompleteList>
       </AutoComplete>

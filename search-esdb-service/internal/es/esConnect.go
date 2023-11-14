@@ -2,8 +2,8 @@ package es
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -52,14 +52,23 @@ func InitESDB() {
 	// Create an Elasticsearch client
 	client, err := elasticsearch.NewClient(cfg)
 	if err != nil {
-		log.Fatalf("Error creating Elasticsearch client: %s", err)
+		fmt.Printf("Error creating Elasticsearch client: %s", err)
+		return
 	}
 
 	// Check the Elasticsearch cluster health
 	checkClusterHealth(client)
 
-	if err = createIndex(client, "record"); err != nil {
-		log.Fatalf("Error creating index: %s", err)
+	//* Check plugins
+	if err = checkPlugins(client); err != nil {
+		fmt.Printf("Error checking Plugins: %s", err)
+		return
+	}
+
+	//* Creating Record Index
+	if err = createRecordIndex(client, "record"); err != nil {
+		fmt.Printf("Error creating index: %s", err)
+		return
 	}
 
 	es_Client = client
@@ -74,18 +83,55 @@ func checkClusterHealth(client *elasticsearch.Client) {
 	// Perform the request
 	res, err := req.Do(context.Background(), client)
 	if err != nil {
-		log.Fatalf("Error checking cluster health: %s", err)
+		fmt.Printf("Error checking cluster health: %s", err)
+		return
 	}
 	defer res.Body.Close()
 
 	// Check the response status
 	if res.IsError() {
-		log.Fatalf("Error: %s", res.Status())
+		fmt.Printf("Error: %s", res.Status())
+		return
 	}
 
 	// Print the cluster health information
-	fmt.Println("Cluster Health:")
+	fmt.Println("Elastic Cluster Health:")
 	fmt.Println("---------------")
 	fmt.Printf("Status: %s\n", res.Status())
 
+}
+
+func checkPlugins(client *elasticsearch.Client) error {
+	// Create a request to check the installed plugins
+	req := esapi.CatPluginsRequest{
+		Format: "json", // Use JSON format for the response
+	}
+
+	// Perform the request
+	res, err := req.Do(context.Background(), client)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	// Check the response status
+	if res.IsError() {
+		return fmt.Errorf("Elasticsearch error: %s", res.Status())
+	}
+
+	// Decode the JSON response
+	var plugins []map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&plugins); err != nil {
+		return err
+	}
+
+	if len(plugins) == 0 {
+		return fmt.Errorf("No plugins installed")
+	}
+	// Print the list of installed plugins
+	for _, plugin := range plugins {
+		fmt.Printf("Name: %s, Component: %s, Version: %s\n", plugin["name"], plugin["component"], plugin["version"])
+	}
+
+	return nil
 }

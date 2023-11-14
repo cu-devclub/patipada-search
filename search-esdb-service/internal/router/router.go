@@ -5,12 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	// "github.com/spf13/viper"
 )
 
 func RouterEngine() *gin.Engine {
 	r := gin.Default()
 	r.Use(CORS())
+	r.GET("/displayAllRecords", record.DisplayAllRecords)
 	r.GET("/search", record.Search)
 	return r
 }

@@ -15,7 +15,7 @@ import { timeToSeconds } from "../functions/timeToSecond.ts";
 import { RepeatIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 
-function QA_Vdo({ data, query }: QAProps) {
+function QA_Vdo({ data,query, tokens }: QAProps) {
   const [isQueryTheQuestion, SetisQueryTheQuestion] = useState(false);
   const startTime = timeToSeconds(data.startTime);
   const endTime = timeToSeconds(data.endTime);
@@ -61,7 +61,7 @@ function QA_Vdo({ data, query }: QAProps) {
 
           {isQueryTheQuestion == false ? (
             <Text as="b">
-              <Highlight query={query} styles={{ color: "red" }}>
+              <Highlight query={tokens} styles={{ color: "red" }}>
                 {data.question}
               </Highlight>
             </Text>
@@ -71,7 +71,7 @@ function QA_Vdo({ data, query }: QAProps) {
             </Text>
           )}
 
-          <Answer text={data.answer} query={query} />
+          <Answer text={data.answer} query={tokens} />
         </VStack>
       </Box>
       <Box w={{ base: "100%", lg: "35%" }}>
