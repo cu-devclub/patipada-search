@@ -1,8 +1,8 @@
 import SearchResults from "../components/SearchResults.tsx";
 import HeaderSearch from "../components/HeaderSearch.tsx";
-import { Flex } from "@chakra-ui/react";
-import { Divider } from "@chakra-ui/react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Flex, Divider } from "@chakra-ui/react";
+import Footer from "../components/Footer.tsx"
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Pagination from "@choc-ui/paginator";
 function SearchResultPage() {
@@ -13,7 +13,9 @@ function SearchResultPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // Set the number of items per page here
-  const { query } = useParams();
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("search");
+
   useEffect(() => {
     if (query) {
       SetQueryMessage(query);
@@ -30,13 +32,12 @@ function SearchResultPage() {
   }, [query]);
 
   const SetSearchParams = (searchParameter: string) => {
-    console.log(searchParameter)
     SetQueryMessage(searchParameter);
   };
 
   const performSearch = (searchParameter: string) => {
-    navigate(`/result/${searchParameter}`);
-    location.reload()
+    navigate(`?search=${searchParameter}`);
+    location.reload();
   };
   const changePage = (current: number | undefined) => {
     if (current) {
@@ -49,30 +50,36 @@ function SearchResultPage() {
   const endIndex = startIndex + itemsPerPage;
 
   // Get the data for the current page
-  let currentPageData = data
+  let currentPageData = data;
   if (data != null) {
-     currentPageData  = data.slice(startIndex, endIndex);
+    currentPageData = data.slice(startIndex, endIndex);
   }
 
   return (
     <Flex
       direction="column"
       gap={8}
+      justify="space-between"
       align="flex-start"
       w="full"
-      minH="100vh"
-      p={8}
+      minH="100svh"
     >
-      { query && <HeaderSearch
-        query={query}
-        searchParam={queryMessage}
-        setSearchParams={SetSearchParams}
-        performSearch={performSearch}
-      /> }
+      {query && (
+        <HeaderSearch
+          query={query}
+          searchParam={queryMessage}
+          setSearchParams={SetSearchParams}
+          performSearch={performSearch}
+        />
+      )}
       <Divider />
       {data != null && (
         <>
-          <SearchResults data={currentPageData} query={queryMessage} tokens={tokens} />
+          <SearchResults
+            data={currentPageData}
+            query={queryMessage}
+            tokens={tokens}
+          />
           <Flex w={{ base: "100%", md: "80%", xl: "70%" }} justify={"center"}>
             <Pagination
               current={currentPage}
@@ -93,6 +100,7 @@ function SearchResultPage() {
           </Flex>
         </>
       )}
+      <Footer />
     </Flex>
   );
 }
