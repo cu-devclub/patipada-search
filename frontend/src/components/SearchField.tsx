@@ -23,11 +23,11 @@ interface SearchFieldProps {
 }
 
 interface SearchOptions {
-  key : string;
-  question : string;
+  key: string;
+  question: string;
 }
 
-async function filterResults(term) {  
+async function filterResults(term) {
   let data: SearchOptions[] = [];
   try {
     const response = await fetchingData(term);
@@ -38,8 +38,7 @@ async function filterResults(term) {
         question: item.question,
       }));
     }
-    return data
-    
+    return data;
   } catch (error) {
     console.error("Error:", error);
     return data;
@@ -65,25 +64,39 @@ function SearchField({
 }: SearchFieldProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState<SearchOptions[]>();
+  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
+    null
+  );
 
   const onChangeInputHandler = (evt) => {
-    setIsLoading(true);
-    setSearchParams(evt.target.value);
-    filterResults(evt.target.value).then((results) => {
+    const inputValue = evt.target.value;
+    setSearchParams(inputValue);
+
+    // Clear the previous timer if it exists
+    if (debounceTimer !== null) {
+      clearTimeout(debounceTimer);
+    }
+
+    // Set a new timer to wait for a timeout before making the API call
+    const timerId = setTimeout(async () => {
+      setIsLoading(true);
+      const results = await filterResults(inputValue);
       setOptions(results);
       setIsLoading(false);
-    });
-    
+    }, 500); // Adjust the timeout duration as needed (e.g., 500 milliseconds)
+
+    // Save the timer ID for cleanup
+    setDebounceTimer(timerId);
   };
 
-  async function onSelectInputHandle (evt) {
+  async function onSelectInputHandle(evt) {
     let query = evt.item.value;
     let response = await fetchingData(query);
     if (!response.result && options) {
-      const q = options.find((o) => o.key === query);      
+      const q = options.find((o) => o.key === query);
       if (q) {
         response = await fetchingData(q?.question);
-        query = q?.question
+        query = q?.question;
       }
     }
     sessionStorage.setItem("response", JSON.stringify(response.results));
@@ -168,30 +181,31 @@ function SearchField({
               </Flex>
             </AutoCompleteItem>
           )}
-          {options && options.map((obj) => (
-            <>
-              <AutoCompleteItem
-                key={obj.key}
-                value={obj.key}
-                textTransform="capitalize"
-                h={["50", "70", "90"]}
-                fontSize={["md", "lg", "xl"]}
-              >
-                <Flex alignItems="center">
-                  <SearchIcon color="gray.500" boxSize={6} mr={4} />
-                  <Tooltip
-                    hasArrow
-                    label={obj.question}
-                    bg="gray.300"
-                    color="black"
-                    placement="right"
-                  >
-                    <Text noOfLines={1}> {obj.question}</Text>
-                  </Tooltip>
-                </Flex>
-              </AutoCompleteItem>
-            </>
-          ))}
+          {options &&
+            options.map((obj,idx) => (
+              <>
+                <AutoCompleteItem
+                  key={idx}
+                  value={obj.key}
+                  textTransform="capitalize"
+                  h={["50", "70", "90"]}
+                  fontSize={["md", "lg", "xl"]}
+                >
+                  <Flex alignItems="center">
+                    <SearchIcon color="gray.500" boxSize={6} mr={4} />
+                    <Tooltip
+                      hasArrow
+                      label={obj.question}
+                      bg="gray.300"
+                      color="black"
+                      placement="right"
+                    >
+                      <Text noOfLines={1}> {obj.question}</Text>
+                    </Tooltip>
+                  </Flex>
+                </AutoCompleteItem>
+              </>
+            ))}
         </AutoCompleteList>
       </AutoComplete>
     </FormControl>
