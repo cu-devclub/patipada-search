@@ -5,9 +5,9 @@ services:
     image: dhammanava-search-image:latest
     container_name: search-container
     environment:
-      CONNECTION_ESDBURL: ${ELASTIC_URL}
-      ESDB_USERNAME: ${ELASTIC_USERNAME}
-      ESDB_PASSWORD: ${ELASTIC_PASSWORD}
+      CONNECTION_ESDBURL: ${ESDB_URL}
+      ESDB_USERNAME: ${ESDB_USERNAME}
+      ESDB_PASSWORD: ${ESDB_PASSWORD}
       CORS_TARGET: ${WEB_CORS_TARGET}
     working_dir: /app/search-esdb
     ports:
@@ -22,8 +22,7 @@ services:
     container_name: elastic-container
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ELASTIC_PASSWORD=${ESDB_PASSWORD}
     ports:
       - 9200:9200
     networks:
@@ -33,33 +32,46 @@ services:
     image: dhammanava-frontend-image:latest
     container_name: frontend-container
     ports:
-      - 5173:8080
+      - 5173:5173
+    environment:
+      VITE_SEARCH_API_URL: ${VITE_SEARCH_API_URL}
     networks:
       - backbone
 
-  #! Kibana still not working : need to config elastic TSL/SSL cert
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.10.4
-    ports:
-      - 5601:5601
-    environment:
-      - ELASTICSEARCH_URL=http://elastic-db:9200
-    depends_on:
-      - elastic-db
-    networks:
-      - backbone
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.10.4
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     - ELASTICSEARCH_URL=http://elastic-db:9200
+  #   depends_on:
+  #     - elastic-db
+  #   networks:
+  #     - backbone
       
   nginx:
-    image: dhammanava-nginx-image
-    container_name: nginx-container
+    image: nginx:latest
+    container_name: nginx_container
+    restart: unless-stopped
     ports:
       - 80:80
+      - 443:443
     networks:
       - backbone
-    depends_on:
-      - elastic-db
-      - search-service
-      - frontend
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot/www/:/var/www/certbot
+      - ./certbot/conf/:/etc/letsencrypt
+
+  certbot:
+    image: certbot/certbot:latest
+    networks:
+      - backbone
+    volumes:
+      - ./certbot/www/:/var/www/certbot
+      - ./certbot/conf/:/etc/letsencrypt
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email naruemon.npr@gmail.com -d search.dhammanava.net --agree-tos
+
 networks:
   backbone:
     driver: bridge

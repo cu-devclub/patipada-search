@@ -34,16 +34,16 @@ services:
       - backbone
 
   #! Kibana still not working : need to config elastic TSL/SSL cert
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.10.4
-    ports:
-      - 5601:5601
-    environment:
-      - ELASTICSEARCH_URL=${ELASTIC_URL}
-    depends_on:
-      - elastic-db
-    networks:
-      - backbone
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.10.4
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     - ELASTICSEARCH_URL=http://elastic-db:9200
+  #   depends_on:
+  #     - elastic-db
+  #   networks:
+  #     - backbone
 
   frontend:
     image: dhammanava-frontend-image
@@ -55,22 +55,6 @@ services:
     networks:
       - backbone
 
-  nginx:
-    image: dhammanava-nginx-image
-    container_name: nginx-container
-    build:
-      context: ./nginx
-    ports:
-      - 80:80
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - elastic-db
-      - search-service
-      - frontend
-    networks:
-      - backbone
-    
   auth-db:
     image: postgres:latest
     container_name: auth-postgres-container
