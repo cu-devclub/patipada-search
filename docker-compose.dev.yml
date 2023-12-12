@@ -54,7 +54,22 @@ services:
       - 5173:8080
     networks:
       - backbone
-      
+
+  auth-db:
+    image: postgres:latest
+    container_name: auth-postgres-container
+    environment:
+      POSTGRES_DB: ${AUTH_DB}
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./auth-db:/docker-entrypoint-initdb.d
+      - ./volumes/database/auth:/var/lib/postgresql/data
+    networks:
+      - backbone
+
 networks:
   backbone:
     driver: bridge

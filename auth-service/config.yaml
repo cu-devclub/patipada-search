@@ -1,0 +1,23 @@
+app:
+  server:
+    port: 8080
+  jwt:
+    key: local-jwt-key
+  super-admin: 
+    username: super-admin
+    password: super-admin
+    email: 9pZoZ@example.com
+    role: super-admin
+  rolesMap:
+    super-admin: 100
+    admin: 50
+    user: 10
+  
+database:
+  host: localhost
+  port: 5432
+  user: authen_user
+  password: authen_password
+  dbname: Authen
+  sslmode: disable
+  timezone: Asia/Bangkok
