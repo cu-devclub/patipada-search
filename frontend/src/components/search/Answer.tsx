@@ -1,14 +1,24 @@
 import { useState, useEffect, useRef } from "react";
 import { Box, IconButton, Highlight } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
-import useMaxChars from "../hook/useMaxChar.ts"; // Import the custom hook
+import {useMaxChars} from "../../hook"; 
+
+
+
+/**
+ * Renders the Answer component, which displays a text with optional highlighting and a "Read More" or "Read Less" button.
+ *
+ * @param {AnswerProps} props - The properties for the Answer component.
+ *   @param {string} props.text - The text to be displayed.
+ *   @param {string[]} props.tokens - The tokens to be highlighted.
+ * @return {JSX.Element} The rendered Answer component.
+ */
 
 interface AnswerProps {
   text: string;
-  query: string[];
+  tokens: string[];
 }
-
-function Answer({ text, query }: AnswerProps) {
+function Answer({ text, tokens }: AnswerProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [truncatedText, setTruncatedText] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,7 +44,7 @@ function Answer({ text, query }: AnswerProps) {
         <>
           {isExpanded ? (
             <>
-              <Highlight query={query} styles={{ color: "red" }}>
+              <Highlight query={tokens} styles={{ color: "red" }}>
                 {text}
               </Highlight>
               <IconButton
@@ -46,7 +56,7 @@ function Answer({ text, query }: AnswerProps) {
             </>
           ) : (
             <>
-              <Highlight query={query} styles={{ color: "red" }}>
+              <Highlight query={tokens} styles={{ color: "red" }}>
                 {truncatedText}
               </Highlight>
               <IconButton
@@ -59,7 +69,7 @@ function Answer({ text, query }: AnswerProps) {
           )}
         </>
       ) : (
-        <Highlight query={query} styles={{ color: "red" }}>
+        <Highlight query={tokens} styles={{ color: "red" }}>
           {text}
         </Highlight>
       )}

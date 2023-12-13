@@ -15,23 +15,26 @@ import {
 } from "@choc-ui/chakra-autocomplete";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
-import axios from "axios";
-interface SearchFieldProps {
-  searchParam: string | null; // Define the searchParam prop
-  setSearchParams: (searchParameter: string) => void;
-  performSearch: (searchParameter: string) => void;
-}
+import { search } from "../../service/search";
+import { SearchResultInterface } from "../../models/qa";
+
 
 interface SearchOptions {
   key: string;
   question: string;
 }
 
+/**
+ * Filters the results based on the given term.
+ *
+ * @param {any} term - The term to filter the results.
+ * @return {Promise<SearchOptions[]>} The filtered results.
+ */
 async function filterResults(term) {
   let data: SearchOptions[] = [];
   try {
-    const response = await fetchingData(term);
-    // create variable where data type is SearchOptions
+    const response = await search(term);
+
     if (response.results != null) {
       data = response.results.map((item) => ({
         key: item.id,
@@ -45,18 +48,23 @@ async function filterResults(term) {
   }
 }
 
-async function fetchingData(query: string) {
-  try {
-    // const path = "http://localhost:8081"; //* For local development
-    const path = import.meta.env.VITE_SEARCH_API_URL; //* For production
-    const response = await axios.get(path + `/search?query=${query}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error:", error);
-    return [];
-  }
-}
 
+/**
+ * Render a search field component. also controlling the search options
+ *
+ * @param {SearchFieldProps} {
+ *   searchParam, // The current search parameter
+ *   setSearchParams, // A function to set the search parameter
+ *   performSearch, // A function to perform the search
+ * } - The props for the SearchField component
+ * @return {JSX.Element} - The rendered search field component
+ */
+
+interface SearchFieldProps {
+  searchParam: string | null; // Define the searchParam prop
+  setSearchParams: (searchParameter: string) => void;
+  performSearch: (searchParameter: string) => void;
+}
 function SearchField({
   searchParam,
   setSearchParams,
@@ -68,6 +76,13 @@ function SearchField({
     null
   );
 
+  /**
+   * Handles the change event of the input.
+   * Add debounce timer to prevent multiple API calls
+   * 
+   * @param {Event} evt - The event object.
+   * @return {void} This function does not return anything.
+   */
   const onChangeInputHandler = (evt) => {
     const inputValue = evt.target.value;
     setSearchParams(inputValue);
@@ -83,28 +98,42 @@ function SearchField({
       const results = await filterResults(inputValue);
       setOptions(results);
       setIsLoading(false);
-    }, 500); // Adjust the timeout duration as needed (e.g., 500 milliseconds)
+    }, 500); 
 
     // Save the timer ID for cleanup
     setDebounceTimer(timerId);
   };
 
+  /**
+   * Handles the selection of an input.
+   *
+   * @param {Event} evt - The event object representing the input selection.
+   * @return {Promise<void>} A promise that resolves when the function completes.
+   */
   async function onSelectInputHandle(evt) {
     let query = evt.item.value;
-    let response = await fetchingData(query);
+    let response = await search(query);
     if (!response.result && options) {
       const q = options.find((o) => o.key === query);
       if (q) {
-        response = await fetchingData(q?.question);
+        response = await search(q?.question);
         query = q?.question;
       }
     }
-    sessionStorage.setItem("response", JSON.stringify(response.results));
+    // sessionStorage.setItem("response", JSON.stringify(response.results));
 
     const tokens = [query, ...response.tokens];
-    sessionStorage.setItem("tokens", JSON.stringify(tokens));
+    
+    const searchResults: SearchResultInterface = {
+      data: response.results,
+      query: query,
+      tokens: tokens,
+    };
 
-    setSearchParams(query);
+    sessionStorage.setItem("response", JSON.stringify(searchResults));
+
+    // sessionStorage.setItem("tokens", JSON.stringify(tokens));
+
     performSearch(query);
   }
 
@@ -182,7 +211,7 @@ function SearchField({
             </AutoCompleteItem>
           )}
           {options &&
-            options.map((obj,idx) => (
+            options.map((obj, idx) => (
               <>
                 <AutoCompleteItem
                   key={idx}

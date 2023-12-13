@@ -1,5 +1,4 @@
-//TODO : refactor to type folders
-export type ToastStatusType = "success" | "error" | "warning" | "info";
+import { ToastStatusType } from "../models/toast";
 
 export const ToastStatus = {
     SUCCESS: "success" as ToastStatusType,

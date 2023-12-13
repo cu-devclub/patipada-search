@@ -1,4 +1,4 @@
-import { QAProps } from "../data/dataInterface.ts";
+import { DataItem } from "../../models/qa";
 import {
   Box,
   VStack,
@@ -11,26 +11,49 @@ import {
   Tooltip,
 } from "@chakra-ui/react";
 import Answer from "./Answer.tsx";
-import { timeToSeconds } from "../functions/timeToSecond.ts";
+import { timeToSeconds } from "../../functions";
 import { RepeatIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 
-function QA_Vdo({ data,query, tokens }: QAProps) {
+interface QAProps {
+    data: DataItem;
+    query: string;
+    tokens: string[];
+}
+/**
+ * Renders a QA video component with the given data, query, and tokens.
+ *
+ * @param {QAProps} data - The data object containing the video information.
+ * @param {string} query - The query string used for highlighting the question.
+ * @param {string[]} tokens - The tokens used for highlighting the question.
+ * @return {JSX.Element} The rendered QA video component.
+ */
+function QA_Vdo({ data, query, tokens }: QAProps) {
   const [isQueryTheQuestion, SetisQueryTheQuestion] = useState(false);
   const startTime = timeToSeconds(data.startTime);
   const endTime = timeToSeconds(data.endTime);
   const youtubeURL = `https://www.youtube.com/embed/${data.youtubeURL}?start=${startTime}&end=${endTime}`;
+  
   useEffect(() => {
     if (query == data.question) {
+      // For Highlighting the question 
       SetisQueryTheQuestion(true);
     }
-  },[query,data.question])
+  }, [query, data.question]);
+  
+  /**
+   * Replays the video by updating the source of the iframe element.
+   *
+   * @param {string} data.question - The id of the iframe element.
+   * @return {void} This function does not return anything.
+   */
   const replay = () => {
     const iframe = document.getElementById(data.question) as HTMLImageElement;
     if (iframe) {
       iframe.src = youtubeURL;
     }
   };
+
   return (
     <Flex
       h="auto"
@@ -71,7 +94,7 @@ function QA_Vdo({ data,query, tokens }: QAProps) {
             </Text>
           )}
 
-          <Answer text={data.answer} query={tokens} />
+          <Answer text={data.answer} tokens={tokens} />
         </VStack>
       </Box>
       <Box w={{ base: "100%", lg: "35%" }}>

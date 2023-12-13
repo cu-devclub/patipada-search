@@ -1,36 +1,43 @@
-import SearchResults from "../components/SearchResults.tsx";
-import HeaderSearch from "../components/HeaderSearch.tsx";
+import { SearchResults, HeaderSearch } from "../../components/search";
 import { Flex, Divider } from "@chakra-ui/react";
-import Footer from "../components/Footer.tsx"
+import { Footer } from "../../components";
+import { SearchResultInterface, DataItem } from "../../models/qa";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Pagination from "@choc-ui/paginator";
+
+/**
+ * Render the search result page.
+ *
+ * @return {JSX.Element} The JSX element representing the search result page.
+ */
 function SearchResultPage() {
   const navigate = useNavigate();
   const [queryMessage, SetQueryMessage] = useState("");
-  const [data, SetData] = useState([]);
-  const [tokens, SetTokens] = useState([]);
+  const [data, SetData] = useState<DataItem[]>([]);
+  const [tokens, SetTokens] = useState<string[]>([]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8; // Set the number of items per page here
   const [searchParams] = useSearchParams();
   const query = searchParams.get("search");
 
+  // When query change; get the result from session storage 
   useEffect(() => {
     if (query) {
       SetQueryMessage(query);
       setCurrentPage(1);
       const responseData = sessionStorage.getItem("response");
       if (responseData != null) {
-        SetData(JSON.parse(responseData));
-      }
-      const tokensData = sessionStorage.getItem("tokens");
-      if (tokensData != null) {
-        SetTokens(JSON.parse(tokensData));
+        const { data, tokens }: Pick<SearchResultInterface, "data" | "tokens"> =
+          JSON.parse(responseData);
+        SetData(data);
+        SetTokens(tokens);
       }
     }
   }, [query]);
 
+  // ------ Header Search in result page ---------
   const SetSearchParams = (searchParameter: string) => {
     SetQueryMessage(searchParameter);
   };
@@ -39,6 +46,9 @@ function SearchResultPage() {
     navigate(`?search=${searchParameter}`);
     location.reload();
   };
+  // --------------------------------------------
+
+  // ------- Pagination  ----------------------
   const changePage = (current: number | undefined) => {
     if (current) {
       setCurrentPage(current);
@@ -54,6 +64,7 @@ function SearchResultPage() {
   if (data != null) {
     currentPageData = data.slice(startIndex, endIndex);
   }
+  // --------------------------------------------
 
   return (
     <Flex

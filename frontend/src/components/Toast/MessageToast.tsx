@@ -1,13 +1,18 @@
-import { ToastStatusType } from "../../constant";
+import { ToastStatusType } from "../../models/toast";
+import { useToast } from "@chakra-ui/react";
 
+/**
+ * Creates a message toast and returns a function to add new toasts.
+ *
+ * @param {MessageToastProps} newRes - The properties of the new toast.
+ * @return {void}
+ */
 interface MessageToastProps {
   description: string;
   status: ToastStatusType;
 }
 
-import { useToast } from "@chakra-ui/react";
-
-function MessageToast() {
+const MessageToast = () =>  {
   const toast = useToast();
   // types are: "success", "info", "warning", "error"
 
