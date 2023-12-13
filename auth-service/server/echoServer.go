@@ -32,6 +32,10 @@ func (s *echoServer) Start() {
 	s.initializeUsersHttpHandler()
 
 	s.app.Use(middleware.Logger())
+	s.app.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{s.cfg.App.FrontendURL},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+	}))
 
 	serverUrl := fmt.Sprintf(":%d", s.cfg.App.Port)
 	s.app.Logger.Fatal(s.app.Start(serverUrl))
@@ -52,11 +56,18 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	usersHttpHandler := usersHandlers.NewUsersHttpHandler(usersUsecase)
 
 	// Routers
+
+	// Login Request
 	// JSON Params - username (string) and password (string)
+	//
+	//Response
+	// 400 - If the request body is not valid
+	// 401 - If username or password is incorrect
+	// Otherwise, it returns a 200 OK status code and the token.
 	s.app.POST("/login", usersHttpHandler.Login)
 
-	// JSON Params - token to verify inside "Authorization" header 
-	// TODO : Improve in future => list of action with roles 
+	// JSON Params - token to verify inside "Authorization" header
+	// TODO : Improve in future => list of action with roles
 	s.app.POST("/authorize", jwt.Authorize)
 
 	usersRouters := s.app.Group("users")
