@@ -15,21 +15,17 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../../service/admin";
 interface FormProps {
-  title: string;
-  isShowForgetPassword: boolean;
+  submit: (username:string,password:string) => void;
 }
 
-export default function AuthenForm({ title, isShowForgetPassword }: FormProps) {
+export default function AuthenForm({ submit}: FormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
   const navigate = useNavigate();
-  const switchNavigate = isShowForgetPassword
-    ? "/admin-reset-password"
-    : "/admin";
+
   const OnChangeUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
   };
@@ -39,25 +35,14 @@ export default function AuthenForm({ title, isShowForgetPassword }: FormProps) {
   };
 
   const submitForm = () => {
-    if (isShowForgetPassword) {
-      //TODO : make login request
-      login(username, password)
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    } else {
-      //TODO : make forget password request
-    }
+    submit(username,password);
   };
 
   return (
     <Box w="50%">
       <Stack spacing={8} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
-          <Heading fontSize={"4xl"}>{title}</Heading>
+          <Heading fontSize={"4xl"}>Login</Heading>
         </Stack>
         <Box
           rounded={"lg"}
@@ -90,9 +75,9 @@ export default function AuthenForm({ title, isShowForgetPassword }: FormProps) {
                 <Button
                   colorScheme="blue"
                   variant="link"
-                  onClick={() => navigate(switchNavigate)}
+                  onClick={() => navigate("/admin-reset-password")}
                 >
-                  {isShowForgetPassword ? "Forget Password?" : "Back to Login"}
+                  Forget Password?
                 </Button>
               </Flex>
               <Center>
@@ -105,7 +90,7 @@ export default function AuthenForm({ title, isShowForgetPassword }: FormProps) {
                   onClick={submitForm}
                   w="50%"
                 >
-                  Submit
+                  Login
                 </Button>
               </Center>
             </Stack>

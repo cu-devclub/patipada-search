@@ -1,3 +1,5 @@
 import AdminLoginPage from "./AdminLoginPage";
 import AdminResetPasswordPage from "./AdminResetPasswordPage";
-export {AdminLoginPage,AdminResetPasswordPage};
+import DataManagementPage from "./DataManagementPage";
+import AdminMiddleware from "./AdminMiddleware";
+export {AdminLoginPage,AdminResetPasswordPage,DataManagementPage,AdminMiddleware};

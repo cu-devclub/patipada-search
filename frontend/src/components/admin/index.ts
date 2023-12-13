@@ -1,3 +1,3 @@
 import AuthenForm from "./AuthenForm";
-
-export {AuthenForm}
+import ForgetPasswordForm from "./ForgetPasswordForm";
+export {AuthenForm,ForgetPasswordForm}

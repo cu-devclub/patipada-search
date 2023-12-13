@@ -7,10 +7,9 @@ function Wrapper() {
   const hasParam = searchParams.get("search");
 
   if (hasParam) {
-    // only A and not B
     return <SearchResultPage />;
   } 
-  return <SearchPage/>; // render nothing
+  return <SearchPage/>; 
 }
 
 export default Wrapper
