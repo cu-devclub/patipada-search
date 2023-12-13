@@ -13,10 +13,11 @@ type (
 	}
 
 	App struct {
-		Port       int
-		JWTKey     string
-		SuperAdmin SuperAdmin
-		RolesMap   map[string]int
+		Port        int
+		FrontendURL string
+		JWTKey      string
+		SuperAdmin  SuperAdmin
+		RolesMap    map[string]int
 	}
 
 	SuperAdmin struct {
@@ -46,7 +47,7 @@ func GetConfig() Config {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %v", err))
 	}
-	
+
 	// Load roles map from config
 	rolesMap := make(map[string]int)
 	if err := viper.UnmarshalKey("app.rolesMap", &rolesMap); err != nil {
@@ -55,8 +56,9 @@ func GetConfig() Config {
 
 	return Config{
 		App: App{
-			Port:   viper.GetInt("app.server.port"),
-			JWTKey: viper.GetString("app.jwt.key"),
+			Port:        viper.GetInt("app.server.port"),
+			FrontendURL: viper.GetString("app.frontend.url"),
+			JWTKey:      viper.GetString("app.jwt.key"),
 			SuperAdmin: SuperAdmin{
 				Username: viper.GetString("app.super-admin.username"),
 				Password: viper.GetString("app.super-admin.password"),
@@ -76,4 +78,3 @@ func GetConfig() Config {
 		},
 	}
 }
-
