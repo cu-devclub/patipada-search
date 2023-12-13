@@ -9,6 +9,15 @@ interface SearchFieldProps {
   performSearch: (searchParameter: string) => void;
 }
 
+/**
+ * Renders a search field in the header with the given props.
+ *
+ * @param {string} query - The current search query.
+ * @param {string} searchParam - The current search parameter.
+ * @param {Function} setSearchParams - A function to update the search parameters.
+ * @param {Function} performSearch - A function to perform the search.
+ * @return {JSX.Element} The rendered search field component.
+ */
 function HeaderSearch({
   query,
   searchParam,
@@ -27,6 +36,7 @@ function HeaderSearch({
   useEffect(() => {
     SetSearchParams(searchParam);
   }, [searchParam]);
+  
   return (
     <Flex px={8} pt={8} direction="row" gap={8} alignItems="center" w="full">
       <Image

@@ -1,5 +1,13 @@
 import axios from "axios";
-import { CustomError } from "../error";
+import { CreateCustomError } from "../error";
+
+/**
+ * Authenticates a user by sending a login request to the server.
+ *
+ * @param {string} username - The username of the user.
+ * @param {string} password - The password of the user.
+ * @return {Promise<any>} - A promise that resolves with the response data from the server.
+ */
 export const login = async (username: string, password: string) => {
     try {
         //TODO : Test the environment mode 
@@ -10,17 +18,7 @@ export const login = async (username: string, password: string) => {
         });
         return response.data;
    } catch (error: unknown) {
-        if (axios.isAxiosError(error)) {
-            const customError: CustomError = {
-                    message: `Axios error: ${error.message?.toString()}`,
-                    status: error.response?.status,
-            };
-            throw customError;
-        } else {
-            const customError: CustomError = {
-                message: `Unknown error: ${error}`,
-            };
-            throw customError;
-        }
+        const returnError = CreateCustomError(error);
+        throw returnError;
     }
 }
