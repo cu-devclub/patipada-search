@@ -1,0 +1,13 @@
+app: 
+  server:
+    port: 8081
+  frontend:
+    url: http://localhost:5173
+
+esdb:
+  url: http://localhost:9200
+  username: elastic
+  password: admin 
+
+static: 
+  data: "./data"

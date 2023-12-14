@@ -2,22 +2,16 @@ package main
 
 import (
 	"fmt"
-	// "search-esdb-service/internal/csv"
-
-	"search-esdb-service/internal/csv"
-	"search-esdb-service/internal/es"
-	"search-esdb-service/internal/router"
-	"search-esdb-service/internal/util"
-
-	"github.com/spf13/viper"
+	"search-esdb-service/config"
+	"search-esdb-service/database"
+	recordMigrator "search-esdb-service/record/migration"
+	"search-esdb-service/server"
 )
 
 func main() {
-	util.InitViper()
-	es.InitESDB()
-	//! Only first time to insert data
-	csv.ConvertCSVFilesInDirectory(viper.GetString("static.data"))
-	r := router.RouterEngine()
-
-	r.Run(fmt.Sprintf(":%d", viper.GetInt("connection.appPort")))
+	cfg := config.GetConfig()
+	fmt.Println("CONFIG--------",cfg)
+	db := database.NewElasticDatabase(&cfg)
+	recordMigrator.RecordMigrate(&cfg, db)
+	server.NewGinServer(&cfg, db.GetDB()).Start()
 }
