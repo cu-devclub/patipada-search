@@ -19,7 +19,7 @@ function SearchResults({ data, query, tokens }: SearchResultInterface) {
     <Flex
       flex={1}
       w="full"
-      justifyContent={{ base: "center", lg: "flex-start" }}
+      justifyContent={{ base: "center", md: "flex-start" }}
       px={8}
     >
       <VStack spacing={8} w={{ base: "100%", md: "80%", xl: "70%" }}>

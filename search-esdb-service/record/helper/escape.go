@@ -1,21 +1,15 @@
-package util
+package helper
 
-import (
-	"strings"
+import "strings"
 
-	"github.com/google/uuid"
-)
 
-func GenerateUUID() string {
-	// Generate a new UUID
-	id := uuid.New()
-
-	// Convert the UUID to a string
-	idString := id.String()
-
-	return idString
-}
-
+// EscapeText replaces new line and tab characters with white space in the input string.
+//
+// Parameters:
+// - input: the string to be escaped.
+//
+// Returns:
+// - The escaped string.
 func EscapeText(input string) string {
     //Replace new line charcter with white space
     s := strings.ReplaceAll(input, "\n", " ")
@@ -28,19 +22,16 @@ func EscapeText(input string) string {
 	return s
 }
 
+
+// UnescapeDoubleQuotes replaces the special character (e.g., '@@') with double quotes (") for unescaping.
+//
+// It takes a single parameter:
+// - input: a string that contains the special character to be replaced.
+//
+// It returns a string that has the special character replaced with double quotes.
 func UnescapeDoubleQuotes(input string) string {
 	// Replace the special character (e.g., '@@') with double quotes (") for unescaping
 	return strings.ReplaceAll(input, `@@`, `"`)
 }
 
-func DistinctArray(arr []string) []string {
-	keys := make(map[string]bool)
-	list := []string{}
-	for _, entry := range arr {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			list = append(list, entry)
-		}
-	}
-	return list
-}
+

@@ -69,7 +69,7 @@ function SearchResultPage() {
   return (
     <Flex
       direction="column"
-      gap={8}
+      gap={4}
       justify="space-between"
       align="flex-start"
       w="full"

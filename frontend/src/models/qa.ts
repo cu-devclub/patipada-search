@@ -1,5 +1,5 @@
 export interface DataItem {
-    id: number;
+    index: string;
     question: string;
     answer: string;
     startTime: string;

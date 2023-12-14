@@ -38,9 +38,9 @@ function HeaderSearch({
   }, [searchParam]);
   
   return (
-    <Flex px={8} pt={8} direction="row" gap={8} alignItems="center" w="full">
+    <Flex px={4} pt={4} direction="row" gap={4} alignItems="center" w="full">
       <Image
-        boxSize="7xs"
+        boxSize={{base:"8xs",md:"7xs"}}
         src="/Dhammanava.svg"
         alt="Dhammanava"
         borderRadius="full"
