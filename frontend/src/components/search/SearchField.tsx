@@ -18,7 +18,6 @@ import { useState } from "react";
 import { search } from "../../service/search";
 import { SearchResultInterface } from "../../models/qa";
 
-
 interface SearchOptions {
   key: string;
   question: string;
@@ -34,10 +33,10 @@ async function filterResults(term) {
   let data: SearchOptions[] = [];
   try {
     const response = await search(term);
-
-    if (response.results != null) {
-      data = response.results.map((item) => ({
-        key: item.id,
+    console.log(response)
+    if (response) {
+      data = response.data.map((item) => ({
+        key: item.index,
         question: item.question,
       }));
     }
@@ -112,27 +111,27 @@ function SearchField({
    */
   async function onSelectInputHandle(evt) {
     let query = evt.item.value;
-    let response = await search(query);
-    if (!response.result && options) {
-      const q = options.find((o) => o.key === query);
-      if (q) {
-        response = await search(q?.question);
-        query = q?.question;
-      }
-    }
-    // sessionStorage.setItem("response", JSON.stringify(response.results));
 
-    const tokens = [query, ...response.tokens];
+    // Check if the query is an option key (user selected from options)
+    // Have to do this because bug of choc-ui package 
+    // Where if the options have the same value it mark as the same key
+    // and then when user selected, evt.item.value is the index(unable to read)
+    // and then when search it will return empty
+    const q = options?.find((o) => o.key === query);
+    if (q) {
+      query = q.question;
+    }
+    const response = await search(query);
     
+    const tokens = [query, ...response.tokens];
+
     const searchResults: SearchResultInterface = {
-      data: response.results,
+      data: response.data,
       query: query,
       tokens: tokens,
     };
 
     sessionStorage.setItem("response", JSON.stringify(searchResults));
-
-    // sessionStorage.setItem("tokens", JSON.stringify(tokens));
 
     performSearch(query);
   }
