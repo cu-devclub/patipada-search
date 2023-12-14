@@ -25,6 +25,7 @@ Check out `.github/workflows` for more information.
 1. Frontend using VITE, React, and Typescript to develop the frontend
 2. Other services using Golang for development
 3. For searching, Elastic DB is used.
-4. storing authentication data and data management using Maria DB
-5. CQRS models for managing data (we will implement Rabbit MQ)
-6. Dockerized every service
+4. storing authentication data using PostgreSQL
+5. Store data management using Maria DB
+6. CQRS models for managing data (we will implement Rabbit MQ)
+7. Dockerized every service
