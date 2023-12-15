@@ -1,0 +1,53 @@
+name : Setup .env and docker-compose file
+on:
+    push:
+        branches:
+            - main
+jobs:
+    setup-ssh:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+            - name: Set up SSH
+              run: |
+                mkdir -p ~/.ssh
+                echo "${{ secrets.LINUX_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+                chmod 600 ~/.ssh/id_rsa
+    
+    create-env-file: 
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+            - name: Copy .env.template to server 
+              run: |
+                scp .env.template root@103.114.200.35:~/dhammanava-search
+            - name: Create .env file from .env.template   
+              uses: appleboy/ssh-action@master
+              with:
+                host: ${{secrets.LINUX_HOST}}
+                username: ${{secrets.LINUX_USERNAME}}
+                key: ${{ secrets.LINUX_PRIVATE_KEY }}
+                script: |
+                  cd dhammanava-search
+                  cp .env.template .env
+                  echo "${{ secrets.ELASTIC_PASSWORD }}" >> .env
+                  echo "${{ secrets.ELASTIC_URL }}" >> .env
+                  echo "${{ secrets.ELASTIC_USERNAME }}" >> .env
+                  echo "${{ secrets.WEB_CORS_TARGET }}" >> .env
+
+    copy-compose-file:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Copy File to Server
+              run: |
+                scp ./docker-compose.prod.yml root@103.114.200.35:~/dhammanava-search
+
+            - name: Display Success Message
+              run: echo "File copied successfully to the server"
+
+#TODO: Need to confirm path and make this job run first 
