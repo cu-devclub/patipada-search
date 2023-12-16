@@ -1,31 +1,53 @@
-# patipada-search
+# Patipada Search System
 
-This project is part of the Waris Lakthong senior project, developing a hybrid search system for dhammanva question-answer videos. The system uses a microservice Docker architecture.
+This project is a part of the Waris Lakthong senior project, focusing on the development of a hybrid search system for Dhammanva question-answer videos. The system is designed using a microservices architecture, with each backend service adhering to clean architecture principles.
 
-1. Frontend service
-2. A search service
-3. Authentication service (in the development process)
-4. Data management service (in the development process)
+## Services Overview
 
-## Data
-All data is extracted from the Dhammanva live question-answer video transcript, which has
-start time of the section
-end time of the section
-- question
-- answer
-YouTube URL
+1. **Frontend Service**
+2. **Search Service**
+3. **Authentication Service (Under Development)**
+4. **Data Management Service (Under Development)**
 
-The data is inside `search-esdb-service/data`
+## Data Source
 
-## Deploy this project
-This project uses github actions, github secrets, and Docker Hub to deploy.
-Check out `.github/workflows` for more information.
+All data is extracted from Dhammanva live question-answer video transcripts, which include:
+- Start time of the section
+- End time of the section
+- Question
+- Answer
+- YouTube URL
 
-## Development
-1. Frontend using VITE, React, and Typescript to develop the frontend
-2. Other services using Golang for development
-3. For searching, Elastic DB is used.
-4. storing authentication data using PostgreSQL
-5. Store data management using Maria DB
-6. CQRS models for managing data (we will implement Rabbit MQ)
-7. Dockerized every service
+The data is stored in the `search-esdb-service/data` directory.
+
+## Deployment
+
+This project leverages GitHub Actions, GitHub Secrets, and Docker Hub for deployment. Please refer to the `.github/workflows` directory for detailed deployment information.
+
+## Development Stack
+
+1. **Frontend**: Vite, React, and TypeScript
+2. **Backend Services**: Golang
+3. **Search Mechanism**: Elastic DB
+4. **Authentication Storage**: PostgreSQL
+5. **Data Management Storage**: Maria DB
+6. **CQRS Models**: Rabbit MQ (Implementation in progress)
+7. **Containerization**: Docker for every service
+
+## Project Structure
+
+Currently, the project has the following structure:
+
+```plaintext
+|- .github/workflows          => CI/CD with GitHub Actions
+|- auth-db                    => Initial Docker script for PostgreSQL authentication database
+|- auth-service               => Golang + GORM + ECHO + Clean architecture for authentication & authorization service
+|- search-esdb-service        => Golang + Elastic API + GIN + Clean architecture for search 
+|- elastic                    => Initial Docker script for Elastic DB (install dependency)
+|- frontend                   => Vite + TypeScript + React for rendering UI
+|- nginx                      => Nginx example config file used in the server (HTTPS handling and reverse proxy)
+|- docker-compose.dev.yml      => Docker Compose file used in development (local)
+|- docker-compose.prod.yml     => Docker Compose file used in production; will be moved to the server by `.github/workflows/set-up.yml`
+|- .gitignore                 => Ignore some unnecessary files
+|- .env.template              => Template for the .env file; will be generated as `.env` and moved to the server by `.github/workflows/set-up.yml`
+|- .secrets.template          => Template for secrets used in `.github/workflows` when testing locally with `act`. In production, GitHub Secrets are used instead.
