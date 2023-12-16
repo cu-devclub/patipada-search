@@ -21,7 +21,7 @@ FROM scratch
 WORKDIR /app/search-esdb
 
 COPY --from=builder /tmp/search-esdb/main .
-COPY --from=builder /tmp/search-esdb/configs ./configs
+COPY --from=builder /tmp/search-esdb/config.yaml .
 COPY --from=builder /tmp/search-esdb/data ./data
 
 CMD ["./main"]

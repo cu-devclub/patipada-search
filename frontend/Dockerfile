@@ -1,10 +1,13 @@
 # Stage 1: Build stage
-FROM node:16.13.2-alpine3.14 as build
+FROM node:alpine as build
 WORKDIR /app
 COPY package.json ./
 COPY yarn.lock ./
 RUN yarn install --frozen-lockfile
 COPY . .
+# Set the NODE_ENV environment variable to 'production'
+ENV NODE_ENV=production
+
 RUN yarn build
 
 # Step 2: Set up the production environment

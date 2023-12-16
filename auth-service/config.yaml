@@ -1,0 +1,31 @@
+app:
+  # Default 
+  server:
+    port: 8082
+  # --------
+  frontend:
+    url: http://localhost:5173
+  jwt:
+    key: local-jwt-key
+  # Local config
+  super-admin: 
+    username: super-admin
+    password: super-admin
+    email: 9pZoZ@example.com
+    role: super-admin
+  # -----------
+  # Default Config 
+  rolesMap:
+    super-admin: 100
+    admin: 50
+    user: 10
+  # -------
+  
+database:
+  host: localhost # runtime 
+  port: 5432
+  user: authen_user # runtime 
+  password: authen_password # runtime 
+  dbname: Authen 
+  sslmode: disable
+  timezone: Asia/Bangkok

@@ -1,0 +1,47 @@
+name : Setup .env and docker-compose file
+on:
+  workflow_dispatch
+
+jobs:
+    deploy-neccessary-file: 
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+            
+            - name: Make envfile
+              uses: SpicyPizza/create-envfile@v1
+              with:
+                envkey_ELASTIC_URL: "http://elastic-db:9200"
+                envkey_ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+                envkey_ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+                envkey_WEB_CORS_TARGET: "http://frontend:5173"
+                envkey_AUTH_DB_NAME: "Authen"
+                envkey_AUTH_DB_USER: ${{ secrets.AUTH_DB_USER }}
+                envkey_AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
+                envkey_JWT_KEY: ${{ secrets.JWT_KEY }}
+                file_name: .env
+
+            - name: Set up SSH
+              run: |
+                mkdir -p ~/.ssh
+                echo "${{ secrets.LINUX_PRIVATE_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
+                chmod 700 ~/.ssh
+                chmod 600 ~/.ssh/id_rsa
+                ssh-keyscan -t rsa ${{ secrets.LINUX_HOST }} >> ~/.ssh/known_hosts
+
+            - name: Copy .env.template to server 
+              run: |
+                scp -i ~/.ssh/id_rsa .env ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+            
+            - name: Copy Compose File to Server
+              run: |
+                scp -i ~/.ssh/id_rsa ./docker-compose.prod.yml ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+
+            - name: Copy Compose File to Server
+              run: |
+                scp -i ~/.ssh/id_rsa ./docker-compose.prod.yml ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+            
+            - name: Copy auth-db directory to server
+              run: |
+                scp -i ~/.ssh/id_rsa ./auth-db ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search

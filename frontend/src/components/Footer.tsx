@@ -10,11 +10,13 @@ function Footer() {
       borderColor="gray.300"
       shadow="md"
       direction="row"
-      justify={{xl:"space-between",md:"center",base:"center"}}
+      justify={{ xl: "space-between", md: "center", base: "center" }}
       align="center"
       px="4"
     >
-      <Text hideBelow="lg" color="white">ธรรมนาวา</Text>
+      <Text hideBelow="lg" color="white">
+        ธรรมนาวา
+      </Text>
       <Text hideBelow="lg">ธรรมนาวา</Text>
       <Text as="u" onClick={onOpen} cursor={"pointer"}>
         อยู่ระหว่างการพัฒนา
@@ -22,7 +24,7 @@ function Footer() {
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent mx={4}>
           <ModalHeader />
           <ModalCloseButton />
           <ModalBody>
