@@ -1,12 +1,10 @@
 name: Frontend CI/CD with Docker
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch
 
 jobs:
-  build-and-deploy-frotnend:
+  build-and-deploy-frontend:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,16 +19,21 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
-      - name: Generate .env file
-        run: echo "VITE_SEARCH_API_URL=${{ secrets.SEARCH_API_URL }}" > ./frontend/.env.production
-
+      
+      - name: Make env file
+        uses: SpicyPizza/create-envfile@v1
+        with:
+          envkey_VITE_SEARCH_API_URLL: "http://search-service:8081"
+          envkey_VITE_AUTH_API_URL: "http://auth-service:8082"
+          file_name: .env.production
+          directory: frontend
+    
       - name: Build and push docker image
         uses: docker/build-push-action@v2
         with: 
           context: ./frontend
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-frontend-image:0.1
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-frontend-image:latest
 
       - name: Deploy to Ubuntu server
         uses: appleboy/ssh-action@master
@@ -43,8 +46,8 @@ jobs:
             docker rm frontend || true
             docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-frontend-image:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-frontend-image:latest
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d frontend
+            cd dhammanava-search 
+            docker compose -f docker-compose.prod.yml up -d frontend
 
-#TODO : Need to configure cd before run docker-compose (navigate to where store docker-compose file)
 #TODO : Versioning for docker image
 

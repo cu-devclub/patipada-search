@@ -3,7 +3,7 @@ FROM golang:1.21-alpine AS builder
 
 RUN apk add --no-cache git
 
-WORKDIR /tmp/search-esdb
+WORKDIR /tmp/auth
 
 COPY go.mod .
 COPY go.sum .
@@ -18,11 +18,10 @@ RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main .
 # Final stage
 FROM scratch
 
-WORKDIR /app/search-esdb
+WORKDIR /app/auth
 
-COPY --from=builder /tmp/search-esdb/main .
-COPY --from=builder /tmp/search-esdb/configs ./configs
-COPY --from=builder /tmp/search-esdb/data ./data
+COPY --from=builder /tmp/auth/main .
+COPY --from=builder /tmp/auth/configs ./configs
 
 CMD ["./main"]
 

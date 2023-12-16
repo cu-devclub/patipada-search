@@ -1,53 +1,47 @@
 name : Setup .env and docker-compose file
 on:
-    push:
-        branches:
-            - main
+  workflow_dispatch
+
 jobs:
-    setup-ssh:
+    deploy-neccessary-file: 
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
+            
+            - name: Make envfile
+              uses: SpicyPizza/create-envfile@v1
+              with:
+                envkey_ELASTIC_URL: "http://elastic-db:9200"
+                envkey_ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
+                envkey_ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
+                envkey_WEB_CORS_TARGET: "http://frontend:5173"
+                envkey_AUTH_DB_NAME: "Authen"
+                envkey_AUTH_DB_USER: ${{ secrets.AUTH_DB_USER }}
+                envkey_AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
+                envkey_JWT_KEY: ${{ secrets.JWT_KEY }}
+                file_name: .env
+
             - name: Set up SSH
               run: |
                 mkdir -p ~/.ssh
-                echo "${{ secrets.LINUX_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+                echo "${{ secrets.LINUX_PRIVATE_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
+                chmod 700 ~/.ssh
                 chmod 600 ~/.ssh/id_rsa
-    
-    create-env-file: 
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
+                ssh-keyscan -t rsa ${{ secrets.LINUX_HOST }} >> ~/.ssh/known_hosts
+
             - name: Copy .env.template to server 
               run: |
-                scp .env.template root@103.114.200.35:~/dhammanava-search
-            - name: Create .env file from .env.template   
-              uses: appleboy/ssh-action@master
-              with:
-                host: ${{secrets.LINUX_HOST}}
-                username: ${{secrets.LINUX_USERNAME}}
-                key: ${{ secrets.LINUX_PRIVATE_KEY }}
-                script: |
-                  cd dhammanava-search
-                  cp .env.template .env
-                  echo "${{ secrets.ELASTIC_PASSWORD }}" >> .env
-                  echo "${{ secrets.ELASTIC_URL }}" >> .env
-                  echo "${{ secrets.ELASTIC_USERNAME }}" >> .env
-                  echo "${{ secrets.WEB_CORS_TARGET }}" >> .env
-
-    copy-compose-file:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v3
-
-            - name: Copy File to Server
+                scp -i ~/.ssh/id_rsa .env ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+            
+            - name: Copy Compose File to Server
               run: |
-                scp ./docker-compose.prod.yml root@103.114.200.35:~/dhammanava-search
+                scp -i ~/.ssh/id_rsa ./docker-compose.prod.yml ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
 
-            - name: Display Success Message
-              run: echo "File copied successfully to the server"
-
-#TODO: Need to confirm path and make this job run first 
+            - name: Copy Compose File to Server
+              run: |
+                scp -i ~/.ssh/id_rsa ./docker-compose.prod.yml ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+            
+            - name: Copy auth-db directory to server
+              run: |
+                scp -i ~/.ssh/id_rsa ./auth-db ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search

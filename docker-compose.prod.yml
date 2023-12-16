@@ -5,10 +5,10 @@ services:
     image: dhammanava-search-image:latest
     container_name: search-container
     environment:
-      CONNECTION_ESDBURL: ${ESDB_URL}
+      ESDB_URL: ${ESDB_URL}
       ESDB_USERNAME: ${ESDB_USERNAME}
       ESDB_PASSWORD: ${ESDB_PASSWORD}
-      CORS_TARGET: ${WEB_CORS_TARGET}
+      FRONTEND_URL: ${WEB_CORS_TARGET}
     working_dir: /app/search-esdb
     ports:
       - 8081:8081
@@ -33,8 +33,6 @@ services:
     container_name: frontend-container
     ports:
       - 5173:5173
-    environment:
-      VITE_SEARCH_API_URL: ${VITE_SEARCH_API_URL}
     networks:
       - backbone
 
@@ -48,6 +46,39 @@ services:
   #     - elastic-db
   #   networks:
   #     - backbone
+
+  auth-service:
+    container_name: auth-container
+    image: dhammanava-auth-image:latest
+    environment:
+      - FRONTEND_URL=${WEB_CORS_TARGET}
+      - JWT_KEY=${JWT_KEY} 
+      - DATABASE_HOST=auth-db
+      - DATABASE_NAME=Authen
+      - DATABASE_USER=${AUTH_DB_USER}
+      - DATABASE_PASSWORD=${AUTH_DB_PASSWORD}
+    working_dir: /app/auth
+    ports:
+      - 8082:8082
+    depends_on:
+      - auth-db
+    networks:
+      - backbone
+
+  auth-db:
+    image: postgres:latest
+    container_name: auth-postgres-container
+    environment:
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./auth-db:/docker-entrypoint-initdb.d
+      - ./volumes/database/auth:/var/lib/postgresql/data
+    networks:
+      - backbone
       
   nginx:
     image: nginx:latest

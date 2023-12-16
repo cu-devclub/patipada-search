@@ -1,8 +1,6 @@
 name: Search Service CI/CD with Docker 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch
 
 jobs:
   build-and-deploy-search-service:
@@ -17,7 +15,6 @@ jobs:
 
       - name: Clean Go module cache
         run: go clean -modcache
-
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
@@ -43,6 +40,6 @@ jobs:
             docker rm  search-service || true
             docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-search-image:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-search-image:latest
-            docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d search-service
-#TODO : Need to configure cd before run docker-compose (navigate to where store docker-compose file)
+            cd dhammanava-search
+            docker compose -f docker-compose.prod.yml up -d search-service
 #TODO : Versioning for docker image
