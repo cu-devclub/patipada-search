@@ -6,3 +6,6 @@ export const ToastStatus = {
     WARNING: "warning" as ToastStatusType,
     INFO: "info" as ToastStatusType,
 }
+
+export const PASSWORD_REQUIRED_LENGTH=8
+ 

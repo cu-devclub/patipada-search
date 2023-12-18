@@ -1,7 +1,7 @@
-import { AuthenForm } from "../../components/admin";
-import { MessageToast } from "../../components";
-import { Center } from "@chakra-ui/react";
-import { login } from "../../service/admin";
+import { AuthenForm } from "../../components/user/forms";
+import { MessageToast, Logo } from "../../components";
+import { Flex, Heading, VStack, Text, HStack, Button } from "@chakra-ui/react";
+import { login } from "../../service/user";
 import { ToastStatus } from "../../constant";
 import { setCookie } from "typescript-cookie";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
  *
  * Renders a login form and handles the submission of login requests.
  */
-const AdminLoginPage = () =>  {
+const LoginPage = () => {
   const navigate = useNavigate();
   const { addToast } = MessageToast();
 
@@ -47,12 +47,43 @@ const AdminLoginPage = () =>  {
         }
       });
   };
-  
-  return (
-    <Center w="100%" h="100vh">
-      <AuthenForm submit={submit} />
-    </Center>
-  );
-}
 
-export default AdminLoginPage;
+  return (
+    <Flex
+      w="100%"
+      minH="100svh"
+      bg="gray.600"
+      justify={"flex-start"}
+      align={"center"}
+      direction={"column"}
+      pt={12}
+    >
+      <Logo size="7xs" />
+      <VStack spacing={0} pb={4}>
+        <Heading
+          fontSize={"5xl"}
+          color={"whiteAlpha.900"}
+          letterSpacing={"tighter"}
+          textShadow={"0px 4px 4px rgba(0, 0, 0, 0.25)"}
+        >
+          ลงชื่อเข้าใช้งาน
+        </Heading>
+        <HStack spacing={2}>
+          <Text color={"whiteAlpha.900"} fontSize={"lg"}>
+            ยังไม่มีบัญชีใช่ไหม ?
+          </Text>
+          <Button
+            variant="brand_link"
+            fontSize={"lg"}
+            onClick={() => navigate("/user/register")}
+          >
+            สมัครเลย
+          </Button>
+        </HStack>
+      </VStack>
+      <AuthenForm submit={submit} />
+    </Flex>
+  );
+};
+
+export default LoginPage;

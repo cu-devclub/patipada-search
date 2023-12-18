@@ -83,13 +83,13 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
           </HStack>
 
           {isQueryTheQuestion == false ? (
-            <Text as="b">
+            <Text variant="question">
               <Highlight query={tokens} styles={{ color: "red" }}>
                 {data.question}
               </Highlight>
             </Text>
           ) : (
-            <Text as="b" color="red">
+            <Text variant="question" color="red">
               {data.question}
             </Text>
           )}
