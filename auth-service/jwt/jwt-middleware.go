@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"auth-service/config"
+	"auth-service/messages"
 	"net/http"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -18,7 +19,7 @@ func ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 		tokenString := c.Request().Header.Get("Authorization")
 		if tokenString == "" {
 			return c.JSON(http.StatusBadRequest, map[string]string{
-				"error": "Missing Authorization header",
+				"error": messages.MISSING_AUTHORIZATION,
 			})
 		}
 		secretKey := config.GetConfig().App.JWTKey
@@ -29,18 +30,18 @@ func ValidateToken(next echo.HandlerFunc) echo.HandlerFunc {
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid || err == jwt.ErrTokenMalformed {
 				return c.JSON(http.StatusUnauthorized, map[string]string{
-					"error": "Invalid token",
+					"error": messages.INVALID_TOKEN,
 				})
 			}
 			return c.JSON(http.StatusBadRequest, map[string]string{
-				"error": err.Error(),
+				"error": messages.BAD_REQUEST,
 			})
 		}
 
 		claims, ok := token.Claims.(*CustomClaims)
 		if !ok || !token.Valid {
 			return c.JSON(http.StatusUnauthorized, map[string]string{
-				"error": "Invalid token",
+				"error": messages.INVALID_TOKEN,
 			})
 		}
 

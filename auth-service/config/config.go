@@ -8,19 +8,27 @@ import (
 
 type (
 	Config struct {
-		App App
-		Db  Db
+		App   App
+		Db    Db
+		Email Email
+		Link  Link
+		User  User
 	}
 
 	App struct {
 		Port        int
 		FrontendURL string
 		JWTKey      string
-		SuperAdmin  SuperAdmin
 		RolesMap    map[string]int
 	}
 
-	SuperAdmin struct {
+	User struct {
+		SuperAdmin UserCredential
+		Admins     UserCredential
+		Users      UserCredential
+	}
+
+	UserCredential struct {
 		Username string
 		Password string
 		Role     string
@@ -36,45 +44,87 @@ type (
 		SSLMode  string
 		TimeZone string
 	}
+	Email struct {
+		Host              string
+		Port              int
+		SenderName        string
+		SenderEmail       string
+		SenderPassword    string
+		ReceiverTestEmail string
+	}
+
+	Link struct {
+		URL string
+	}
 )
 
-func GetConfig() Config {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./")
-
+func InitializeViper(path string) {
+	viper.AddConfigPath(path)
+	viper.SetConfigName("app")
+	viper.SetConfigType("env")
+	viper.AutomaticEnv()
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %v", err))
 	}
+}
 
+func GetConfig() Config {
 	// Load roles map from config
 	rolesMap := make(map[string]int)
-	if err := viper.UnmarshalKey("app.rolesMap", &rolesMap); err != nil {
-		panic(fmt.Errorf("error loading roles map: %w", err))
-	}
+	superAdmin := viper.GetInt("ROLES_MAP_SUPER_ADMIN")
+	admin := viper.GetInt("ROLES_MAP_ADMIN")
+	user := viper.GetInt("ROLES_MAP_USER")
+	rolesMap["super-admin"] = superAdmin
+	rolesMap["admin"] = admin
+	rolesMap["user"] = user
 
 	return Config{
 		App: App{
-			Port:        viper.GetInt("app.server.port"),
-			FrontendURL: viper.GetString("app.frontend.url"),
-			JWTKey:      viper.GetString("app.jwt.key"),
-			SuperAdmin: SuperAdmin{
-				Username: viper.GetString("app.super-admin.username"),
-				Password: viper.GetString("app.super-admin.password"),
-				Role:     viper.GetString("app.super-admin.role"),
-				Email:    viper.GetString("app.super-admin.email"),
+			Port:        viper.GetInt("SERVER_PORT"),
+			FrontendURL: viper.GetString("FRONTEND_URL"),
+			JWTKey:      viper.GetString("JWT_KEY"),
+			RolesMap:    rolesMap,
+		},
+		User: User{
+			SuperAdmin: UserCredential{
+				Username: viper.GetString("SUPER_ADMIN_USERNAME"),
+				Password: viper.GetString("SUPER_ADMIN_PASSWORD"),
+				Role:     viper.GetString("SUPER_ADMIN_ROLE"),
+				Email:    viper.GetString("SUPER_ADMIN_EMAIL"),
 			},
-			RolesMap: rolesMap,
+			Admins: UserCredential{
+				Username: viper.GetString("ADMIN_USERNAME"),
+				Password: viper.GetString("ADMIN_PASSWORD"),
+				Role:     viper.GetString("ADMIN_ROLE"),
+				Email:    viper.GetString("ADMIN_EMAIL"),
+			},
+			Users: UserCredential{
+				Username: viper.GetString("USER_USERNAME"),
+				Password: viper.GetString("USER_PASSWORD"),
+				Role:     viper.GetString("USER_ROLE"),
+				Email:    viper.GetString("USER_EMAIL"),
+			},
 		},
 		Db: Db{
-			Host:     viper.GetString("database.host"),
-			Port:     viper.GetInt("database.port"),
-			User:     viper.GetString("database.user"),
-			Password: viper.GetString("database.password"),
-			DBName:   viper.GetString("database.dbname"),
-			SSLMode:  viper.GetString("database.sslmode"),
-			TimeZone: viper.GetString("database.timezone"),
+			Host:     viper.GetString("DATABASE_HOST"),
+			Port:     viper.GetInt("DATABASE_PORT"),
+			User:     viper.GetString("DATABASE_USER"),
+			Password: viper.GetString("DATABASE_PASSWORD"),
+			DBName:   viper.GetString("DATABASE_DBNAME"),
+			SSLMode:  viper.GetString("DATABASE_SSLMODE"),
+			TimeZone: viper.GetString("DATABASE_TIMEZONE"),
+		},
+		Email: Email{
+			Host:              viper.GetString("EMAIL_SERVER_HOST"),
+			Port:              viper.GetInt("EMAIL_SERVER_PORT"),
+			SenderName:        viper.GetString("EMAIL_SENDER_NAME"),
+			SenderEmail:       viper.GetString("EMAIL_SENDER_EMAIL"),
+			SenderPassword:    viper.GetString("EMAIL_SENDER_PASSWORD"),
+			ReceiverTestEmail: viper.GetString("EMAIL_RECEIVER_TESTEMAIL"),
+		},
+		Link: Link{
+			URL: viper.GetString("LINK_URL"),
 		},
 	}
 }
