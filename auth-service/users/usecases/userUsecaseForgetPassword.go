@@ -75,7 +75,7 @@ func (u *UsersUsecaseImpl) ForgetPassword(in *models.ForgetPassword) (string, er
 	// Sending email
 	cfg := config.GetConfig()
 	subject := "Reset Password"
-	resetLink := fmt.Sprintf("%s/reset-password/%s", cfg.Link.URL, resetPasswordToken)
+	resetLink := fmt.Sprintf("%s/user/reset-password/%s", cfg.Link.URL, resetPasswordToken)
 	content := fmt.Sprintf(`
 	<h1>Hello %s </h1>
 	<p>We received a request to reset your password. Click the link below to reset your password:</p>
