@@ -41,7 +41,7 @@ func UsersMigrate(db database.Database) error {
 }
 
 func migrateUserEntities(user *config.UserCredential, users []*entities.Users, db database.Database) error {
-	if e := helper.GetUserFromUserLists(users, user.Username); e != nil {
+	if foundUser := helper.GetUserFromUserLists(users, user.Username); foundUser != nil {
 		return nil
 	}
 
