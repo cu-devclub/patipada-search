@@ -1,6 +1,6 @@
-import { Flex, Show, Hide, Image } from "@chakra-ui/react";
+import { Flex, Center, VStack } from "@chakra-ui/react";
 import { SearchField } from "../../components/search";
-import { Header, Footer } from "../../components";
+import { Header, Footer, Logo } from "../../components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -33,46 +33,34 @@ const SearchPage = () => {
     SetSearchParam(searchParameter);
     navigate(`?search=${searchParameter}`);
   };
-  
+
   return (
     <Flex
+      justify="space-between"
       direction="column"
-      gap={4}
-      justify={"space-between"}
       align="center"
       w="full"
       minH="100svh"
     >
-      <Hide below="sm">
+      <VStack w="full" spacing={[4, 16]}>
         <Header />
-      </Hide>
 
-      <Flex
-        w="full"
-        h="full"
-        justify="center"
-        direction="column"
-        align="center"
-        gap="4"
-      >
-        <Show below="sm">
-          <Image
-            boxSize="7xs"
-            objectFit="cover"
-            src="/Dhammanava.svg"
-            alt="Dhammanava"
+        <VStack w="full">
+          <Center>
+            <Logo size={["6xs", "4xs"]} />
+          </Center>
+          <SearchField
+            searchParam={searchParam}
+            setSearchParams={setSearchParams}
+            performSearch={performSearch}
           />
-        </Show>
-
-        <SearchField
-          searchParam={searchParam}
-          setSearchParams={setSearchParams}
-          performSearch={performSearch}
-        />
+        </VStack>
+      </VStack>
+      <Flex w="100%">
+        <Footer />
       </Flex>
-      <Footer />
     </Flex>
   );
-}
+};
 
 export default SearchPage;

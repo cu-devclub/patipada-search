@@ -1,4 +1,4 @@
-import { ToastStatusType } from "../../models/toast";
+import { ToastStatusType } from "../../constant";
 import { useToast } from "@chakra-ui/react";
 
 /**

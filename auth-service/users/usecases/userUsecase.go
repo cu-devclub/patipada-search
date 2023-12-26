@@ -3,19 +3,99 @@ package usecases
 import "auth-service/users/models"
 
 type UsersUsecase interface {
-	// UsersRegisterDataProcessing processes the registration data for users.
+	// RegisterUser
+	// If new user role is "admin" or "super-admin"
+	// then requester role must be "admin" or "super-admin"
+	// Parameters (JSON) :
+	// - requesterRole : string ; one of admin, super-admin, user
+	// - models.RegisterDto
+	//		- username : string ; 3 <= length <= 50, unique
+	//      - password : string ; 8 <= length <= 50, unique
+	// 		- email : string ; valid email, unique
+	// 		- role : string ; one of admin, super-admin, user
 	//
-	// Parameter(s):
-	// - in: the data for adding users, including username, password, email, and role.
-	//
-	// Return type(s):
-	// - if username and email already exists return error with status code 409 Conflict
-	// - error: any error that occurred during the processing.
-	UsersRegisterDataProcessing(in *models.AddUsersData) error
+	// Response
+	// - 201 and user id
+	// - 400 bad request ; or input invalid
+	//      - Email already exsits => message `Email already exists`
+	//      - Username already exsits => message `Username already exists`
+	// - 409 conflict ; no permission when requester is not super-admin/admin
+	// - 500 internal server error
 
-	// Authentication performs user authentication.
+	RegisterUser(requesterRole string, in *models.RegisterDto) (string, error)
+
+	// Authentication
+	// Parameters (models.LoginDto) :
+	// - username : string ; 3 <= length <= 50
+	// - password : string ; 8 <= length <= 50
 	//
-	// It takes a LoginDto as input and returns a token(string)and an error.
-	// If the user is not found or the username/password is incorrect, it returns an error of 401.
-	Authentication(in *models.LoginDto) (string, error)
+	// Response
+	// - 200 , role and token
+	// - 400 bad request ; some field missing or input invalid
+	// - 401 unauthorized ;  username or password incorrect
+	// - 500 internal server error
+	Authentication(in *models.LoginDto) (string, string, error)
+
+	// Request the link to reset password
+	// Link when sent to input email if valid
+	// Parameter(models.ForgetPassword)
+	// - email (string,email)
+
+	// Response
+	// - 200 OK & reset password token (also send to email)
+	// - 400 bad request (invalid email)
+	// - 404 User not found (email not exists)
+	// - 500 internal server error
+	ForgetPassword(in *models.ForgetPassword) (string, error)
+
+	// Reset Password
+	// Parameters(models.ResetPassword)
+	// - token (string) ; reset password token
+	// - password (string) ; new password ; 8 <= length <= 50
+	//
+	// Response
+	// - 201 Created ; Update password success
+	// - 400 bad request (invalid format password)
+	// - 401 Unautorize ; invalid reset password
+	// - 422 ; New password == Old password
+	// - 500 internal server error
+	ResetPassword(in *models.ResetPassword) error
+
+	// Remove user by username & requestor role must be higher
+	// Parameters  :
+	// - requester Role (string) ; one of admin, super-admin, user
+	// - models.RemoveUserDto
+	// 		- username (string)
+	//
+	// Response
+	// - 200 OK
+	// - 400 bad request (invalid/missing username)
+	// - 401 Unauthorize ; missing token
+	// - 403 Forbidden ; no permission
+	// - 404 User not found (invalid username)
+	// - 500 internal server error
+	RemoveUser(requesterRole string, in *models.RemoveUserDto) error
+
+	// Verify Reset Token to verify the time valid of token (15 minute)
+	// Parameter
+	// - token ; string
+	//
+	// Response
+	// - 200 OK & result (true/false)
+	// - 404 Not found ; token == "" or not attach token
+	// - 500 internal server error
+	VerifyResetToken(token string) (bool, error)
+
+	// Change Password
+	// Parameter(JSON)
+	// - oldPassword (string) ; old password ; 8 <= length <= 50
+	// - newPassword (string) ; new password ; 8 <= length <= 50
+	//
+	// Response
+	// - 200 OK ; Update password success
+	// - 400 bad request (invalid format password)
+	// - 401 Unautorize ; invalid old password
+	// - 422 ; New password == Old password
+	// - 500 internal server error
+	ChangePassword(in *models.ChangePassword,username string) error
 }

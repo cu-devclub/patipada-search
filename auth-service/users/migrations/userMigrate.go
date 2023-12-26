@@ -21,42 +21,52 @@ func UsersMigrate(db database.Database) error {
 	if err != nil {
 		return err
 	}
-	user := helper.GetUserFromUserLists(users, cfg.App.SuperAdmin.Username)
-	if user != nil {
-		//* alrady have super admin in database 
-		return nil  
-	}
 
-	// 3. Insert super admin 
-	uuid,err := helper.GenerateUUID()
-	if err != nil {
-		return err
-	}
-	password,salt,err := helper.GenerateHashedSaltedPassword(cfg.App.SuperAdmin.Password)
-	if err != nil {
+	// Migrate super admin entities
+	if err = migrateUserEntities(&cfg.User.SuperAdmin, users, db); err != nil {
 		return err
 	}
 
-	superAdmin := &entities.Users{
-		Id:       uuid,
-		Username: cfg.App.SuperAdmin.Username,
-		Password: password,
-		Salt:     salt,
-		Email:    cfg.App.SuperAdmin.Email,
-		Role:     cfg.App.SuperAdmin.Role,
+	// Migrate admin entities
+	if err = migrateUserEntities(&cfg.User.Admins, users, db); err != nil {
+		return err
+	}
+
+	// Migrate user entities
+	if err = migrateUserEntities(&cfg.User.Users, users, db); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func migrateUserEntities(user *config.UserCredential, users []*entities.Users, db database.Database) error {
+	if foundUser := helper.GetUserFromUserLists(users, user.Username); foundUser != nil {
+		return nil
+	}
+
+	uuid, err := helper.GenerateUUID()
+	if err != nil {
+		return err
+	}
+	password, salt, err := helper.GenerateHashedSaltedPassword(user.Password)
+	if err != nil {
+		return err
+	}
+
+	u := &entities.Users{
+		Id:        uuid,
+		Username:  user.Username,
+		Password:  password,
+		Salt:      salt,
+		Email:     user.Email,
+		Role:      user.Role,
 		Is_Active: true,
 	}
 
-	if err := insertUser(db.GetDb(), superAdmin); err != nil {
-		return err
-	}
-
-	return nil 
+	return insertUser(db.GetDb(), u)
 }
 
-// getAllUsers retrieves all users from the database.
-//
-// It takes a *gorm.DB as a parameter and returns a slice of *entities.Users and an error.
 func getAllUsers(db *gorm.DB) ([]*entities.Users, error) {
 	users := make([]*entities.Users, 0)
 	if err := db.Find(&users).Error; err != nil {
@@ -65,14 +75,6 @@ func getAllUsers(db *gorm.DB) ([]*entities.Users, error) {
 	return users, nil
 }
 
-// insertUser inserts a user into the database.
-//
-// Parameters:
-// - db: A pointer to a gorm.DB object representing the database connection.
-// - user: A pointer to a entities.Users object representing the user to be inserted.
-//
-// Returns:
-// - error: An error object representing any error that occurred during the insertion process.
 func insertUser(db *gorm.DB, user *entities.Users) error {
 	if err := db.Create(user).Error; err != nil {
 		return err

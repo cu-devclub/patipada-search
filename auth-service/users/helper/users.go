@@ -1,6 +1,8 @@
 package helper
 
-import "auth-service/users/entities"
+import (
+	"auth-service/users/entities"
+)
 
 // GetUserFromUserLists returns a user from a list of users based on the username.
 //

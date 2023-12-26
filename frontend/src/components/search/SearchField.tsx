@@ -137,7 +137,7 @@ function SearchField({
   }
 
   return (
-    <FormControl w={["90%", "70%", "50%"]}>
+    <FormControl w={["90%", "70%", "50%"]} fontWeight="light">
       <AutoComplete
         emptyState={<Text textAlign="center">ค้นหาเลย</Text>}
         openOnFocus
@@ -146,31 +146,15 @@ function SearchField({
         disableFilter
       >
         <InputGroup>
-          <InputLeftElement pointerEvents="none" h={["50", "70", "90"]}>
+          <InputLeftElement pointerEvents="none" h={["50", "70"]}>
             <SearchIcon color="gray.500" boxSize={6} />
           </InputLeftElement>
           <AutoCompleteInput
-            loadingIcon={
-              <div>
-                <br />
-                <br />
-                <Spinner
-                  thickness="4px"
-                  speed="0.65s"
-                  emptyColor="gray.200"
-                  color="blue.500"
-                  size="md"
-                />
-              </div>
-            }
             onChange={onChangeInputHandler}
-            bg="blackAlpha.200"
-            pl={12}
-            variant="filled"
+            variant="search_bar"
             value={searchParam}
-            placeholder="ค้นหาด้วยคีย์เวิร์ด"
-            borderRadius="30"
-            h={["50", "70", "90"]}
+            placeholder="ค้นหาเลย"
+            h={["50", "70"]}
             fontSize={["md", "lg", "xl"]}
           />
         </InputGroup>

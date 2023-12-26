@@ -1,4 +1,12 @@
-export function timeToSeconds(time) {
-  const [hours, minutes, seconds] = time.split(':').map(Number);
-  return hours * 3600 + minutes * 60 + seconds;
-}
+import { isValidEmail, isValueExist, isLengthEnough } from "./form";
+import { timeToSeconds } from "./time";
+import { handleEnterKeyPress } from "./keyboard";
+import {SignOut} from "./user";
+export {
+  isValidEmail,
+  isValueExist,
+  isLengthEnough,
+  timeToSeconds,
+  handleEnterKeyPress,
+  SignOut,
+};

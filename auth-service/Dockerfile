@@ -21,7 +21,7 @@ FROM scratch
 WORKDIR /app/auth
 
 COPY --from=builder /tmp/auth/main .
-COPY --from=builder /tmp/auth/configs ./configs
+COPY --from=builder /tmp/auth/app.env .
 
 CMD ["./main"]
 

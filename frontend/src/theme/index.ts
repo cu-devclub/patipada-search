@@ -1,96 +1,37 @@
-import {
-  extendTheme,
-  theme as base,
-  withDefaultColorScheme,
-    withDefaultVariant
-} from "@chakra-ui/react";
-import { mode } from '@chakra-ui/theme-tools';
-const inputSelectedStyles = {
-    variants: {
-        filled: {
-            field: {
-                _focus: {
-                    borderColor:'gray.100',
-                    bg: 'gray.100'
-                },
-                _hover: {
-                    borderColor:'gray.100',
-                    bg: 'gray.100'
-                }
-            }
-        }
-    },
-    sizes : {
-        md: {
-            field: {
-                borderRadius: 'none',
-            }
-        }
-    }
-
-}
-
-const brandRing = {
-    _focus: {
-        ring:2,
-        ringColor:'gray.500'
-    }
-}
-const theme = extendTheme(
-  {
-    sizes : {
-        '6xs': '7rem',
-        '7xs' : '5rem',
-        '8xs' : '4rem'
-    },
-    fonts: {
-      heading: `Montserrat, ${base.fonts?.heading}`,
-      body: `Inter ${base.fonts?.body}`,
-    },
-    components: {
-        Button: {
-            props: {
-                myProp: String, // Define the type for myProp
-            },
-            variants: {
-            primary: (props: { myProp: string }) => ({ // Specify the type for props
-                rounded: 'none',
-                ...brandRing,
-                color: mode('white', 'gray.800')(props),
-                backgroundColor: mode('gray.500', 'gray.200')(props),
-
-                _hover: {
-                backgroundColor: mode('gray.600', 'gray.300')(props)
-                },
-
-                _active: {
-                backgroundColor: mode('gray.700', 'gray.400')(props)
-                }
-            })
-            }
-        },
-    
-
-       Input : {...inputSelectedStyles},
-       Select: {...inputSelectedStyles},
-       CheckBox: {
-        baseStyle: {
-            control: {
-                borderRadius: 'none',
-                ...brandRing
-            }
-        }
-       }
-    }
+import { extendTheme } from "@chakra-ui/react";
+import component from "./component";
+const font = {
+  fonts: {
+    heading: `'Mitr', sans-serif`,
+    body: `'Mitr', sans-serif`,
+    mono: `Mitr`,
   },
-  withDefaultColorScheme({
-    colorScheme: "gray",
-    components: ["Checkbox"],
-  }),
-  withDefaultVariant({
-    variant: 'filled',
-    components: ['Input','Select']
-  }),
-);
+};
 
+const size = {
+  sizes: {
+    "4xs": "10rem",
+    "5xs": "8rem",
+    "6xs": "7rem",
+    "7xs": "5rem",
+    "8xs": "4rem",
+    "10xs": "2rem",
+  },
+};
+const color = {
+  colors: {
+    brand_orange: {
+      400: "#FFA800",
+    },
+    gray: {
+      450: "#D9D9D9",
+    },
+    brand_gray : {
+      400: "#F2F2F2",
+      500: "#D9D9D9",
+    },
+  },
+};
+
+const theme = extendTheme(font, component, size, color);
 export default theme;
