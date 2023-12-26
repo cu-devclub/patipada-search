@@ -1,8 +1,9 @@
 import { Button } from '@chakra-ui/react';
-
+import { useNavigate } from 'react-router-dom';
 function SignInButton() {
+  const navigate = useNavigate();
   return (
-    <Button variant={"brand"} fontSize={{base:"12",md:"16"}} >
+    <Button variant={"brand"} fontSize={{base:"12",md:"16"}} onClick={()=> navigate("/user/login")} >
       ลงชื่อเข้าใช้
     </Button>
   );

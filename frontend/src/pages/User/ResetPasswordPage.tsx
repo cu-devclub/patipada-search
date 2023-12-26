@@ -1,12 +1,57 @@
-import { ForgetPasswordForm } from "../../components/user/forms";
+import { ResetPasswordForm } from "../../components/user/forms";
 import { Flex, Text, VStack, Heading } from "@chakra-ui/react";
-import { Logo } from "../../components";
+import { Logo, MessageToast } from "../../components";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { verifyResetPasswordToken, resetPassword } from "../../service/user";
+import { ReturnError } from "../../service/error";
 
 function ResetPasswordPage() {
-  const submit = (email) => {
-    console.log(email);
-    //TODO : making request to backend
+  const { token } = useParams();
+  const navigate = useNavigate();
+  const { addToast } = MessageToast();
+  const [formError, setformError] = useState(false);
+  useEffect(() => {
+    const verifyToken = async (token: string) => {
+      await verifyResetPasswordToken(token)
+        .then((res) => {
+          if (res.result == false) {
+            alert("url หมดอายุ หากต้องการเปลี่ยนรหัสผ่าน กรุณาขอ url ใหม่");
+            navigate("/user");
+          }
+        })
+        .catch((err: ReturnError) => {
+          addToast({
+            description: err.message,
+            status: err.toastStatus,
+          });
+        });
+    };
+
+    if (token) verifyToken(token);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  const submit = async (password: string) => {
+    if (!token) return;
+    await resetPassword(token, password)
+      .then(() => {
+        setformError(false);
+        addToast({
+          description: "เปลี่ยนรหัสผ่านสำเร็จ",
+          status: "success",
+        });
+        navigate("/user");
+      })
+      .catch((err: ReturnError) => {
+        setformError(true);
+        addToast({
+          description: err.message,
+          status: err.toastStatus,
+        });
+      });
   };
+
   return (
     <Flex
       w="100%"
@@ -28,10 +73,10 @@ function ResetPasswordPage() {
           เปลี่ยนรหัสผ่าน
         </Heading>
         <Text color={"whiteAlpha.900"} fontSize={"lg"}>
-          ลิ้งค์เปลี่ยนรหัสผ่านจะถูกส่งไปยังอีเมลของท่าน
+          กรุณากรอกรหัสผ่านใหม่
         </Text>
       </VStack>
-      <ForgetPasswordForm submit={submit} />
+      <ResetPasswordForm submit={submit} formError={formError} />
     </Flex>
   );
 }

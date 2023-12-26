@@ -2,10 +2,12 @@ import { AuthenForm } from "../../components/user/forms";
 import { MessageToast, Logo } from "../../components";
 import { Flex, Heading, VStack, Text, HStack, Button } from "@chakra-ui/react";
 import { login } from "../../service/user";
-import { ToastStatus } from "../../constant";
+import { ToastStatus,Role } from "../../constant";
 import { setCookie } from "typescript-cookie";
 import { useNavigate } from "react-router-dom";
-
+import { LoginDTO } from "../../models/user";
+import { useState } from "react";
+import {ReturnError} from "../../service/error";
 /**
  * Admin Login Page Component.
  *
@@ -14,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 const LoginPage = () => {
   const navigate = useNavigate();
   const { addToast } = MessageToast();
+  const [formError, setformError] = useState(false);
 
   /**
    * Submits a login request using the given username and password.
@@ -21,30 +24,31 @@ const LoginPage = () => {
    * @param {string} username - The username for the login request.
    * @param {string} password - The password for the login request.
    */
-  const submit = (username: string, password: string) => {
-    login(username, password)
+  const submit = async (username: string, password: string) => {
+    const loginDTO: LoginDTO = {
+      username: username,
+      password: password,
+    };
+
+    await login(loginDTO)
       .then((response) => {
+        setformError(false);
         addToast({
           description: "Login successfully",
           status: ToastStatus.SUCCESS,
         });
         setCookie("token", response.token);
-        navigate("/admin");
+        setCookie("username",username)
+        setCookie("role",response.role)
+        if (response.role == Role.ADMIN || response.role == Role.SUPER_ADMIN) navigate("/user");
+        else navigate("/")
       })
-      .catch((error) => {
-        if (error.status) {
-          if (error.status === 401) {
-            addToast({
-              description: "Incorrect username or password",
-              status: ToastStatus.WARNING,
-            });
-          }
-        } else {
-          addToast({
-            description: "Login failed",
-            status: ToastStatus.ERROR,
-          });
-        }
+      .catch((error: ReturnError) => {
+        setformError(true);
+        addToast({
+          description: error.message,
+          status: error.toastStatus,
+        });
       });
   };
 
@@ -81,7 +85,7 @@ const LoginPage = () => {
           </Button>
         </HStack>
       </VStack>
-      <AuthenForm submit={submit} />
+      <AuthenForm submit={submit} formError={formError} />
     </Flex>
   );
 };

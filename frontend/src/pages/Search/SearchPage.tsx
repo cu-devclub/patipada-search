@@ -1,6 +1,6 @@
-import { Flex,Center,VStack} from "@chakra-ui/react";
+import { Flex, Center, VStack } from "@chakra-ui/react";
 import { SearchField } from "../../components/search";
-import { Header, Footer,Logo } from "../../components";
+import { Header, Footer, Logo } from "../../components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -42,11 +42,11 @@ const SearchPage = () => {
       w="full"
       minH="100svh"
     >
-      <VStack w="full" spacing={[4,16]}>
+      <VStack w="full" spacing={[4, 16]}>
         <Header />
 
-        <VStack w="full" >
-          <Center >
+        <VStack w="full">
+          <Center>
             <Logo size={["6xs", "4xs"]} />
           </Center>
           <SearchField

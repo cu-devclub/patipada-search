@@ -26,6 +26,12 @@ const inputSelectedStyles = {
         },
       },
     },
+    success_authen_field: {
+      field: {
+        borderRadius: "15",
+        border: "1px solid #48BB78",
+      },
+    },
   },
   sizes: {
     md: {
@@ -58,6 +64,16 @@ const buttonStyle = {
       color: "brand_orange.400",
       p: 0,
     },
+    complete_ghost : {
+      bg: "transparent",
+      _hover: {
+        bg: "transparent",
+      },
+      _active: {
+        bg: "transparent",
+      },
+    },
+    
   },
 };
 

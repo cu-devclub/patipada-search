@@ -1,8 +1,14 @@
 import axios from "axios";
-
+import { ToastStatusType } from "../../constant";
 interface CustomError {
     message: string;
     status?: number;
+}
+
+export interface ReturnError {
+  message: string;
+  status: number;
+  toastStatus: ToastStatusType;
 }
 
 /**
@@ -15,13 +21,14 @@ interface CustomError {
 export const CreateCustomError = (error : unknown): CustomError => {
     if (axios.isAxiosError(error)) {
         const customError: CustomError = {
-                message: `Axios error: ${error.message?.toString()}`,
+                message: `${error.response?.data.message}`,
                 status: error.response?.status,
         };
         return customError;
     } else {
         const customError: CustomError = {
             message: `Unknown error: ${error}`,
+            status: 500,
         };
         return customError;
     }

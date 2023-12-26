@@ -1,6 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SearchMiddleware } from "./pages/Search";
-import { ResetPasswordPage, UserMiddleware,LoginPage,RegisterPage } from "./pages/User";
+import {
+  ForgetPasswordPage,
+  UserMiddleware,
+  LoginPage,
+  RegisterPage,
+  ResetPasswordPage,
+  ChangePasswordPage,
+} from "./pages/User";
 export default function App() {
   return (
     <BrowserRouter>
@@ -9,8 +16,10 @@ export default function App() {
         <Route path="/user/">
           <Route path="" element={<UserMiddleware />} />
           <Route path="login" element={<LoginPage />} />
-          <Route path="reset-password" element={<ResetPasswordPage />} />
+          <Route path="forget-password" element={<ForgetPasswordPage />} />
+          <Route path="reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="register" element={<RegisterPage />} />
+          <Route path="change-password" element={<ChangePasswordPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

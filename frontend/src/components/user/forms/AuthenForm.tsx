@@ -15,47 +15,75 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { isValueExist, isLengthEnough } from "../../../functions";
+import {
+  isValueExist,
+  isLengthEnough,
+  handleEnterKeyPress,
+} from "../../../functions";
 import { PASSWORD_REQUIRED_LENGTH } from "../../../constant";
 interface FormProps {
   submit: (username: string, password: string) => void;
+  formError: boolean;
 }
 
-export default function AuthenForm({ submit }: FormProps) {
+export default function AuthenForm({ submit, formError }: FormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
   const navigate = useNavigate();
-  const [isUsernameValid, setisUsernameValid] = useState(true);
-
   const [submitCount, setSubmitCount] = useState(0);
+  const [tempCredential, setTempCredential] = useState({
+    username: "",
+    password: "",
+  });
+  const userNameErrorMessage = formError
+    ? "ชื่อผู้ใช้งานหรือรหัสผ่านผิด"
+    : "กรุณากรอกชื่อผู้ใช้งาน";
+  const passwordErrorMessage = formError
+    ? "ชื่อผู้ใช้งานหรือรหัสผ่านผิด"
+    : "รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร";
+
+  const verifyChangeCredential = 
+      tempCredential.username != username || tempCredential.password != password;
+
+  const isUsernameInvalid =
+    (submitCount > 0 && !isValueExist(username)) ||
+    (formError && !verifyChangeCredential);
+
   const isPasswordInValid =
-    submitCount > 0 &&
-    (!isValueExist(password) ||
-      !isLengthEnough(password, PASSWORD_REQUIRED_LENGTH));
+    (submitCount > 0 &&
+      (!isValueExist(password) ||
+        !isLengthEnough(password, PASSWORD_REQUIRED_LENGTH))) ||
+    (formError && !verifyChangeCredential);
 
   const submitForm = () => {
     setSubmitCount(submitCount + 1);
-    if (!isValueExist(username)) {
-      setisUsernameValid(false);
+    if (
+      isUsernameInvalid ||
+      isPasswordInValid ||
+      !isValueExist(username) ||
+      !isLengthEnough(password, PASSWORD_REQUIRED_LENGTH)
+    ) {
       return;
     }
     submit(username, password);
+    setTempCredential({ username: username, password: password });
   };
 
   return (
-    <Box w={["xs", "md"]}>
+    <Box w={["2xs", "md"]} pb={12}>
       <Box rounded={"lg"} bg={"white"} boxShadow={"xl"} p={8} w="full">
         <Stack spacing={2} w="full">
-          <FormControl id="username" isRequired isInvalid={!isUsernameValid}>
+          <FormControl id="username" isRequired isInvalid={isUsernameInvalid}>
             <FormLabel fontWeight={"light"}>ชื่อผู้ใช้งาน</FormLabel>
             <Input
               type="text"
               onChange={(e) => setUsername(e.target.value)}
               variant={"authen_field"}
+              onKeyDown={handleEnterKeyPress(submitForm)}
             />
-            <FormErrorMessage>กรุณากรอกชื่อผู้ใช้งาน</FormErrorMessage>
+            <FormErrorMessage>{userNameErrorMessage}</FormErrorMessage>
           </FormControl>
           <FormControl id="password" isRequired isInvalid={isPasswordInValid}>
             <FormLabel fontWeight={"light"}>รหัสผ่าน</FormLabel>
@@ -65,6 +93,7 @@ export default function AuthenForm({ submit }: FormProps) {
                 type={show ? "text" : "password"}
                 onChange={(e) => setPassword(e.target.value)}
                 variant={"authen_field"}
+                onKeyDown={handleEnterKeyPress(submitForm)}
               />
 
               <InputRightElement width="3rem">
@@ -77,15 +106,13 @@ export default function AuthenForm({ submit }: FormProps) {
                 />
               </InputRightElement>
             </InputGroup>
-            <FormErrorMessage>
-              รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร
-            </FormErrorMessage>
+            <FormErrorMessage>{passwordErrorMessage}</FormErrorMessage>
           </FormControl>
           <Stack spacing={0}>
             <Flex direction="column" align={"end"}>
               <Button
                 variant="brand_link"
-                onClick={() => navigate("/user/reset-password")}
+                onClick={() => navigate("/user/forget-password")}
               >
                 ลืมรหัสผ่าน
               </Button>
