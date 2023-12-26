@@ -14,7 +14,6 @@ import (
 func setUpTestEnvironment() usersHandlers.UsersHandler {
 	config.InitializeViper("../")
 	cfg := config.GetConfig()
-	fmt.Println("CONFIG",cfg)
 	db := database.NewPostgresDatabase(&cfg)
 
 	err := usersMigrate.UsersMigrate(db)

@@ -82,11 +82,36 @@ func TestRegisterAndRemove(t *testing.T) {
 		assert.Equal(t, http.StatusOK, w.Code)
 
 	})
-	t.Run("Failed Register : Username/Email already exists : 400", func(t *testing.T) {
+	t.Run("Failed Register : Username already exists : 400", func(t *testing.T) {
 		m := models.RegisterDto{}
 		m.MockData()
 		// use super admin credentials (already insert in set up env (migration))
 		m.Username = cfg.User.SuperAdmin.Username
+
+		payload, _ := json.Marshal(m)
+		req, _ := http.NewRequest("POST", "/register", bytes.NewBuffer(payload))
+		req.Header.Set("Content-Type", "application/json") // Set the Content-Type header
+		w := httptest.NewRecorder()
+		e.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+
+		// retrive respond body
+		var responseBody map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &responseBody)
+		if err != nil {
+			t.Fatalf("Error parsing response body: %v", err)
+		}
+
+		// check message
+		message := responseBody["message"]
+		assert.Equal(t, "Username already exists", message)
+	})
+
+	t.Run("Failed Register : Email already exists : 400", func(t *testing.T) {
+		m := models.RegisterDto{}
+		m.MockData()
+		// use super admin credentials (already insert in set up env (migration))
 		m.Email = cfg.User.SuperAdmin.Email
 
 		payload, _ := json.Marshal(m)
@@ -96,6 +121,17 @@ func TestRegisterAndRemove(t *testing.T) {
 		e.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
+
+		// retrive respond body
+		var responseBody map[string]interface{}
+		err := json.Unmarshal(w.Body.Bytes(), &responseBody)
+		if err != nil {
+			t.Fatalf("Error parsing response body: %v", err)
+		}
+
+		// check message
+		message := responseBody["message"]
+		assert.Equal(t, "Email already exists", message)
 	})
 
 	t.Run("Failed Register Bad request field : 400 ", func(t *testing.T) {
@@ -114,7 +150,7 @@ func TestRegisterAndRemove(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 
-	t.Run("Failed Register: no permission (not attach token)", func(t *testing.T) {
+	t.Run("Failed Register: no permission (not attach token when needed) : 400", func(t *testing.T) {
 		m := models.RegisterDto{}
 		m.MockData()
 		m.Role = "admin"
@@ -182,7 +218,7 @@ func TestRegisterAndRemove(t *testing.T) {
 		assert.Equal(t, http.StatusConflict, w.Code)
 	})
 
-	// ------ Remove
+	//* ------ Remove
 	t.Run("Failed Remove ; Not attach username ; 404", func(t *testing.T) {
 		// Generate user token
 		token, err := jwt.CreateToken(cfg.User.Users.Username, cfg.User.Users.Role)

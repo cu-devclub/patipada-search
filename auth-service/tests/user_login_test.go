@@ -19,7 +19,7 @@ func TestLogin(t *testing.T) {
 	e := echo.New()
 	e.POST("/login", handlers.Login)
 	t.Run("Success Login : 200 ", func(t *testing.T) {
-		roleCredentials := cfg.User.Admins
+		roleCredentials := cfg.User.SuperAdmin
 		m := models.LoginDto{
 			Username: roleCredentials.Username,
 			Password: roleCredentials.Password,
