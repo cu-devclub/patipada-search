@@ -16,6 +16,7 @@ const (
 	UNAUTHORIZED                          = "Unauthorized"
 	MISSING_AUTHORIZATION                 = "Missing Authorization header"
 	INVALID_TOKEN                         = "Invalid token"
-	PASSWORD_SAME                         = "Password same as old password"
+	PASSWORD_SAME                         = "New password must be different from old password"
 	SUCCESSFUL_VERIFY_RESET_TOKEN         = "Successful verify reset token"
+	SUCCESSFUL_CHANGE_PASSWORD            = "Successful change password"
 )
