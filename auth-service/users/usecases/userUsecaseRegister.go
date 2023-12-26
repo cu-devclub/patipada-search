@@ -25,6 +25,8 @@ import (
 // Response
 // - 201 and user id
 // - 400 bad request ; or input invalid
+//      - Email already exsits => message `Email already exists`
+//      - Username already exsits => message `Username already exists`
 // - 409 conflict ; no permission when requester is not super-admin/admin
 // - 500 internal server error
 func (u *UsersUsecaseImpl) RegisterUser(requesterRole string, in *models.RegisterDto) (string, error) {
@@ -48,8 +50,11 @@ func (u *UsersUsecaseImpl) RegisterUser(requesterRole string, in *models.Registe
 		return "", err
 	}
 	for _, user := range users {
-		if user.Username == in.Username || user.Email == in.Email {
+		if user.Username == in.Username {
 			return "", errors.CreateError(400, messages.USERNAME_ALREADY_EXISTS)
+		}
+		if user.Email == in.Email {
+			return "", errors.CreateError(400, messages.EMAIL_ALREADY_EXISTS)
 		}
 	}
 
