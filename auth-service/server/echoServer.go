@@ -33,7 +33,7 @@ func (s *echoServer) Start() {
 	s.App.Use(middleware.Logger())
 	s.App.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{s.cfg.App.FrontendURL},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 	}))
 
 	serverUrl := fmt.Sprintf(":%d", s.cfg.App.Port)
@@ -86,7 +86,8 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// Response
 	// - 201 and user id
 	// - 400 bad request ; or input invalid
-	// - 401 Unauthorize ; no token 
+	//      - Email already exsits => message `Email already exists`
+	//      - Username already exsits => message `Username already exists`
 	// - 409 conflict ; no permission when requester is not super-admin/admin
 	// - 500 internal server error
 	s.App.POST("/register", usersHttpHandler.RegisterUser)
@@ -116,6 +117,20 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 500 internal server error
 	s.App.POST("/reset-password", usersHttpHandler.ResetPassword)
 
+	// Change Password
+	// Header Authorization - token
+	// Parameter(JSON)
+	// - oldPassword (string) ; old password ; 8 <= length <= 50
+	// - newPassword (string) ; new password ; 8 <= length <= 50
+	//
+	// Response
+	// - 200 OK ; Update password success
+	// - 400 bad request (invalid format password)
+	// - 401 Unautorize ; invalid old password
+	// - 422 ; New password == Old password
+	// - 500 internal server error
+	s.App.POST("/change-password", usersHttpHandler.ChangePassword)
+
 	// Verify Reset Token to verify the time valid of token (15 minute)
 	// Route Params - `token`
 	//
@@ -123,7 +138,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 200 OK & result (true/false)
 	// - 404 Not found ; token == "" or not attach token
 	// - 500 internal server error
-	s.App.GET("/verifry-reset-token/:token", usersHttpHandler.VerifyResetToken)
+	s.App.GET("/verify-reset-token/:token", usersHttpHandler.VerifyResetToken)
 
 	// Remove user by username & requestor role must be higher
 	// Header - Authorization : <token>
@@ -134,7 +149,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 200 OK
 	// - 401 Unauthorize ; missing token
 	// - 403 Forbidden ; no permission
-	// - 404 User not found (invalid username/not found) 
+	// - 404 User not found (invalid username/not found)
 	// - 500 internal server error
 	s.App.DELETE("/user/:username", usersHttpHandler.RemoveUser)
 

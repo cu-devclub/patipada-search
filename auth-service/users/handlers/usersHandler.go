@@ -18,7 +18,8 @@ type UsersHandler interface {
 	// Response
 	// - 201 and user id
 	// - 400 bad request ; or input invalid
-	// - 401 unauthorized ;  no token attach
+	//      - Email already exsits => message `Email already exists`
+	//      - Username already exsits => message `Username already exists`
 	// - 409 conflict ; no permission when requester is not super-admin/admin
 	// - 500 internal server error
 	RegisterUser(c echo.Context) error
@@ -84,4 +85,18 @@ type UsersHandler interface {
 	// - 404 Not found ; token == "" or not attach token
 	// - 500 internal server error
 	VerifyResetToken(c echo.Context) error
+
+
+	// Change Password
+	// Parameter(JSON)
+	// - oldPassword (string) ; old password ; 8 <= length <= 50
+	// - newPassword (string) ; new password ; 8 <= length <= 50
+	//
+	// Response
+	// - 200 OK ; Update password success
+	// - 400 bad request (invalid format password)
+	// - 401 Unautorize ; invalid old password
+	// - 422 ; New password == Old password
+	// - 500 internal server error
+	ChangePassword(c echo.Context) error
 }

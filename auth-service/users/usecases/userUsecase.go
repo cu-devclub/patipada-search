@@ -17,6 +17,8 @@ type UsersUsecase interface {
 	// Response
 	// - 201 and user id
 	// - 400 bad request ; or input invalid
+	//      - Email already exsits => message `Email already exists`
+	//      - Username already exsits => message `Username already exists`
 	// - 409 conflict ; no permission when requester is not super-admin/admin
 	// - 500 internal server error
 
@@ -44,7 +46,7 @@ type UsersUsecase interface {
 	// - 400 bad request (invalid email)
 	// - 404 User not found (email not exists)
 	// - 500 internal server error
-	ForgetPassword(in *models.ForgetPassword) (string,error)
+	ForgetPassword(in *models.ForgetPassword) (string, error)
 
 	// Reset Password
 	// Parameters(models.ResetPassword)
@@ -83,4 +85,17 @@ type UsersUsecase interface {
 	// - 404 Not found ; token == "" or not attach token
 	// - 500 internal server error
 	VerifyResetToken(token string) (bool, error)
+
+	// Change Password
+	// Parameter(JSON)
+	// - oldPassword (string) ; old password ; 8 <= length <= 50
+	// - newPassword (string) ; new password ; 8 <= length <= 50
+	//
+	// Response
+	// - 200 OK ; Update password success
+	// - 400 bad request (invalid format password)
+	// - 401 Unautorize ; invalid old password
+	// - 422 ; New password == Old password
+	// - 500 internal server error
+	ChangePassword(in *models.ChangePassword,username string) error
 }
