@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { isValueExist, isLengthEnough, isValidEmail } from "../../../functions";
+import { isValueExist, isLengthEnough, isValidEmail,handleEnterKeyPress } from "../../../functions";
 import { PASSWORD_REQUIRED_LENGTH } from "../../../constant";
 interface FormProps {
   submit: (username: string, email: string, password: string) => void;
@@ -103,6 +103,7 @@ export default function RegisterForm({
               type="text"
               onChange={(e) => setUsername(e.target.value)}
               variant={"authen_field"}
+              onKeyDown={handleEnterKeyPress(submitForm)}
             />
             <FormErrorMessage>{userNameErrorMessage}</FormErrorMessage>
           </FormControl>
@@ -113,6 +114,7 @@ export default function RegisterForm({
               type="email"
               onChange={(e) => setEmail(e.target.value)}
               variant={"authen_field"}
+              onKeyDown={handleEnterKeyPress(submitForm)}
             />
             <FormErrorMessage>{emailErrorMessage}</FormErrorMessage>
           </FormControl>
@@ -125,6 +127,7 @@ export default function RegisterForm({
                 type={showPassword ? "text" : "password"}
                 onChange={(e) => setPassword(e.target.value)}
                 variant={"authen_field"}
+                onKeyDown={handleEnterKeyPress(submitForm)}
               />
 
               <InputRightElement width="3rem">
@@ -152,6 +155,7 @@ export default function RegisterForm({
                 type={showConfirmPassword ? "text" : "password"}
                 onChange={() => setConfirmPassword(password)}
                 variant={"authen_field"}
+                onKeyDown={handleEnterKeyPress(submitForm)}
               />
 
               <InputRightElement width="3rem">

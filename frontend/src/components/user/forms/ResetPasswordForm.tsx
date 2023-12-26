@@ -13,7 +13,7 @@ import {
   FormErrorMessage,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { isLengthEnough } from "../../../functions";
+import { isLengthEnough, handleEnterKeyPress } from "../../../functions";
 import { PASSWORD_REQUIRED_LENGTH } from "../../../constant";
 interface FormProps {
   submit: (password: string) => void;
@@ -67,6 +67,7 @@ export default function ResetPasswordForm({ submit, formError }: FormProps) {
                 type={showPassword ? "text" : "password"}
                 onChange={(e) => setPassword(e.target.value)}
                 variant={"authen_field"}
+                onKeyDown={handleEnterKeyPress(submitForm)}
               />
 
               <InputRightElement width="3rem">
@@ -94,6 +95,7 @@ export default function ResetPasswordForm({ submit, formError }: FormProps) {
                 type={showConfirmPassword ? "text" : "password"}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 variant={"authen_field"}
+                onKeyDown={handleEnterKeyPress(submitForm)}
               />
 
               <InputRightElement width="3rem">

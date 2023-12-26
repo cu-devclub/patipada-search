@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { isValidEmail } from "../../../functions";
+import { isValidEmail,handleEnterKeyPress } from "../../../functions";
 interface FormProps {
   submit: (email: string) => void;
   formSuccess: boolean;
@@ -65,6 +65,7 @@ export default function ForgetPasswordForm({
                 type="email"
                 variant={emailFieldVariant}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={handleEnterKeyPress(submitForm)}
               />
             </InputGroup>
             <FormErrorMessage>{errMessage}</FormErrorMessage>
