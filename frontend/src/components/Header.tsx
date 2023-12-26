@@ -1,14 +1,13 @@
-import { Center,Image } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
+import { SignInButton,UserAvatar } from "./user";
+import { getCookie } from "typescript-cookie";
 function Header() {
+  const token = getCookie("token");
+  const username = getCookie("username");
   return (
-    <Center w="100%" h="6xs" border="1px" borderColor="gray.300" shadow="md">
-      <Image
-        boxSize="7xs"
-        objectFit="cover"
-        src="/Dhammanava.svg"
-        alt="Dhammanava"
-      />
-    </Center>
+    <Flex pr={4} justify="flex-end" alignItems="center" w="100%" h="8xs">
+      {token&&username ? <UserAvatar username={username}/> : <SignInButton />}
+    </Flex>
   );
 }
 

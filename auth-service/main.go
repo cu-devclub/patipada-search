@@ -5,15 +5,19 @@ import (
 	"auth-service/database"
 	"auth-service/server"
 	usersMigrate "auth-service/users/migrations"
+	"fmt"
 )
 
 func main() {
-	//TODO : Dockerized service 
+	config.InitializeViper("./")
 	cfg := config.GetConfig()
 	db := database.NewPostgresDatabase(&cfg)
 
-	usersMigrate.UsersMigrate(db)
+	err := usersMigrate.UsersMigrate(db)
+	if err != nil {
+		_ = fmt.Errorf("failed to migrate %w", err)
+		return 
+	}
 
 	server.NewEchoServer(&cfg, db.GetDb()).Start()
 }
-

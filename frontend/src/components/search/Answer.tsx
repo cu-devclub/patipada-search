@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Box, IconButton, Highlight } from "@chakra-ui/react";
+import { Box, IconButton, Highlight,Text } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
 import {useMaxChars} from "../../hook"; 
 
@@ -44,6 +44,11 @@ function Answer({ text, tokens }: AnswerProps) {
         <>
           {isExpanded ? (
             <>
+              <Text variant="answer">
+                <Highlight query={tokens} styles={{ color: "red" }}>
+                  {text}
+                </Highlight>{" "}
+              </Text>
               <Highlight query={tokens} styles={{ color: "red" }}>
                 {text}
               </Highlight>
@@ -56,9 +61,12 @@ function Answer({ text, tokens }: AnswerProps) {
             </>
           ) : (
             <>
-              <Highlight query={tokens} styles={{ color: "red" }}>
-                {truncatedText}
-              </Highlight>
+              <Text variant="answer">
+                <Highlight query={tokens} styles={{ color: "red" }}>
+                  {truncatedText}
+                </Highlight>
+              </Text>
+
               <IconButton
                 size="xs"
                 aria-label="read more"
@@ -69,9 +77,11 @@ function Answer({ text, tokens }: AnswerProps) {
           )}
         </>
       ) : (
-        <Highlight query={tokens} styles={{ color: "red" }}>
-          {text}
-        </Highlight>
+        <Text variant="answer">
+          <Highlight query={tokens} styles={{ color: "red" }}>
+            {text}
+          </Highlight>
+        </Text>
       )}
     </Box>
   );

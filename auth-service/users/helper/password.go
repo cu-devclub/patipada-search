@@ -34,6 +34,5 @@ func GenerateHashedSaltedPassword(rawPassword string) (string,string, error) {
 // Returns:
 // - error: an error if the passwords do not match.
 func VerifyPassword(dbPassword string, inputPasswordAndSalt string) error {
-	saltedpassword := inputPasswordAndSalt
-	return bcrypt.CompareHashAndPassword([]byte(dbPassword), []byte(saltedpassword))
+	return bcrypt.CompareHashAndPassword([]byte(dbPassword), []byte(inputPasswordAndSalt))
 }

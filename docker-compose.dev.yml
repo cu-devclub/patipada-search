@@ -64,9 +64,11 @@ services:
       - FRONTEND_URL=${WEB_CORS_TARGET}
       - JWT_KEY=${JWT_KEY} 
       - DATABASE_HOST=auth-db
-      - DATABASE_NAME=Authen
       - DATABASE_USER=${AUTH_DB_USER}
       - DATABASE_PASSWORD=${AUTH_DB_PASSWORD}
+      - EMAIL_SENDER_EMAIL=${SENDER_EMAIL}
+      - EMAIL_SENDER_PASSWORD=${SENDER_PASSWORD}
+      - LINK_URL=${LINK_URL}
     working_dir: /app/auth
     ports:
       - 8082:8082

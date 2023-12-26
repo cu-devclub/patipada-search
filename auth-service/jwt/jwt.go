@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"auth-service/config"
+	"auth-service/messages"
 	"net/http"
 	"time"
 
@@ -26,9 +27,8 @@ type CustomClaims struct {
 // Returns:
 // - token: the generated token (string)
 // - error: an error if the token generation fails (error)
-func CreateToken(userID, username, role string) (string, error) {
+func CreateToken(username, role string) (string, error) {
 	claims := CustomClaims{
-		UserID:   userID,
 		Username: username,
 		Role:     role,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -46,7 +46,7 @@ func CreateToken(userID, username, role string) (string, error) {
 func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, error) {
 	tokenString := c.Request().Header.Get("Authorization")
 	if tokenString == "" {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, "Missing Authorization header")
+		return nil, echo.NewHTTPError(http.StatusBadRequest, messages.MISSING_AUTHORIZATION)
 	}
 
 	secretKey := config.GetConfig().App.JWTKey
@@ -56,14 +56,14 @@ func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, error) {
 	})
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid || err == jwt.ErrTokenMalformed {
-			return nil, echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
+			return nil, echo.NewHTTPError(http.StatusUnauthorized, messages.INVALID_TOKEN)
 		}
 		return nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	claims, ok := token.Claims.(*CustomClaims)
 	if !ok || !token.Valid {
-		return nil, echo.NewHTTPError(http.StatusUnauthorized, "Invalid token")
+		return nil, echo.NewHTTPError(http.StatusUnauthorized, messages.INVALID_TOKEN)
 	}
 
 	return claims, nil

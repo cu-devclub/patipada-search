@@ -5,6 +5,8 @@ CREATE TABLE users (
     salt VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
     role VARCHAR(50) NOT NULL,
-    is_active BOOLEAN DEFAULT true
+    is_active BOOLEAN DEFAULT true,
+    reset_token VARCHAR(255),
+    reset_token_expires_at TIMESTAMP WITH TIME ZONE
 );
 
