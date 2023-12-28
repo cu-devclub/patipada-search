@@ -10,14 +10,61 @@ import (
 	"search-esdb-service/database"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
-	"search-esdb-service/record/es_query"
 	"search-esdb-service/record/repositories"
 	"strings"
 
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
-// Migration steps 
+const (
+	CREATE_INDEX_ICU_TOKENIZER = `
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "analyzer": {
+          "analyzer_shingle": {
+            "tokenizer": "icu_tokenizer",
+            "filter": ["filter_shingle"]
+          }
+        },
+        "filter": {
+          "filter_shingle": {
+            "type": "shingle",
+            "max_shingle_size": 3,
+            "min_shingle_size": 2,
+            "output_unigrams": "true"
+          }
+        }
+      }
+    }
+  },
+    "mappings": {
+    "properties": {
+      "youtubeURL": {
+        "type": "text"
+      },
+      "question": {
+        "type": "text",
+        "analyzer": "analyzer_shingle"
+      },
+      "answer": {
+        "type": "text",
+        "analyzer": "analyzer_shingle"
+      },
+      "startTime": {
+        "type": "text"
+      },
+      "endTime": {
+        "type": "text"
+      }
+    }
+  }
+}
+`
+)
+
+// Migration steps
 // Create index named `record`; if not exists else return
 // Convert file in csv format to json format from data folder
 // insert json to es
@@ -43,7 +90,7 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 	// Create the index
 	res, err := client.Indices.Create(
 		indexName,
-		client.Indices.Create.WithBody(strings.NewReader(es_query.CREATE_INDEX_ICU_TOKENIZER)),
+		client.Indices.Create.WithBody(strings.NewReader(CREATE_INDEX_ICU_TOKENIZER)),
 	)
 	if err != nil {
 		panic(err)
@@ -53,7 +100,6 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 	// Convert csv file
 	records, err := ConvertCSVFilesInDirectory(cfg.Static.DataPath)
 	fmt.Println("CONVERTING CSV-----------")
-	fmt.Println(records[0])
 	if err != nil {
 		panic(err)
 	}
@@ -81,10 +127,10 @@ func indexExists(client *elasticsearch.Client, indexName string) (bool, error) {
 	return res.StatusCode != 404, nil
 }
 
-// ConvertCSVFilesInDirectory converts CSV files in the specified 
+// ConvertCSVFilesInDirectory converts CSV files in the specified
 // directory into a slice of entities.Record structs.
 //
-// It takes a directory path as a parameter and returns a slice of 
+// It takes a directory path as a parameter and returns a slice of
 // entities.Record structs and an error.
 func ConvertCSVFilesInDirectory(directoryPath string) ([]*entities.Record, error) {
 	// Find file

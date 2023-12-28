@@ -1,5 +1,5 @@
 import { SearchResults, HeaderSearch } from "../../components/search";
-import { Flex, Divider } from "@chakra-ui/react";
+import { Flex,Grid } from "@chakra-ui/react";
 import { Footer } from "../../components";
 import { SearchResultInterface, DataItem } from "../../models/qa";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -67,11 +67,9 @@ function SearchResultPage() {
   // --------------------------------------------
 
   return (
-    <Flex
-      direction="column"
+    <Grid
+      templateRows="auto 1fr auto"
       gap={4}
-      justify="space-between"
-      align="flex-start"
       w="full"
       minH="100svh"
     >
@@ -83,7 +81,6 @@ function SearchResultPage() {
           performSearch={performSearch}
         />
       )}
-      <Divider />
       {data != null && (
         <>
           <SearchResults
@@ -91,7 +88,7 @@ function SearchResultPage() {
             query={queryMessage}
             tokens={tokens}
           />
-          <Flex w={{ base: "100%", md: "80%", xl: "70%" }} justify={"center"}>
+          <Flex w={{ base: "100%", md: "80%", xl: "70%" }} justifyItems={"center"}>
             <Pagination
               current={currentPage}
               total={data.length}
@@ -112,7 +109,7 @@ function SearchResultPage() {
         </>
       )}
       <Footer />
-    </Flex>
+    </Grid>
   );
 }
 

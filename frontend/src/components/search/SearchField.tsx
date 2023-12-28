@@ -137,7 +137,7 @@ function SearchField({
   }
 
   return (
-    <FormControl w={["90%", "70%", "50%"]} fontWeight="light">
+    <FormControl w={{base:"90%",lg:"50%"}} fontWeight="light">
       <AutoComplete
         emptyState={<Text textAlign="center">ค้นหาเลย</Text>}
         openOnFocus

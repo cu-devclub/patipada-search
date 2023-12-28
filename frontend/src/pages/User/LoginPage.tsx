@@ -2,12 +2,12 @@ import { AuthenForm } from "../../components/user/forms";
 import { MessageToast, Logo } from "../../components";
 import { Flex, Heading, VStack, Text, HStack, Button } from "@chakra-ui/react";
 import { login } from "../../service/user";
-import { ToastStatus,Role } from "../../constant";
+import { ToastStatus } from "../../constant";
 import { setCookie } from "typescript-cookie";
 import { useNavigate } from "react-router-dom";
 import { LoginDTO } from "../../models/user";
 import { useState } from "react";
-import {ReturnError} from "../../service/error";
+import { ReturnError } from "../../service/error";
 /**
  * Admin Login Page Component.
  *
@@ -38,10 +38,11 @@ const LoginPage = () => {
           status: ToastStatus.SUCCESS,
         });
         setCookie("token", response.token);
-        setCookie("username",username)
-        setCookie("role",response.role)
-        if (response.role == Role.ADMIN || response.role == Role.SUPER_ADMIN) navigate("/user");
-        else navigate("/")
+        setCookie("username", username);
+        setCookie("role", response.role);
+        navigate(-1);
+        // if (response.role == Role.ADMIN || response.role == Role.SUPER_ADMIN) navigate("/user");
+        // else navigate("/")
       })
       .catch((error: ReturnError) => {
         setformError(true);

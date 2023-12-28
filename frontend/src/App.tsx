@@ -8,6 +8,10 @@ import {
   ResetPasswordPage,
   ChangePasswordPage,
 } from "./pages/User";
+import {
+  PendingRequestPage,
+  EditRecordPage
+} from "./pages/Contributor";
 export default function App() {
   return (
     <BrowserRouter>
@@ -20,6 +24,10 @@ export default function App() {
           <Route path="reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="register" element={<RegisterPage />} />
           <Route path="change-password" element={<ChangePasswordPage />} />
+        </Route>
+        <Route path="/contributor/">
+          <Route path="pending-request" element={<PendingRequestPage />} />
+          <Route path="edit-record/:recordID" element={<EditRecordPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
