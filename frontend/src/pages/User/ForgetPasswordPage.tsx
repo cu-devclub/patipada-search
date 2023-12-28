@@ -1,6 +1,6 @@
 import { ForgetPasswordForm } from "../../components/user/forms";
 import { Flex, Text, VStack, Heading } from "@chakra-ui/react";
-import {  Logo, MessageToast } from "../../components";
+import { Logo, MessageToast } from "../../components";
 import { forgetPassword } from "../../service/user";
 import { useState } from "react";
 import { ReturnError } from "../../service/error";
@@ -8,25 +8,27 @@ import { ReturnError } from "../../service/error";
 function ForgetPasswordPage() {
   const { addToast } = MessageToast();
 
-  const [formSuccess, setformSuccess] = useState(false)
+  const [formSuccess, setformSuccess] = useState(false);
   const [emailError, setemailError] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
 
   const submit = async (email: string) => {
+    setIsLoading(true);
     await forgetPassword(email)
       .then(() => {
-        setemailError(false)
-        setformSuccess(true)
+        setemailError(false);
+        setformSuccess(true);
       })
-      .catch((err:ReturnError) => {
-        setemailError(true)
+      .catch((err: ReturnError) => {
+        setemailError(true);
         addToast({
           description: err.message,
           status: err.toastStatus,
-        })
+        });
       });
-  }
-  
+    setIsLoading(false);
+  };
+
   return (
     <Flex
       w="100%"
@@ -51,7 +53,12 @@ function ForgetPasswordPage() {
           ลิ้งค์เปลี่ยนรหัสผ่านจะถูกส่งไปยังอีเมลของท่าน
         </Text>
       </VStack>
-      <ForgetPasswordForm submit={submit} formSuccess={formSuccess} emailError={emailError}/>
+      <ForgetPasswordForm
+        submit={submit}
+        formSuccess={formSuccess}
+        emailError={emailError}
+        isLoading={isLoading}
+      />
     </Flex>
   );
 }

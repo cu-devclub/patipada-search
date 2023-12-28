@@ -12,6 +12,7 @@ import {
   Text,
   VStack,
   FormErrorMessage,
+  Spinner,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -20,12 +21,14 @@ interface FormProps {
   submit: (email: string) => void;
   formSuccess: boolean;
   emailError: boolean;
+  isLoading:boolean;
 }
 
 export default function ForgetPasswordForm({
   submit,
   formSuccess,
   emailError,
+  isLoading,
 }: FormProps) {
   const [email, setEmail] = useState("");
   const [submitCount, setsubmitCount] = useState(0);
@@ -74,6 +77,15 @@ export default function ForgetPasswordForm({
             <Button variant="brand" onClick={submitForm}>
               ส่งอีเมล
             </Button>
+            {isLoading && (
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="blue.500"
+                size="xl"
+              />
+            )}
             {formSuccess && (
               <Text color="green.400">
                 ระบบได้ส่งลิ้งค์สำหรับเปลี่ยนรหัสผ่านไปที่อีเมลล์ของท่านแล้ว
