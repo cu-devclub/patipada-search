@@ -8,8 +8,8 @@ import (
 	recordUsecases "search-esdb-service/record/usecases"
 
 	"github.com/elastic/go-elasticsearch/v8"
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 type ginServer struct {
@@ -27,12 +27,12 @@ func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
 }
 
 func (g *ginServer) Start() {
-	
-	// Allow CORS from frontend 
+
+	// Allow CORS from frontend
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{g.cfg.App.FrontendURL}
 	g.app.Use(cors.New(config))
-	
+
 	g.initializeRecordHttpHandler()
 
 	g.app.Run(fmt.Sprintf(":%d", g.cfg.App.Port))
@@ -50,7 +50,7 @@ func (g *ginServer) Start() {
 //
 // The "/search" endpoint handles GET requests and returns a
 // status code 200 with records found if any, or an empty list if none are
-// found. And returns a status code 400 (Bad Request) if the query word is 
+// found. And returns a status code 400 (Bad Request) if the query word is
 // not attached.
 func (g *ginServer) initializeRecordHttpHandler() {
 	recordESRepository := recordRepository.NewRecordESRepository(g.db)
@@ -59,12 +59,26 @@ func (g *ginServer) initializeRecordHttpHandler() {
 
 	recordHttpHandler := recordHandlers.NewRecordHttpHandler(recordUsecase)
 
-	// GET Request return 200 with records found (get/search)
-	// if not found still return 200 with empty list 
-	// 500 for internal server error 
+	// GetAllRecords retrieves all records from the database and sends a response back to the client.
+	//
+	// Response:
+	// - 200: A list of all records retrieved from the database.
+	// - 500: An internal server error occurred.
 	g.app.GET("/displayAllRecords", recordHttpHandler.GetAllRecords)
-	
-	// If query word is not attach, return 400 Bad request 
+
+	// Search searches for records based on the provided query.
+	//
+	// It takes a gin.Context object as a parameter.
+	// It returns the search results as a slice of records.
+	//
+	// Query :
+	// - query (*required): The query string used to search for records.
+	// - amount : The number of results to return. default is 20
+	//
+	// Response :
+	// - 200: The search results.
+	// - 400: Bad request. (query not attached) or invalid amount
+	// - 500: An internal server error occurred.
 	g.app.GET("/search", recordHttpHandler.Search)
 
 }
