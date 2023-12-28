@@ -112,8 +112,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// Response
 	// - 201 Created ; Update password success
 	// - 400 bad request (invalid format password)
-	// - 401 Unautorize ; invalid reset password token
-	// - 422 ; New password == Old password
+	// - 401 Unauthorize ; invalid reset password token
 	// - 500 internal server error
 	s.App.POST("/reset-password", usersHttpHandler.ResetPassword)
 
@@ -126,8 +125,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// Response
 	// - 200 OK ; Update password success
 	// - 400 bad request (invalid format password)
-	// - 401 Unautorize ; invalid old password
-	// - 422 ; New password == Old password
+	// - 401 Unauthorize ; invalid old password
 	// - 500 internal server error
 	s.App.POST("/change-password", usersHttpHandler.ChangePassword)
 

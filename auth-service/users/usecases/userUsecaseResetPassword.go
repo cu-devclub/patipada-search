@@ -20,7 +20,6 @@ import (
 // - 201 Created ; Update password success
 // - 400 bad request (invalid format password)
 // - 401 Unautorize ; invalid reset password
-// - 422 ; New password == Old password
 // - 500 internal server error
 func (u *UsersUsecaseImpl) ResetPassword(in *models.ResetPassword) error {
 
@@ -51,12 +50,6 @@ func (u *UsersUsecaseImpl) ResetPassword(in *models.ResetPassword) error {
 	}
 	if !ch {
 		return errors.CreateError(401, messages.UNAUTHORIZED)
-	}
-
-	// Check new password != old password
-	if err := helper.VerifyPassword(user.Password, in.Password+user.Salt); err == nil {
-		// No error means same password
-		return errors.CreateError(422, messages.PASSWORD_SAME)
 	}
 
 	password, salt, err := helper.GenerateHashedSaltedPassword(in.Password)
