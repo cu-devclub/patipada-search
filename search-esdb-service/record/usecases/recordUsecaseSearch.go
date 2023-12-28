@@ -12,11 +12,13 @@ import "search-esdb-service/record/models"
 // - *models.SearchRecordStruct: The search results containing the matching records.
 // - error: An error if the search operation fails.
 func (r *recordUsecaseImpl) Search(indexName, query string, amount int) (*models.SearchRecordStruct, error) {
+	// search the record 
 	records, err := r.recordRepository.Search(indexName, query, amount)
 	if err != nil {
 		return nil, err
 	}
 
+	// extract tokens from query
 	tokens, err := r.recordRepository.AnalyzeQueryKeyword(query)
 	if err != nil {
 		return nil, err
