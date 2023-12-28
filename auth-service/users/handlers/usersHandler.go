@@ -85,7 +85,6 @@ type UsersHandler interface {
 	// - 500 internal server error
 	VerifyResetToken(c echo.Context) error
 
-
 	// Change Password
 	// Parameter(JSON)
 	// - oldPassword (string) ; old password ; 8 <= length <= 50
@@ -97,4 +96,27 @@ type UsersHandler interface {
 	// - 401 Unautorize ; invalid old password
 	// - 500 internal server error
 	ChangePassword(c echo.Context) error
+
+	// Verify Token to verify the time valid of auth token
+	// Header - Authorization : <token>
+	//
+	// Response
+	// - 200 OK & result (true/false)
+	// - 400 Bad request ; missing token
+	// - 401 Unauthorize ; invalid token
+	// - 500 internal server error
+	VerifyToken(c echo.Context) error
+
+	// Authorize to verify the user authorization
+	// Header - Authorization : <token>
+	//
+	// Query Params
+	// - requiredRole (string) ; one of admin, super-admin, user
+	//
+	// Response
+	// - 200 OK & result (true/false)
+	// - 400 Bad request ; missing token
+	// - 401 Unauthorize ; invalid token
+	// - 500 internal server error
+	Authorize(c echo.Context) error
 }

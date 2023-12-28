@@ -28,7 +28,7 @@ func (u *UsersUsecaseImpl) RemoveUser(requesterRole string, in *models.RemoveUse
 	}
 
 	// Check roles
-	ch, _ := jwt.HasAuthorizeRole(requesterRole, user.Role,false)
+	ch := jwt.HasAuthorizeRole(requesterRole, user.Role,false)
 	if !ch {
 		return errors.CreateError(403, messages.NO_PERMISSION)
 	}

@@ -1,6 +1,11 @@
 package usecases
 
-import "auth-service/users/models"
+import (
+	"auth-service/errors"
+	"auth-service/users/models"
+
+	"github.com/labstack/echo/v4"
+)
 
 type UsersUsecase interface {
 	// RegisterUser
@@ -95,5 +100,28 @@ type UsersUsecase interface {
 	// - 400 bad request (invalid format password)
 	// - 401 Unautorize ; invalid old password
 	// - 500 internal server error
-	ChangePassword(in *models.ChangePassword,username string) error
+	ChangePassword(in *models.ChangePassword, username string) error
+
+	// Verify Token to verify the time valid of auth token
+	// Header - Authorization : <token>
+	//
+	// Response
+	// - 200 OK & result (true/false)
+	// - 400 Bad request ; missing token
+	// - 401 Unauthorize ; invalid token
+	// - 500 internal server error
+	VerifyToken(c echo.Context) (bool, *errors.RequestError)
+
+	// Authorize to verify the user authorization
+	// Header - Authorization : <token>
+	//
+	// Query Params
+	// - requiredRole (string) ; one of admin, super-admin, user
+	//
+	// Response
+	// - 200 OK & result (true/false)
+	// - 400 Bad request ; missing token
+	// - 401 Unauthorize ; invalid token
+	// - 500 internal server error
+	Authorize(c echo.Context, requireRole string) (bool, *errors.RequestError)
 }

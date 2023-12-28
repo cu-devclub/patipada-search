@@ -38,7 +38,7 @@ func (u *UsersUsecaseImpl) RegisterUser(requesterRole string, in *models.Registe
 
 	// Check roles
 	if in.Role == "admin" || in.Role == "super-admin" {
-		ch, _ := jwt.HasAuthorizeRole(requesterRole, in.Role,true)
+		ch := jwt.HasAuthorizeRole(requesterRole, in.Role,true)
 		if !ch {
 			return "", errors.CreateError(409, messages.NO_PERMISSION)
 		}
