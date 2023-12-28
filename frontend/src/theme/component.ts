@@ -60,11 +60,11 @@ const buttonStyle = {
         bg: "orange.800",
       },
     },
-    brand_link : {
+    brand_link: {
       color: "brand_orange.400",
       p: 0,
     },
-    complete_ghost : {
+    complete_ghost: {
       bg: "transparent",
       _hover: {
         bg: "transparent",
@@ -73,7 +73,26 @@ const buttonStyle = {
         bg: "transparent",
       },
     },
-    
+    success: {
+      bg: "green.400",
+      color: "white",
+      _hover: {
+        bg: "green.600",
+      },
+      _active: {
+        bg: "green.800",
+      },
+    },
+    cancel: {
+      bg: "red.400",
+      color: "white",
+      _hover: {
+        bg: "red.600",
+      },
+      _active: {
+        bg: "red.800",
+      },
+    },
   },
 };
 

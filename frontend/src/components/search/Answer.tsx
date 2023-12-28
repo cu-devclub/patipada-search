@@ -49,9 +49,6 @@ function Answer({ text, tokens }: AnswerProps) {
                   {text}
                 </Highlight>{" "}
               </Text>
-              <Highlight query={tokens} styles={{ color: "red" }}>
-                {text}
-              </Highlight>
               <IconButton
                 size="xs"
                 aria-label="read less"

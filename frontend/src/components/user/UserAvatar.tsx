@@ -40,6 +40,9 @@ function UserAvatar({ username }: UserAvatarProps) {
         <Box w="full" h="full" pl={2}>
           <Text fontWeight={"semibold"}> สวัสดี {username}</Text>
         </Box>
+        <MenuItem onClick={() => navigate("/contributor/pending-request")}>
+          ติดตามคำขอแก้ไข
+        </MenuItem>
         <MenuItem onClick={() => navigate("/user/change-password")}>
           เปลี่ยนรหัสผ่าน
         </MenuItem>
