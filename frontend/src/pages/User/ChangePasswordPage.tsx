@@ -1,12 +1,12 @@
 import { ChangePasswordForm } from "../../components/user/forms";
-import { Flex, Text, VStack, Heading } from "@chakra-ui/react";
-import { Logo, MessageToast } from "../../components";
+import { Text, Heading } from "@chakra-ui/react";
+import { MessageToast } from "../../components";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { changePassword } from "../../service/user";
 import { ReturnError } from "../../service/error";
 import { getCookie } from "typescript-cookie";
-
+import { UserBasePage } from "./UserBasePage";
 function ChangePasswordPage() {
   const token = getCookie("token") || "";
   const username = getCookie("username") || "";
@@ -23,7 +23,7 @@ function ChangePasswordPage() {
           description: "เปลี่ยนรหัสผ่านสำเร็จ",
           status: "success",
         });
-       navigate(-1)
+        navigate(-1);
       })
       .catch((err: ReturnError) => {
         addToast({
@@ -31,45 +31,33 @@ function ChangePasswordPage() {
           status: err.toastStatus,
         });
         if (err.status == 401) {
-            setOldPasswordError(true);
-        }
-        else if (err.status == 422) {
-            setNewPasswordError(true);
+          setOldPasswordError(true);
+        } else if (err.status == 422) {
+          setNewPasswordError(true);
         }
       });
   };
 
   return (
-    <Flex
-      w="100%"
-      minH="100svh"
-      bg="gray.600"
-      justify={"flex-start"}
-      align={"center"}
-      direction={"column"}
-      pt={12}
-    >
-      <Logo size="7xs" />
-      <VStack spacing={0} pb={4}>
-        <Heading
-          fontSize={"5xl"}
-          color={"whiteAlpha.900"}
-          letterSpacing={"tighter"}
-          textShadow={"0px 4px 4px rgba(0, 0, 0, 0.25)"}
-        >
-          เปลี่ยนรหัสผ่าน
-        </Heading>
-        <Text color={"whiteAlpha.900"} fontSize={"lg"}>
-          กรุณากรอกรหัสผ่านใหม่
-        </Text>
-      </VStack>
+    <UserBasePage>
+      <Heading
+        fontSize={"5xl"}
+        color={"whiteAlpha.900"}
+        letterSpacing={"tighter"}
+        textShadow={"0px 4px 4px rgba(0, 0, 0, 0.25)"}
+      >
+        เปลี่ยนรหัสผ่าน
+      </Heading>
+      <Text color={"whiteAlpha.900"} fontSize={"lg"} pb={2}>
+        กรุณากรอกรหัสผ่านใหม่
+      </Text>
       <ChangePasswordForm
         username={username}
         submit={submit}
         oldPasswordError={oldPasswordError}
         newPasswordError={newPasswordError}
       />
-    </Flex>
+    </UserBasePage>
   );
 }
 

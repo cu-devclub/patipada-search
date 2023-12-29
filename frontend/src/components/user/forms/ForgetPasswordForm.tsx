@@ -2,7 +2,6 @@ import { EmailIcon } from "@chakra-ui/icons";
 import {
   Box,
   FormControl,
-  Flex,
   FormLabel,
   Input,
   Stack,
@@ -15,13 +14,12 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { isValidEmail,handleEnterKeyPress } from "../../../functions";
+import { isValidEmail, handleEnterKeyPress } from "../../../functions";
 interface FormProps {
   submit: (email: string) => void;
   formSuccess: boolean;
   emailError: boolean;
-  isLoading:boolean;
+  isLoading: boolean;
 }
 
 export default function ForgetPasswordForm({
@@ -35,22 +33,21 @@ export default function ForgetPasswordForm({
   const [tempCredential, setTempCredential] = useState({
     email: "",
   });
-    const verifyChangeCredential =
-      tempCredential.email != email 
+  const verifyChangeCredential = tempCredential.email != email;
 
-  const navigate = useNavigate();
   const iconColor = formSuccess ? "green.400" : "gray.600";
   const emailFieldVariant = formSuccess
     ? `success_authen_field`
     : `authen_field`;
   const isEmailInvalid =
-    (submitCount > 0 && !isValidEmail(email)) || (emailError && !verifyChangeCredential);
+    (submitCount > 0 && !isValidEmail(email)) ||
+    (emailError && !verifyChangeCredential);
   const errMessage = emailError ? "ไม่พบ email นี้ในระบบ" : "อีเมลไม่ถูกต้อง";
 
   const submitForm = () => {
     setsubmitCount(submitCount + 1);
     if (isEmailInvalid || !isValidEmail(email)) return;
-    setTempCredential({ email:email });
+    setTempCredential({ email: email });
     submit(email);
   };
 
@@ -94,15 +91,6 @@ export default function ForgetPasswordForm({
           </VStack>
         </Stack>
       </Box>
-      <Flex justify="flex-end">
-        <Button
-          variant="brand_link"
-          onClick={() => navigate("/user/login")}
-          color="blue.100"
-        >
-          กลับหน้าเข้าสู่ระบบ
-        </Button>
-      </Flex>
     </Box>
   );
 }

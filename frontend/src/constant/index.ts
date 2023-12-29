@@ -13,7 +13,7 @@ export const PASSWORD_REQUIRED_LENGTH=8
 export const Role = {
     USER: "user",
     ADMIN: "admin",
-    SUPER_ADMIN: "super_admin",
+    SUPER_ADMIN: "super-admin",
 }
 
 export const SERVER_ERROR_MESSAGE = {
@@ -34,6 +34,8 @@ export const ERR_Messages = {
   INVALID_PASSWORD_FORMAT: `รหัสผ่านต้องมีความยาวอย่างน้อย ${PASSWORD_REQUIRED_LENGTH} ตัวอักษร`,
   SAME_PASSWORD: "รหัสผ่านเดิมและรหัสผ่านใหม่ตรงกัน",
   INVALID_OLD_PASSWORD: "รหัสผ่านเดิมไม่ถูกต้อง",
+  INVALID_TOKEN: "Token ไม่ถูกต้อง",
+  MISSING_TOKEN: "ไม่พบ Token",
 };
 
 // Mapping user-friendly error messages to error message from server
