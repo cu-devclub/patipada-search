@@ -13,8 +13,7 @@ function ChangePasswordPage() {
   const navigate = useNavigate();
   const { addToast } = MessageToast();
   const [oldPasswordError, setOldPasswordError] = useState(false); // not equal in db Password
-  const [newPasswordError, setNewPasswordError] = useState(false); // == db Password
-
+  
   const submit = async (oldPassword: string, newPassword: string) => {
     if (username == "" || token == "") return;
     await changePassword(token, oldPassword, newPassword)
@@ -32,9 +31,7 @@ function ChangePasswordPage() {
         });
         if (err.status == 401) {
           setOldPasswordError(true);
-        } else if (err.status == 422) {
-          setNewPasswordError(true);
-        }
+        } 
       });
   };
 
@@ -55,7 +52,6 @@ function ChangePasswordPage() {
         username={username}
         submit={submit}
         oldPasswordError={oldPasswordError}
-        newPasswordError={newPasswordError}
       />
     </UserBasePage>
   );

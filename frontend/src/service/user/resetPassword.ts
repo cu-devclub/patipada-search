@@ -58,13 +58,7 @@ export const resetPassword = async (token: string, password: string) => {
         status: 401,
         toastStatus: ToastStatus.ERROR,
       };
-    } else if (requestError.status === 422) {
-      returnError = {
-        message: ERR_Messages.SAME_PASSWORD,
-        status: 422,
-        toastStatus: ToastStatus.ERROR,
-      };
-    } else {
+    }  else {
       returnError = {
         message: ERR_Messages.SYSTEM_ERROR,
         status: 500,

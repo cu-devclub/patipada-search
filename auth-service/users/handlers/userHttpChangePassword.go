@@ -5,7 +5,6 @@ import (
 	"auth-service/jwt"
 	"auth-service/messages"
 	"auth-service/users/models"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -32,12 +31,11 @@ func (h *usersHttpHandler) ChangePassword(c echo.Context) error {
 	if err != nil {
 		return baseResponse(c, http.StatusUnauthorized, messages.UNAUTHORIZED)
 	}
-	
+
 	username := claims.Username
 
 	if err := h.usersUsecase.ChangePassword(reqBody, username); err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
-			fmt.Println("REQUEST ERROR", er.Error())
 			return baseResponse(c, er.StatusCode, er.Error())
 		} else {
 			return baseResponse(c, http.StatusInternalServerError, messages.INTERNAL_SERVER_ERROR)

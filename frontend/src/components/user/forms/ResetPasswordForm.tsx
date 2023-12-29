@@ -27,11 +27,10 @@ export default function ResetPasswordForm({ submit, formError }: FormProps) {
     password: "",
   });
 
-    const verifyChangeCredential =
-      tempCredential.password != password;
+  const verifyChangeCredential = tempCredential.password != password;
 
   const passwordErrMessage = formError
-    ? "รหัสผ่านใหม่เหมือนกับรหัสผ่านเดิมในระบบ"
+    ? "เกิดข้อผิดพลาด"
     : "รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร";
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
