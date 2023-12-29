@@ -7,7 +7,7 @@ import {
   ResetPasswordPage,
   ChangePasswordPage,
 } from "./pages/User";
-
+import NotFoundPage from "./pages/404";
 import { Dashboard as AdminDashboard, AdminChoosePage } from "./pages/Admin";
 import { PendingRequestPage, EditRecordPage } from "./pages/Contributor";
 export default function App() {
@@ -30,6 +30,7 @@ export default function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="choosePage" element={<AdminChoosePage />} />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
