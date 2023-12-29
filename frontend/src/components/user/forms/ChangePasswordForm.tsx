@@ -13,40 +13,33 @@ import {
   FormErrorMessage,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { isLengthEnough,handleEnterKeyPress } from "../../../functions";
+import { isLengthEnough, handleEnterKeyPress } from "../../../functions";
 import { PASSWORD_REQUIRED_LENGTH } from "../../../constant";
 interface FormProps {
   username: string;
   submit: (oldPassword: string, newPassword: string) => void;
   oldPasswordError: boolean;
-  newPasswordError: boolean;
 }
 
 export default function ChangePasswordForm({
   username,
   submit,
   oldPasswordError,
-  newPasswordError,
 }: FormProps) {
   const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [tempCredential, setTempCredential] = useState({
     oldPassword: "",
-    password: "",
   });
 
-  const verifyChangeCredential =
-    tempCredential.oldPassword != oldPassword ||
-    tempCredential.password != password;
+  const verifyChangeCredential = tempCredential.oldPassword != oldPassword;
 
   const oldPasswordErrMessage = oldPasswordError
     ? "รหัสผ่านเดิมไม่ตรงกับข้อมูลในระบบ"
     : "รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร";
 
-  const passwordErrMessage = newPasswordError
-    ? "รหัสผ่านใหม่เหมือนกับรหัสผ่านเดิมในระบบ"
-    : "รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร";
+  const passwordErrMessage = "รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร";
   const [showOldPassword, setShowOldPassword] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -60,8 +53,7 @@ export default function ChangePasswordForm({
     (oldPasswordError && !verifyChangeCredential);
 
   const isPasswordInvalid =
-    (countSubmit > 0 && !isLengthEnough(password, PASSWORD_REQUIRED_LENGTH)) ||
-    (newPasswordError && !verifyChangeCredential);
+    countSubmit > 0 && !isLengthEnough(password, PASSWORD_REQUIRED_LENGTH);
 
   const isConfirmPasswordInvalid =
     countSubmit > 0 && password !== confirmPassword;
@@ -76,7 +68,7 @@ export default function ChangePasswordForm({
       password !== confirmPassword
     )
       return;
-    setTempCredential({ oldPassword: oldPassword, password: password });
+    setTempCredential({ oldPassword: oldPassword });
     submit(oldPassword, password);
   };
 

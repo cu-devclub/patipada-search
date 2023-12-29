@@ -1,23 +1,32 @@
 import axios from "axios";
-import { ERR_Messages, ToastStatus } from "../../constant";
 import { CreateCustomError, ReturnError } from "../error";
-
-export const verifyResetPasswordToken = async (token: string) => {
+import { ERR_Messages, ToastStatus } from "../../constant";
+// use in contributor to verify their token
+export const verifyToken = async (token: string) => {
   try {
-    //TODO : Test the environment mode
     const apiUrl =
       import.meta.env.MODE === "production"
         ? import.meta.env.VITE_AUTH_API_URL
         : "http://localhost:8082";
-    const response = await axios.get(`${apiUrl}/verify-reset-token/${token}`);
-    return response.data;
+    const response = await axios.get(`${apiUrl}/verify-token`, {
+      headers: {
+        Authorization: token,
+      },
+    });
+    return response.data.result;
   } catch (error: unknown) {
     const requestError = CreateCustomError(error);
     let returnError: ReturnError;
-    if (requestError.status === 404) {
+    if (requestError.status == 400) {
       returnError = {
-        message: ERR_Messages.NOT_FOUND_TOKEN,
-        status: 404,
+        message: ERR_Messages.MISSING_TOKEN,
+        status: 400,
+        toastStatus: ToastStatus.WARNING,
+      };
+    } else if (requestError.status === 401) {
+      returnError = {
+        message: ERR_Messages.INVALID_TOKEN,
+        status: 401,
         toastStatus: ToastStatus.ERROR,
       };
     } else {
@@ -31,34 +40,39 @@ export const verifyResetPasswordToken = async (token: string) => {
   }
 };
 
-export const resetPassword = async (token: string, password: string) => {
+// use in admin task to verify their token and role
+export const authorize = async (token: string, requireRole: string) => {
   try {
-    //TODO : Test the environment mode
     const apiUrl =
       import.meta.env.MODE === "production"
         ? import.meta.env.VITE_AUTH_API_URL
         : "http://localhost:8082";
-    const response = await axios.post(`${apiUrl}/reset-password`, {
-      token: token,
-      password: password,
-    });
-    return response.data;
+    const response = await axios.get(
+      `${apiUrl}/authorize?requiredRole=${requireRole}`,
+      {
+        headers: {
+          Authorization: token,
+        },
+      }
+    );
+
+    return response.data.result;
   } catch (error: unknown) {
     const requestError = CreateCustomError(error);
     let returnError: ReturnError;
     if (requestError.status == 400) {
       returnError = {
-        message: ERR_Messages.INVALID_PASSWORD_FORMAT,
+        message: ERR_Messages.MISSING_TOKEN,
         status: 400,
-        toastStatus: ToastStatus.ERROR,
+        toastStatus: ToastStatus.WARNING,
       };
     } else if (requestError.status === 401) {
       returnError = {
-        message: ERR_Messages.NOT_FOUND_TOKEN,
+        message: ERR_Messages.INVALID_TOKEN,
         status: 401,
         toastStatus: ToastStatus.ERROR,
       };
-    }  else {
+    } else {
       returnError = {
         message: ERR_Messages.SYSTEM_ERROR,
         status: 500,

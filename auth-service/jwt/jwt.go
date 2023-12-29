@@ -2,6 +2,7 @@ package jwt
 
 import (
 	"auth-service/config"
+	"auth-service/errors"
 	"auth-service/messages"
 	"net/http"
 	"time"
@@ -43,10 +44,10 @@ func CreateToken(username, role string) (string, error) {
 
 // ValidateAndExtractClaims validates the JWT token in the Authorization header
 // and extracts the claims.
-func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, error) {
+func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, *errors.RequestError) {
 	tokenString := c.Request().Header.Get("Authorization")
 	if tokenString == "" {
-		return nil, echo.NewHTTPError(http.StatusBadRequest, messages.MISSING_AUTHORIZATION)
+		return nil, errors.CreateError(http.StatusBadRequest, messages.MISSING_AUTHORIZATION)
 	}
 
 	secretKey := config.GetConfig().App.JWTKey
@@ -55,15 +56,12 @@ func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, error) {
 		return []byte(secretKey), nil
 	})
 	if err != nil {
-		if err == jwt.ErrSignatureInvalid || err == jwt.ErrTokenMalformed {
-			return nil, echo.NewHTTPError(http.StatusUnauthorized, messages.INVALID_TOKEN)
-		}
-		return nil, echo.NewHTTPError(http.StatusBadRequest, err.Error())
+		return nil, errors.CreateError(http.StatusUnauthorized, messages.INVALID_TOKEN)
 	}
 
 	claims, ok := token.Claims.(*CustomClaims)
 	if !ok || !token.Valid {
-		return nil, echo.NewHTTPError(http.StatusUnauthorized, messages.INVALID_TOKEN)
+		return nil, errors.CreateError(http.StatusUnauthorized, messages.INVALID_TOKEN)
 	}
 
 	return claims, nil

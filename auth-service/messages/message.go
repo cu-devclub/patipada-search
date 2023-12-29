@@ -19,4 +19,7 @@ const (
 	PASSWORD_SAME                         = "New password must be different from old password"
 	SUCCESSFUL_VERIFY_RESET_TOKEN         = "Successful verify reset token"
 	SUCCESSFUL_CHANGE_PASSWORD            = "Successful change password"
+	SUCCESSFUL_VERIFIY_AUTH_TOKEN         = "Successful verify auth token"
+	SUCCESSFUL_AUTHORIZE                  = "Successful authorize"
+	MISSING_REQUIRED_ROLE                 = "Missing required role"
 )

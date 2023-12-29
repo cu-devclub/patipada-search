@@ -38,12 +38,6 @@ export const changePassword = async (
         status: 401,
         toastStatus: ToastStatus.ERROR,
       };
-    } else if (requestError.status === 422) {
-      returnError = {
-        message: ERR_Messages.SAME_PASSWORD,
-        status: 422,
-        toastStatus: ToastStatus.ERROR,
-      };
     } else {
       returnError = {
         message: ERR_Messages.SYSTEM_ERROR,

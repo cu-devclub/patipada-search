@@ -1,7 +1,7 @@
 import { isValidEmail, isValueExist, isLengthEnough } from "./form";
 import { timeToSeconds } from "./time";
 import { handleEnterKeyPress } from "./keyboard";
-import {SignOut} from "./user";
+import { SignOut, ValidateToken, AuthorizeAdmin } from "./user";
 export {
   isValidEmail,
   isValueExist,
@@ -9,4 +9,6 @@ export {
   timeToSeconds,
   handleEnterKeyPress,
   SignOut,
+  ValidateToken,
+  AuthorizeAdmin,
 };

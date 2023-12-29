@@ -1,6 +1,6 @@
 import { RegisterForm } from "../../components/user/forms";
-import { Logo, MessageToast } from "../../components";
-import { Flex, Heading, VStack } from "@chakra-ui/react";
+import { MessageToast } from "../../components";
+import { Button, Flex, Heading } from "@chakra-ui/react";
 import { useState } from "react";
 import {
   Role,
@@ -12,12 +12,13 @@ import { RegisterDTO, LoginDTO } from "../../models/user";
 import { register } from "../../service/user";
 import { login } from "../../service/user";
 import { setCookie } from "typescript-cookie";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ReturnError } from "../../service/error";
-
+import { UserBasePage } from "./UserBasePage";
 const RegisterPage = () => {
   const { addToast } = MessageToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // 400 Bad request has 2 different message
   // 1. `Username already exists`
@@ -41,23 +42,25 @@ const RegisterPage = () => {
           status: ToastStatus.SUCCESS,
         });
       })
-      .catch((error:ReturnError) => {
-         if (error.status === 400) {
-           if (error.message === SERVER_ERROR_MESSAGE.USERNAME_ALREADY_EXISTS) {
-             setusernameError(true);
-           } else if (error.message === SERVER_ERROR_MESSAGE.EMAIL_ALREADY_EXISTS) {
-             setemailError(true);
-           }
-           addToast({
-             description: ERR_Messages_MAP[error.message],
-             status: ToastStatus.WARNING,
-           });
-         } else {
-            addToast({
-              description: error.message,
-              status: error.toastStatus,
-            });
-         }
+      .catch((error: ReturnError) => {
+        if (error.status === 400) {
+          if (error.message === SERVER_ERROR_MESSAGE.USERNAME_ALREADY_EXISTS) {
+            setusernameError(true);
+          } else if (
+            error.message === SERVER_ERROR_MESSAGE.EMAIL_ALREADY_EXISTS
+          ) {
+            setemailError(true);
+          }
+          addToast({
+            description: ERR_Messages_MAP[error.message],
+            status: ToastStatus.WARNING,
+          });
+        } else {
+          addToast({
+            description: error.message,
+            status: error.toastStatus,
+          });
+        }
       });
 
     afterwardsLogin(username, password);
@@ -76,45 +79,54 @@ const RegisterPage = () => {
           status: ToastStatus.SUCCESS,
         });
         setCookie("token", response.token);
+        if (response.role == Role.ADMIN || response.role == Role.SUPER_ADMIN) {
+          navigate("/admin/choosePage");
+        } else {
+          if (location.state?.from) {
+            navigate(location.state.from);
+          } else {
+            navigate("/");
+          }
+        }
       })
-      .catch((error : ReturnError) => {
+      .catch((error: ReturnError) => {
         addToast({
           description: error.message,
           status: error.toastStatus,
         });
       });
-
-      navigate("/user");
-
   };
 
   return (
-    <Flex
-      w="100%"
-      minH="100svh"
-      bg="gray.600"
-      justify={"flex-start"}
-      align={"center"}
-      direction={"column"}
-      pt={12}
-    >
-      <Logo size="7xs" />
-      <VStack spacing={0} pb={4}>
+    <UserBasePage>
         <Heading
-          fontSize={"5xl"}
+          fontSize={["3xl","5xl"]}
           color={"whiteAlpha.900"}
           letterSpacing={"tighter"}
           textShadow={"0px 4px 4px rgba(0, 0, 0, 0.25)"}
+          textAlign={"center"}
+          pb={2}
         >
-          ลงทะเบียนสำหรับ Content Contributor
+           ลงทะเบียนสำหรับ <br/>
+          Content Contributor
         </Heading>
-      </VStack>
-      <RegisterForm
-        submit={submit}
-        usernameError={usernameError}
-        emailError={emailError}
-      />
-    </Flex>
+        <RegisterForm
+          submit={submit}
+          usernameError={usernameError}
+          emailError={emailError}
+        />
+        <Flex alignSelf={"flex-end"}>
+          <Button
+            variant="brand_link"
+            color="blue.100"
+            onClick={() =>
+              navigate("/user/login", { state: { from: location.state?.from } })
+            }
+          >
+            กลับหน้าเข้าสู่ระบบ
+          </Button>
+        </Flex>
+    </UserBasePage>
   );
 };
 

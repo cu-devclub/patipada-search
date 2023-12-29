@@ -1,6 +1,5 @@
 import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import {
-  Flex,
   Box,
   FormControl,
   Center,
@@ -14,8 +13,12 @@ import {
   FormErrorMessage,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { isValueExist, isLengthEnough, isValidEmail,handleEnterKeyPress } from "../../../functions";
+import {
+  isValueExist,
+  isLengthEnough,
+  isValidEmail,
+  handleEnterKeyPress,
+} from "../../../functions";
 import { PASSWORD_REQUIRED_LENGTH } from "../../../constant";
 interface FormProps {
   submit: (username: string, email: string, password: string) => void;
@@ -72,8 +75,6 @@ export default function RegisterForm({
 
   const passwordErrorMessage = "รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร";
 
-
-  const navigate = useNavigate();
 
   const submitForm = () => {
     SetsubmitCount(submitCount + 1);
@@ -182,15 +183,6 @@ export default function RegisterForm({
           </Center>
         </Stack>
       </Box>
-      <Flex justify="flex-end">
-        <Button
-          variant="brand_link"
-          color="blue.100"
-          onClick={() => navigate("/user/login")}
-        >
-          กลับหน้าเข้าสู่ระบบ
-        </Button>
-      </Flex>
     </Box>
   );
 }
