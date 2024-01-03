@@ -24,3 +24,6 @@ search-esdb-service
 
 volumes/
 .vscode/
+
+# Binary file
+searchApp

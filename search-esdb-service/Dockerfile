@@ -1,29 +1,11 @@
-# Build stage
-FROM golang:1.21-alpine AS builder
+FROM alpine:latest
 
-RUN apk add --no-cache git
+RUN mkdir /app
 
-WORKDIR /tmp/search-esdb
+WORKDIR /app
 
-COPY go.mod .
-COPY go.sum .
+COPY searchApp /app
+COPY app.env /app
+COPY /data /app/data
 
-RUN go mod download &&\
-    go mod vendor
-
-COPY . .
-
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o main .
-
-# Final stage
-FROM scratch
-
-WORKDIR /app/search-esdb
-
-COPY --from=builder /tmp/search-esdb/main .
-COPY --from=builder /tmp/search-esdb/config.yaml .
-COPY --from=builder /tmp/search-esdb/data ./data
-
-CMD ["./main"]
-
-
+CMD ["/app/searchApp"]

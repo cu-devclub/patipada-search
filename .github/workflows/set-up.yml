@@ -20,6 +20,9 @@ jobs:
                 envkey_AUTH_DB_USER: ${{ secrets.AUTH_DB_USER }}
                 envkey_AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
                 envkey_JWT_KEY: ${{ secrets.JWT_KEY }}
+                envkey_SENDER_EMAIL: "search.dhammanava@gmail.com"
+                envkey_SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+                envkey_LINK_URL: "https://search.dhammanava.net"
                 file_name: .env
 
             - name: Set up SSH

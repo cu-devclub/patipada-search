@@ -1,5 +1,4 @@
 version: '3'
-
 services:
   search-service:
     container_name: search-container
@@ -11,7 +10,6 @@ services:
       ESDB_USERNAME: ${ELASTIC_USERNAME}
       ESDB_PASSWORD: ${ELASTIC_PASSWORD}
       FRONTEND_URL: ${WEB_CORS_TARGET}
-    working_dir: /app/search-esdb
     ports:
       - 8081:8081
     depends_on:
@@ -69,7 +67,6 @@ services:
       - EMAIL_SENDER_EMAIL=${SENDER_EMAIL}
       - EMAIL_SENDER_PASSWORD=${SENDER_PASSWORD}
       - LINK_URL=${LINK_URL}
-    working_dir: /app/auth
     ports:
       - 8082:8082
     depends_on:

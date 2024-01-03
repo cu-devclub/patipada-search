@@ -2,7 +2,6 @@ package migration
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -75,7 +74,7 @@ const (
 // Takes a *config.Config and a database.Database as parameters.
 // Does not return anything.
 func RecordMigrate(cfg *config.Config, es database.Database) {
-	fmt.Println("RECORD MIGRATION---------")
+	log.Println("RECORD MIGRATION---------")
 	client := es.GetDB()
 	indexName := "record"
 	exists, err := indexExists(client, indexName)
@@ -83,7 +82,7 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 		panic(err)
 	}
 	if exists {
-		fmt.Println("---------DATA ALREADY EXISTS---------")
+		log.Println("---------DATA ALREADY EXISTS---------")
 		return // index already exists
 	}
 
@@ -99,7 +98,7 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 
 	// Convert csv file
 	records, err := ConvertCSVFilesInDirectory(cfg.Static.DataPath)
-	fmt.Println("CONVERTING CSV-----------")
+	log.Println("CONVERTING CSV-----------")
 	if err != nil {
 		panic(err)
 	}
@@ -110,7 +109,7 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 		panic(err)
 	}
 
-	fmt.Printf("Successfully migrated %d records\n", len(records))
+	log.Printf("Successfully migrated %d records\n", len(records))
 }
 
 // indexExists checks if the index exists using the Indices.Exists API.
@@ -162,7 +161,7 @@ func ConvertCSVFilesInDirectory(directoryPath string) ([]*entities.Record, error
 		// Insert data from the CSV file
 		r, err := generateDataFromCSV(csvFilePath, fileName)
 		if err != nil {
-			fmt.Printf("Error inserting data from CSV file %s: %s\n", csvFilePath, err)
+			log.Printf("Error inserting data from CSV file %s: %s\n", csvFilePath, err)
 			continue // Continue to the next file if there's an error
 		}
 		records = append(records, r...)
