@@ -12,6 +12,7 @@ import { SignOut } from "../../functions";
 
 import { MessageToast } from "..";
 import { useNavigate } from "react-router-dom";
+import React from "react";
 
 interface UserAvatarProps {
   username: string;

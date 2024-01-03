@@ -1,6 +1,7 @@
 import { AspectRatio } from "@chakra-ui/react";
 import { forwardRef, useImperativeHandle } from "react";
 import { timeToSeconds } from "../../functions";
+import React from "react";
 
 interface VdoProps {
   question: string;
@@ -13,12 +14,13 @@ export interface VdoRef {
   replay: () => void;
 }
 
-const Vdo = forwardRef<VdoRef, VdoProps>(
+const YoutubeVideo = forwardRef<VdoRef, VdoProps>(
   ({ startTime, endTime, youtubeURL, question }: VdoProps, ref) => {
     const displayStartTime = timeToSeconds(startTime);
     const displayEndTime = timeToSeconds(endTime);
     const displayYoutubeURL = `https://www.youtube.com/embed/${youtubeURL}?start=${displayStartTime}&end=${displayEndTime}`;
 
+    console.log("🚀 ~ file: YoutubeVideo.tsx:23 ~ displayYoutubeURL:", displayYoutubeURL)
     const replay = () => {
       const iframe = document.getElementById(question) as HTMLImageElement;
       if (iframe) {
@@ -43,4 +45,4 @@ const Vdo = forwardRef<VdoRef, VdoProps>(
   }
 );
 
-export default Vdo;
+export default YoutubeVideo;

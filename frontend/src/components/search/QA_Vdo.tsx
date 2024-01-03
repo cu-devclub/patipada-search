@@ -1,22 +1,14 @@
 import { DataItem } from "../../models/qa";
-import {
-  Box,
-  VStack,
-  Text,
-  Flex,
-  IconButton,
-  HStack,
-  Highlight,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, VStack, Text, Flex, Highlight } from "@chakra-ui/react";
 import Answer from "./Answer.tsx";
-import Vdo from "./Vdo.tsx";
-import { RepeatIcon, EditIcon } from "@chakra-ui/icons";
+import YoutubeVideo from "./YoutubeVideo.tsx";
 import { useEffect, useState } from "react";
 import { getCookie } from "typescript-cookie";
 import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
-import { VdoRef } from "./Vdo.tsx";
+import { VdoRef } from "./YoutubeVideo.tsx";
+import TimesAndTools from "./TimesAndTools.tsx";
+import React from "react";
 interface QAProps {
   data: DataItem;
   query: string;
@@ -33,7 +25,7 @@ interface QAProps {
  */
 function QA_Vdo({ data, query, tokens }: QAProps) {
   const [isQueryTheQuestion, SetisQueryTheQuestion] = useState(false);
-  const token = getCookie("token");
+  const token = getCookie("token"); //TODO : check token is valid
   const navigate = useNavigate();
   const vdoRef = useRef<VdoRef | null>(null);
 
@@ -57,7 +49,14 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
     >
       <Box w={{ base: "100%", lg: "65%" }}>
         <VStack spacing={1} alignItems="flex-start">
-          <HStack spacing={2} alignItems="center">
+          <TimesAndTools
+            data={data}
+            token={token}
+            handleReplay={handleReplay}
+            navigate={navigate}
+          />
+          {/* //TODO : Check new component */}
+          {/* <HStack spacing={2} alignItems="center">
             <Text as="b" color="blue">
               เวลาเริ่มต้น {data.startTime} เวลาสิ้นสุด {data.endTime}
             </Text>
@@ -91,7 +90,7 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
                 />
               </Tooltip>
             )}
-          </HStack>
+          </HStack> */}
 
           {isQueryTheQuestion == false ? (
             <Text variant="question">
@@ -109,7 +108,7 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
         </VStack>
       </Box>
       <Box w={{ base: "100%", lg: "35%" }}>
-        <Vdo
+        <YoutubeVideo
           ref={vdoRef}
           youtubeURL={data.youtubeURL}
           question={data.question}

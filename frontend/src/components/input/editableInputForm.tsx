@@ -7,9 +7,10 @@ import {
   Tooltip,
   EditablePreview,
   useColorModeValue,
-  Textarea,
   EditableInput,
+  Textarea,
 } from "@chakra-ui/react";
+import React from "react";
 
 interface EditableInputFormProps {
   defaultValue: string;
@@ -59,12 +60,7 @@ function EditableInputForm({ defaultValue }: EditableInputFormProps) {
           h="full"
         />
       </Tooltip>
-      <EditableInput
-        as={Textarea}
-        fontWeight={"light"}
-        w="full"
-        h="full"
-      />
+      <EditableInput as={Textarea} fontWeight={"light"} w="full" h="full" />
       <EditableControls />
     </Editable>
   );
