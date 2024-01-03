@@ -39,7 +39,6 @@ func InitializeViper(path string) {
 }
 
 func GetConfig() Config {
-	//TODO : change docker environment name to match
 	return Config{
 		App: App{
 			Port:        viper.GetInt("SERVER_PORT"),

@@ -1,5 +1,4 @@
 version: '3'
-# TODO Add env file path
 services:
   search-service:
     container_name: search-container

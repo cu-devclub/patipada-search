@@ -1,6 +1,5 @@
 name: Auth Service CI/CD with Docker
 on: workflow_dispatch
-# TODO : build go binary before build docker image
 jobs:
   build-and-deploy-auth-service:
     runs-on: ubuntu-latest

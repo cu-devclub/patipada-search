@@ -1,5 +1,4 @@
 version: '3'
-# TODO : change .env path 
 services:
   search-service:
     image: dhammanava-search-image:latest
