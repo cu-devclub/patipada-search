@@ -5,6 +5,7 @@ import (
 	"auth-service/database"
 	"auth-service/users/entities"
 	"auth-service/users/helper"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -41,7 +42,9 @@ func UsersMigrate(db database.Database) error {
 }
 
 func migrateUserEntities(user *config.UserCredential, users []*entities.Users, db database.Database) error {
+	log.Println("Migrating user entities role", user.Role)
 	if foundUser := helper.GetUserFromUserLists(users, user.Username); foundUser != nil {
+		log.Println(user.Role,"already exists")
 		return nil
 	}
 
@@ -64,7 +67,12 @@ func migrateUserEntities(user *config.UserCredential, users []*entities.Users, d
 		Is_Active: true,
 	}
 
-	return insertUser(db.GetDb(), u)
+	if err = insertUser(db.GetDb(), u); err != nil {
+		return err
+	}
+
+	log.Println("Success migrate user entities role", user.Role)
+	return nil
 }
 
 func getAllUsers(db *gorm.DB) ([]*entities.Users, error) {
