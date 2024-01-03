@@ -30,3 +30,5 @@ This is done because not every service need to re-deploy when push to some branc
 7. ELASTIC_USERNAME
 8. AUTH_DB_USER
 9. AUTH_DB_PASSWORD
+10. JWT_KEY
+11. SENDER_PASSWORD
