@@ -10,6 +10,7 @@ import {
 import NotFoundPage from "./pages/404";
 import { Dashboard as AdminDashboard, AdminChoosePage } from "./pages/Admin";
 import { PendingRequestPage, EditRecordPage } from "./pages/Contributor";
+import React from "react";
 export default function App() {
   return (
     <BrowserRouter>

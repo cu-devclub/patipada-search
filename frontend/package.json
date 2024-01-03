@@ -16,8 +16,15 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fontsource/mitr": "^5.0.8",
+    "@sereneinserenade/tiptap-comment-extension": "^0.0.6",
+    "@tiptap/extension-color": "^2.1.13",
+    "@tiptap/extension-text-style": "^2.1.13",
+    "@tiptap/pm": "^2.1.13",
+    "@tiptap/react": "^2.1.13",
+    "@tiptap/starter-kit": "^2.1.13",
     "axios": "^1.6.0",
     "chakra-ui-autocomplete": "^1.4.5",
+    "date-fns": "^3.0.6",
     "framer-motion": "^10.16.4",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
@@ -27,7 +34,7 @@
     "typescript-cookie": "^1.0.6"
   },
   "devDependencies": {
-    "@types/node": "^20.6.3",
+    "@types/node": "^20.10.6",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@types/react-show-more-text": "^1.4.2",
@@ -38,6 +45,8 @@
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "sass": "^1.69.6",
+    "sass-loader": "^13.3.3",
     "typescript": "^5.0.2",
     "vite": "5"
   }

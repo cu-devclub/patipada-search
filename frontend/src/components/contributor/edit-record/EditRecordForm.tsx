@@ -3,16 +3,17 @@ import {
   Grid,
   VStack,
   Button,
-  Box,
-  Text,
   Center,
   HStack,
+  Box,
 } from "@chakra-ui/react";
-import { EditableInputForm } from "../../input";
-import { Vdo } from "../../search";
+import { YoutubeVideo } from "../../search";
 import { DataItem } from "../../../models/qa";
 import { useRef } from "react";
-import { VdoRef } from "../../search/Vdo";
+import { VdoRef } from "../../search/YoutubeVideo";
+import { TimesAndTools } from "../../search";
+import React from "react";
+import CommentableTextField from "./CommentableTextField";
 interface EditRecordFormProps {
   data: DataItem;
 }
@@ -24,31 +25,27 @@ function EditRecordForm({ data }: EditRecordFormProps) {
   };
 
   return (
-    <Flex flex={1} w="full" p={{ base: 2, md: 8 }} direction="column">
+    <Flex flex={1} w="full" p={{ base: 2, md: 4 }} direction="column">
       <Grid
-        templateColumns={{ base: "repeat(1, 1fr)", md: "60fr 40fr" }}
+        templateColumns={{ base: "repeat(1, 1fr)", md: "70fr 30fr" }}
         gap={6}
         w="full"
-        p={8}
+        p={2}
       >
         {/* //TODO: start time, end time */}
         <VStack order={{ base: 2, md: 1 }} px={2}>
-          <Grid w="full" templateColumns="auto 1fr" gap={4}>
-            <Text py={1} fontWeight={"semibold"}>
-              คำถาม
-            </Text>
-            <EditableInputForm defaultValue={data.question} />
-          </Grid>
-          <Grid w="full" templateColumns="auto 1fr" gap={4}>
-            <Text py={1} fontWeight={"semibold"}>
-              คำตอบ
-            </Text>
-            <EditableInputForm defaultValue={data.answer} />{" "}
-          </Grid>
+          <CommentableTextField
+            defaultValue={data.question}
+            heading={"คำถาม"}
+          />
+          <CommentableTextField defaultValue={data.answer} heading={"คำตอบ"} />
         </VStack>
-        <VStack order={{ base: 1, md: 2 }}>
-          <Box w="full">
-            <Vdo
+        <VStack
+          order={{ base: 1, md: 2 }}
+          align="center"
+        >
+          <Box w={{ base: "100%", lg: "60%" }}>
+            <YoutubeVideo
               ref={vdoRef}
               youtubeURL={data.youtubeURL}
               question={data.question}
@@ -56,9 +53,11 @@ function EditRecordForm({ data }: EditRecordFormProps) {
               endTime={data.endTime}
             />
           </Box>
-          <Button variant="brand_link" onClick={handleReplay}>
-            เล่นอีกครั้ง
-          </Button>
+          <TimesAndTools
+            data={data}
+            handleReplay={handleReplay}
+            navigate={() => {}}
+          />
         </VStack>
       </Grid>
       <Center w="full">
