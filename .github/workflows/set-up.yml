@@ -23,6 +23,12 @@ jobs:
                 envkey_SENDER_EMAIL: "search.dhammanava@gmail.com"
                 envkey_SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
                 envkey_LINK_URL: "https://search.dhammanava.net"
+                envkey_SUPER_ADMIN_PASSWORD: ${{ secrets.SUPER_ADMIN_PASSWORD }}
+                envkey_SUPER_ADMIN_EMAIL: ${{ secrets.SUPER_ADMIN_EMAIL }}
+                envkey_ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+                envkey_ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+                envkey_USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
+                envkey_USER_EMAIL: ${{ secrets.USER_EMAIL }}
                 file_name: .env
 
             - name: Set up SSH

@@ -6,7 +6,7 @@ export const verifyToken = async (token: string) => {
   try {
     const apiUrl =
       import.meta.env.MODE === "production"
-        ? import.meta.env.VITE_AUTH_API_URL
+        ? "http://auth-service:8082"
         : "http://localhost:8082";
     const response = await axios.get(`${apiUrl}/verify-token`, {
       headers: {
@@ -45,7 +45,7 @@ export const authorize = async (token: string, requireRole: string) => {
   try {
     const apiUrl =
       import.meta.env.MODE === "production"
-        ? import.meta.env.VITE_AUTH_API_URL
+        ? "http://auth-service:8082"
         : "http://localhost:8082";
     const response = await axios.get(
       `${apiUrl}/authorize?requiredRole=${requireRole}`,

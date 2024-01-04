@@ -1,9 +1,17 @@
-# This is the directory using to initialize authentication database
+Description
+============================
+> using to initialize authentication database (postgreSQL)
 
-- ID is uuid 
-- username min 3 max 50
-- raw password min 8 max 50
-- Password and salt field needed to be generate by (Raw password + salt) + encryption = password 
-- Email need to be valid email
-- Role need to be one of `super-admin` `admin` or `user`
-- is_active default is true which can be future improvement on user system 
+The [init.sql](./init.sql) will automatically grab by [docker-compose.dev.yml](../docker-compose.dev.yml) file and used it in initialize docker container phase. 
+### init.sql : `users` table
+```
+- ID                        # uuid 
+- username                  # min 3 max 50
+- password                  # encrypted password (encrypt(raw password + salt))
+- salt                      # random
+- email                     # valid email
+- role                      # one of `super-admin` `admin` or `user`
+- is_active                 # default is true 
+- reset_token               # reset password token
+- reset_token_expires_at    # expire time (15 minutes)
+```

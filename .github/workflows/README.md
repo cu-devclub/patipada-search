@@ -32,3 +32,9 @@ This is done because not every service need to re-deploy when push to some branc
 9. AUTH_DB_PASSWORD
 10. JWT_KEY
 11. SENDER_PASSWORD
+12. SUPER_ADMIN_PASSWORD
+13. SUPER_ADMIN_EMAIL
+14. ADMIN_PASSWORD
+15. ADMIN_EMAIL
+16. USER_PASSWORD
+17. USER_EMAIL
