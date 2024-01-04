@@ -75,7 +75,19 @@ To run this project, you will need to add the following environment variables to
 
 `LINK_URL` : url link to provide reset password token (local would be frontend, production would be host name)
 
-> _<u>Note</u>_ if you run each project without docker e.g. `go run main.go` you do not need to assign the .env variables each service has default env variables in app.env except `SENDER_PASSWORD`, which you need to assign in `app.env`
+`SUPER_ADMIN_PASSWORD` : Password for the super admin account
+
+`SUPER_ADMIN_EMAIL` : Email for the super admin account
+
+`ADMIN_PASSWORD` : Password for the admin account
+
+`ADMIN_EMAIL` : Email for the admin account
+
+`USER_PASSWORD` : Password for the user account
+
+`USER_EMAIL` : Email for the user account
+
+> _<u>Note</u>_ if you run each project without docker e.g. `go run main.go` you do not need to assign the .env variables each service has default env variables in app.env except `SENDER_PASSWORD`, which you are required to assign in `app.env`
 
 
 ## Tech Stack
