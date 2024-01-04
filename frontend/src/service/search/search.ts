@@ -12,7 +12,7 @@ export const search = async (query: string) => {
     //TODO : Test the environment mode
     const apiUrl =
       import.meta.env.MODE === "production"
-        ? import.meta.env.VITE_SEARCH_API_URL
+        ? "http://search-service:8081"
         : "http://localhost:8081";
     const response = await axios.get(`${apiUrl}/search?query=${query}`);
 

@@ -7,7 +7,7 @@ export const verifyResetPasswordToken = async (token: string) => {
     //TODO : Test the environment mode
     const apiUrl =
       import.meta.env.MODE === "production"
-        ? import.meta.env.VITE_AUTH_API_URL
+        ? "http://auth-service:8082"
         : "http://localhost:8082";
     const response = await axios.get(`${apiUrl}/verify-reset-token/${token}`);
     return response.data;
@@ -36,7 +36,7 @@ export const resetPassword = async (token: string, password: string) => {
     //TODO : Test the environment mode
     const apiUrl =
       import.meta.env.MODE === "production"
-        ? import.meta.env.VITE_AUTH_API_URL
+        ? "http://auth-service:8082"
         : "http://localhost:8082";
     const response = await axios.post(`${apiUrl}/reset-password`, {
       token: token,
