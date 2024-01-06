@@ -94,6 +94,37 @@ services:
       - ./volumes/database/auth:/var/lib/postgresql/data
     networks:
       - backbone
+    
+  data-service:
+    container_name: data-container
+    image: dhammanava-data-image
+    build:
+      context: ./data-management-service
+    environment:
+       FRONTEND_URL: http://frontend:5173
+       MONGO_DB_HOST: data-db
+       MONGO_DB_PORT: 27017
+       MONGO_DB_USER: ${DATA_MNGMNT_DB_USER}
+       MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
+       MONGO_DB_NAME: record
+    ports:
+      - 8083:8083
+    depends_on:
+      - data-db
+    networks:
+      - backbone
+
+  data-db: 
+    image: mongo:latest
+    container_name: data-mongo-container
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: record
+      MONGO_INITDB_ROOT_USERNAME: ${DATA_MNGMNT_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
+    volumes:
+      - ./volumes/database/mongo-data:/data/db
 
 networks:
   backbone:
