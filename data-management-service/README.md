@@ -38,12 +38,12 @@ go run main.go
 
 ## API Reference
 
-Postman documentation :
+Postman documentation : // Not available yet
 
 ## Tech stack
 
 **Language** : Golang
-**Web Server** : Gin GOnic
+**Web Server** : Gin 
 **Database**: Mongo DB
 
 ## Project structure
@@ -66,6 +66,7 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
         ├── usecases
         ├── repositories
         ├── models
+        ├── helper
     ├── app.env                 # default env file
     ├── go.mod
     ├── go.sum
