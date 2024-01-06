@@ -11,7 +11,7 @@ export const changePassword = async (
     //TODO : Test the environment mode
     const apiUrl =
       import.meta.env.MODE === "production"
-        ? import.meta.env.VITE_AUTH_API_URL
+        ? "http://auth-service:8082"
         : "http://localhost:8082";
     
     const response = await axios.post(`${apiUrl}/change-password`, {
@@ -36,12 +36,6 @@ export const changePassword = async (
       returnError = {
         message: ERR_Messages.INVALID_OLD_PASSWORD,
         status: 401,
-        toastStatus: ToastStatus.ERROR,
-      };
-    } else if (requestError.status === 422) {
-      returnError = {
-        message: ERR_Messages.SAME_PASSWORD,
-        status: 422,
         toastStatus: ToastStatus.ERROR,
       };
     } else {

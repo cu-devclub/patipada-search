@@ -27,28 +27,30 @@ type (
 	}
 )
 
-func GetConfig() Config {
-	viper.SetConfigName("config")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./")
-
+func InitializeViper(path string) {
+	viper.AddConfigPath(path)
+	viper.SetConfigName("app")
+	viper.SetConfigType("env")
+	viper.AutomaticEnv()
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %v", err))
 	}
-	//TODO : change docker environment name to match
+}
+
+func GetConfig() Config {
 	return Config{
 		App: App{
-			Port:        viper.GetInt("app.server.port"),
-			FrontendURL: viper.GetString("app.frontend.url"),
+			Port:        viper.GetInt("SERVER_PORT"),
+			FrontendURL: viper.GetString("FRONTEND_URL"),
 		},
 		ESDB: ESDB{
-			URL:      viper.GetString("esdb.url"),
-			Username: viper.GetString("esdb.username"),
-			Password: viper.GetString("esdb.password"),
+			URL:      viper.GetString("ESDB_URL"),
+			Username: viper.GetString("ESDB_USERNAME"),
+			Password: viper.GetString("ESDB_PASSWORD"),
 		},
 		Static: Static{
-			DataPath: viper.GetString("static.data"),
+			DataPath: viper.GetString("STATIC_DATA"),
 		},
 	}
 }

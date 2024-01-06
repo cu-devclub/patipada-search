@@ -112,8 +112,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// Response
 	// - 201 Created ; Update password success
 	// - 400 bad request (invalid format password)
-	// - 401 Unautorize ; invalid reset password token
-	// - 422 ; New password == Old password
+	// - 401 Unauthorize ; invalid reset password token
 	// - 500 internal server error
 	s.App.POST("/reset-password", usersHttpHandler.ResetPassword)
 
@@ -126,8 +125,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// Response
 	// - 200 OK ; Update password success
 	// - 400 bad request (invalid format password)
-	// - 401 Unautorize ; invalid old password
-	// - 422 ; New password == Old password
+	// - 401 Unauthorize ; invalid old password
 	// - 500 internal server error
 	s.App.POST("/change-password", usersHttpHandler.ChangePassword)
 
@@ -139,6 +137,29 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 404 Not found ; token == "" or not attach token
 	// - 500 internal server error
 	s.App.GET("/verify-reset-token/:token", usersHttpHandler.VerifyResetToken)
+
+	// Verify Token to verify the time valid of auth token 
+	// Header - Authorization : <token>
+	//
+	// Response
+	// - 200 OK & result (true/false)
+	// - 400 Bad request ; missing token
+	// - 401 Unauthorize ; invalid token
+	// - 500 internal server error
+	s.App.GET("/verify-token", usersHttpHandler.VerifyToken)
+
+	// Authorize to verify the user authorization
+	// Header - Authorization : <token>
+	// 
+	// Query Params
+	// - requiredRole (string) ; one of admin, super-admin, user
+	//
+	// Response
+	// - 200 OK & result (true/false)
+	// - 400 Bad request ; missing token or invalid requires role
+	// - 401 Unauthorize ; invalid token
+	// - 500 internal server error
+	s.App.GET("/authorize", usersHttpHandler.Authorize)
 
 	// Remove user by username & requestor role must be higher
 	// Header - Authorization : <token>

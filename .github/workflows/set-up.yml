@@ -12,14 +12,23 @@ jobs:
             - name: Make envfile
               uses: SpicyPizza/create-envfile@v1
               with:
-                envkey_ELASTIC_URL: "http://elastic-db:9200"
                 envkey_ELASTIC_USERNAME: ${{ secrets.ELASTIC_USERNAME }}
                 envkey_ELASTIC_PASSWORD: ${{ secrets.ELASTIC_PASSWORD }}
-                envkey_WEB_CORS_TARGET: "http://frontend:5173"
                 envkey_AUTH_DB_NAME: "Authen"
                 envkey_AUTH_DB_USER: ${{ secrets.AUTH_DB_USER }}
                 envkey_AUTH_DB_PASSWORD: ${{ secrets.AUTH_DB_PASSWORD }}
                 envkey_JWT_KEY: ${{ secrets.JWT_KEY }}
+                envkey_SENDER_EMAIL: "search.dhammanava@gmail.com"
+                envkey_SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
+                envkey_LINK_URL: "https://search.dhammanava.net"
+                envkey_SUPER_ADMIN_PASSWORD: ${{ secrets.SUPER_ADMIN_PASSWORD }}
+                envkey_SUPER_ADMIN_EMAIL: ${{ secrets.SUPER_ADMIN_EMAIL }}
+                envkey_ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+                envkey_ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+                envkey_USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
+                envkey_USER_EMAIL: ${{ secrets.USER_EMAIL }}
+                envkey_DATA_MNGMNT_DB_USER: ${{ secrets.DATA_MNGMNT_DB_USER }}
+                envkey_DATA_MNGMNT_DB_PASSWORD: ${{ secrets.DATA_MNGMNT_DB_PASSWORD }}
                 file_name: .env
 
             - name: Set up SSH

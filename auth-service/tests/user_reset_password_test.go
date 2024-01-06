@@ -69,20 +69,6 @@ func TestResetPassword(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, w.Code)
 	})
 
-	t.Run("Failed Reset Password; Same password ; 422", func(t *testing.T) {
-		m := models.ResetPassword{
-			Token:    token,
-			Password: roleCredentials.Password,
-		}
-		payload, _ := json.Marshal(m)
-		req, _ := http.NewRequest("POST", "/reset-password", bytes.NewBuffer(payload))
-		req.Header.Set("Content-Type", "application/json") // Set the Content-Type header
-		w := httptest.NewRecorder()
-		e.ServeHTTP(w, req)
-		assert.Equal(t, http.StatusUnprocessableEntity, w.Code)
-
-	})
-
 	t.Run("Failed Reset Password; Invalid token ; 401", func(t *testing.T) {
 		m := models.ResetPassword{
 			Token:    "SOME WRONG TOKEN",

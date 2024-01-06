@@ -1,53 +1,130 @@
 # Patipada Search System
 
-This project is a part of the Waris Lakthong senior project, focusing on the development of a hybrid search system for Dhammanva question-answer videos. The system is designed using a microservices architecture, with each backend service adhering to clean architecture principles.
+This project is a part of the Waris Lakthong senior project, focusing on developing a hybrid search system for Dhammanva question-answer videos. The system is designed using a microservices architecture, with each backend service adhering to clean architecture principles.
 
 ## Services Overview
 
-1. **Frontend Service**
-2. **Search Service**
-3. **Authentication Service (Under Development)**
-4. **Data Management Service (Under Development)**
+1. [Frontend Service](./frontend/)
+2. [Search Service](./search-esdb-service/)
+3. [Authentication Service](./auth-service/)
+4. [Data Management Service](./data-management-service/)
 
 ## Data Source
 
-All data is extracted from Dhammanva live question-answer video transcripts, which include:
+All data is extracted from Dhammanva live question-answer video transcripts ([visit the youtube channel](https://www.youtube.com/@dhammanava7327)), which include:
+
 - Start time of the section
 - End time of the section
 - Question
 - Answer
 - YouTube URL
 
-The data is stored in the `search-esdb-service/data` directory.
+The data is stored in the [search-esdb-service/data](./search-esdb-service/data/) directory.
 
 ## Deployment
 
-This project leverages GitHub Actions, GitHub Secrets, and Docker Hub for deployment. Please refer to the `.github/workflows` directory for detailed deployment information.
+In [.github/workflows](./.github/workflows/) directiory contians workflow for each container and each workflow will run on `workflow_dispatch`, means you need to press a `run` button in github actions page.
+for more information please visit [.github/workflows](./.github/workflows/)
 
-## Development Stack
+## Run Locally
 
-1. **Frontend**: Vite, React, and TypeScript
-2. **Backend Services**: Golang
-3. **Search Mechanism**: Elastic DB
-4. **Authentication Storage**: PostgreSQL
-5. **Data Management Storage**: Maria DB
-6. **CQRS Models**: Rabbit MQ (Implementation in progress)
-7. **Containerization**: Docker for every service
+### Prerequisites
 
-## Project Structure
+1. docker install
+2. Make install (optional)
 
-Currently, the project has the following structure:
+### Steps
 
-```plaintext
-|- .github/workflows          => CI/CD with GitHub Actions
-|- auth-db                    => Initial Docker script for PostgreSQL authentication database
-|- auth-service               => Golang + GORM + ECHO + Clean architecture for authentication & authorization service
-|- search-esdb-service        => Golang + Elastic API + GIN + Clean architecture for search 
-|- elastic                    => Initial Docker script for Elastic DB (install dependency)
-|- frontend                   => Vite + TypeScript + React for rendering UI
-|- nginx                      => Nginx example config file used in the server (HTTPS handling and reverse proxy)
-|- docker-compose.dev.yml      => Docker Compose file used in development (local)
-|- docker-compose.prod.yml     => Docker Compose file used in production; will be moved to the server by `.github/workflows/set-up.yml`
-|- .gitignore                 => Ignore some unnecessary files
-|- .env.template              => Template for the .env file; will be generated as `.env` and moved to the server by `.github/workflows/set-up.yml`
-|- .secrets.template          => Template for secrets used in `.github/workflows` when testing locally with `act`. In production, GitHub Secrets are used instead.
+- Clone the project
+
+- Copy `.env.template`, paste in the same directory then rename to `.env` (for more information in env variable navigate to [Environment Variables](#environment-variables))
+
+- Open your terminal and type
+
+```bash
+make up_build
+```
+
+or
+
+```bash
+docker compose -f docker-compose.dev.yml up -d
+```
+
+## Environment Variables
+
+<a id="environment-variables"></a>
+
+To run this project, you will need to add the following environment variables to your .env file
+
+`ELASTIC_USERNAME` : username to access elasticSearch
+
+`ELASTIC_PASSWORD`: password to access elasticSearch
+
+`AUTH_DB_USER` : username to access Auth DB (PostgreSQL)
+
+`AUTH_DB_PASSWORD` : password to access Auth DB (PostgreSQL)
+
+`JWT_KEY` : key used to sign JWT token
+
+`SENDER_EMAIL` : email of sender use to send email in reset password process
+
+`SENDER_PASSWORD` : app password (Gmail) of sender
+
+`LINK_URL` : url link to provide reset password token (local would be frontend, production would be host name)
+
+`SUPER_ADMIN_PASSWORD` : Password for the super admin account
+
+`SUPER_ADMIN_EMAIL` : Email for the super admin account
+
+`ADMIN_PASSWORD` : Password for the admin account
+
+`ADMIN_EMAIL` : Email for the admin account
+
+`USER_PASSWORD` : Password for the user account
+
+`USER_EMAIL` : Email for the user account
+
+`DATA_MNGMNT_DB_USER` : Default username for data management database
+
+`DATA_MNGMNT_DB_PASSWORD` : password for default user in data management database
+
+> _<u>Note</u>_ if you run each project without docker e.g. `go run main.go` you do not need to assign the .env variables each service has default env variables in app.env except `SENDER_PASSWORD`, which you are required to assign in `app.env`
+
+## Tech Stack
+
+**Frontend:** React, Typescript, Vite, Chakra UI, Tiptap
+
+**Seasrch service:** Golang, Gin, ElasticSearch
+
+**Authentication service:** Golang, Echo, PostgreSQL
+
+**Data management service:** Golang, Gin, MongoDB
+
+**Communication:** gRPC
+
+**Containerization:** Docker, kubenetes
+
+## Project structure
+
+###
+
+    .
+    ├── auth-db                     # initialize authentication database
+    ├── auth-service
+    ├── data-management-service
+    ├── elastic                     # initialize elasticSearch
+    ├── frontend
+    ├── .github/workflows           # Workflow files
+    ├── nginx                       # example of nginx used in production
+    ├── search-esdb-service
+    ├── .env.template               # template of .env
+    ├── .secrets.template           # template of .secrets used in act (test workflow locally)
+    ├── README.md
+    ├── Makefile                    # Makefile used in development
+    ├── docker-compose.dev.yml      # used to build image and test local
+    ├── docker-compose.prod.yml     # used in production
+
+> You can discover more information for each directory in `README.md` of each directory
+
+> This project is under development

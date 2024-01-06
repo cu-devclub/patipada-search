@@ -2,7 +2,6 @@ package migration
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -10,14 +9,61 @@ import (
 	"search-esdb-service/database"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
-	"search-esdb-service/record/es_query"
 	"search-esdb-service/record/repositories"
 	"strings"
 
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
-// Migration steps 
+const (
+	CREATE_INDEX_ICU_TOKENIZER = `
+{
+  "settings": {
+    "index": {
+      "analysis": {
+        "analyzer": {
+          "analyzer_shingle": {
+            "tokenizer": "icu_tokenizer",
+            "filter": ["filter_shingle"]
+          }
+        },
+        "filter": {
+          "filter_shingle": {
+            "type": "shingle",
+            "max_shingle_size": 3,
+            "min_shingle_size": 2,
+            "output_unigrams": "true"
+          }
+        }
+      }
+    }
+  },
+    "mappings": {
+    "properties": {
+      "youtubeURL": {
+        "type": "text"
+      },
+      "question": {
+        "type": "text",
+        "analyzer": "analyzer_shingle"
+      },
+      "answer": {
+        "type": "text",
+        "analyzer": "analyzer_shingle"
+      },
+      "startTime": {
+        "type": "text"
+      },
+      "endTime": {
+        "type": "text"
+      }
+    }
+  }
+}
+`
+)
+
+// Migration steps
 // Create index named `record`; if not exists else return
 // Convert file in csv format to json format from data folder
 // insert json to es
@@ -28,7 +74,7 @@ import (
 // Takes a *config.Config and a database.Database as parameters.
 // Does not return anything.
 func RecordMigrate(cfg *config.Config, es database.Database) {
-	fmt.Println("RECORD MIGRATION---------")
+	log.Println("RECORD MIGRATION---------")
 	client := es.GetDB()
 	indexName := "record"
 	exists, err := indexExists(client, indexName)
@@ -36,14 +82,14 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 		panic(err)
 	}
 	if exists {
-		fmt.Println("---------DATA ALREADY EXISTS---------")
+		log.Println("---------DATA ALREADY EXISTS---------")
 		return // index already exists
 	}
 
 	// Create the index
 	res, err := client.Indices.Create(
 		indexName,
-		client.Indices.Create.WithBody(strings.NewReader(es_query.CREATE_INDEX_ICU_TOKENIZER)),
+		client.Indices.Create.WithBody(strings.NewReader(CREATE_INDEX_ICU_TOKENIZER)),
 	)
 	if err != nil {
 		panic(err)
@@ -52,8 +98,7 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 
 	// Convert csv file
 	records, err := ConvertCSVFilesInDirectory(cfg.Static.DataPath)
-	fmt.Println("CONVERTING CSV-----------")
-	fmt.Println(records[0])
+	log.Println("CONVERTING CSV-----------")
 	if err != nil {
 		panic(err)
 	}
@@ -64,7 +109,7 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 		panic(err)
 	}
 
-	fmt.Printf("Successfully migrated %d records\n", len(records))
+	log.Printf("Successfully migrated %d records\n", len(records))
 }
 
 // indexExists checks if the index exists using the Indices.Exists API.
@@ -81,10 +126,10 @@ func indexExists(client *elasticsearch.Client, indexName string) (bool, error) {
 	return res.StatusCode != 404, nil
 }
 
-// ConvertCSVFilesInDirectory converts CSV files in the specified 
+// ConvertCSVFilesInDirectory converts CSV files in the specified
 // directory into a slice of entities.Record structs.
 //
-// It takes a directory path as a parameter and returns a slice of 
+// It takes a directory path as a parameter and returns a slice of
 // entities.Record structs and an error.
 func ConvertCSVFilesInDirectory(directoryPath string) ([]*entities.Record, error) {
 	// Find file
@@ -116,7 +161,7 @@ func ConvertCSVFilesInDirectory(directoryPath string) ([]*entities.Record, error
 		// Insert data from the CSV file
 		r, err := generateDataFromCSV(csvFilePath, fileName)
 		if err != nil {
-			fmt.Printf("Error inserting data from CSV file %s: %s\n", csvFilePath, err)
+			log.Printf("Error inserting data from CSV file %s: %s\n", csvFilePath, err)
 			continue // Continue to the next file if there's an error
 		}
 		records = append(records, r...)

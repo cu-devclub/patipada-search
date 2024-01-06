@@ -72,24 +72,4 @@ func TestChangePassword(t *testing.T) {
 
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
 	})
-	t.Run("Change Password Fail - New password == DB Password", func(t *testing.T) {
-		roleCredentials := cfg.User.SuperAdmin
-		m := models.ChangePassword{
-			OldPassword: roleCredentials.Password,
-			NewPassword: roleCredentials.Password,
-		}
-
-		token, err := jwt.CreateToken(roleCredentials.Username, cfg.User.SuperAdmin.Role)
-		if err != nil {
-			t.Fatalf("Error creating token: %v", err)
-		}
-		payload, _ := json.Marshal(m)
-		req, _ := http.NewRequest("POST", "/change-password", bytes.NewBuffer(payload))
-		req.Header.Set("Content-Type", "application/json") // Set the Content-Type header
-		req.Header.Set("Authorization", token)             // Set the Content-Type header
-		w := httptest.NewRecorder()
-		e.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusUnprocessableEntity, w.Code)
-	})
 }

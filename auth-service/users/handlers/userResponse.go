@@ -16,7 +16,7 @@ type registerResponseStruct struct {
 	UserID  string `json:"user_id"`
 }
 
-type verifyResetTokenStruct struct {
+type verifyTokenStruct struct {
 	Message string `json:"message"`
 	Result  bool   `json:"result"`
 }
@@ -48,7 +48,7 @@ func registerResponse(c echo.Context, responseCode int, message string, userID s
 }
 
 func verifyTokenResponse(c echo.Context, responseCode int, message string, valid bool) error {
-	return c.JSON(responseCode, &verifyResetTokenStruct{
+	return c.JSON(responseCode, &verifyTokenStruct{
 		Message: message,
 		Result:  valid,
 	})

@@ -6,6 +6,9 @@ const font = {
     body: `'Mitr', sans-serif`,
     mono: `Mitr`,
   },
+  fontSizes: {
+    "15xl" : "15rem",
+  }
 };
 
 const size = {

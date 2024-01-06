@@ -5,7 +5,6 @@ import (
 	"auth-service/jwt"
 	"auth-service/messages"
 	"auth-service/users/models"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -20,8 +19,7 @@ import (
 // Response
 // - 200 OK ; Update password success
 // - 400 bad request (invalid format password)
-// - 401 Unautorize ; invalid old password
-// - 422 ; New password == Old password
+// - 401 Unauthorize ; invalid old password
 // - 500 internal server error
 func (h *usersHttpHandler) ChangePassword(c echo.Context) error {
 	reqBody := new(models.ChangePassword)
@@ -31,15 +29,13 @@ func (h *usersHttpHandler) ChangePassword(c echo.Context) error {
 
 	claims, err := jwt.ValidateAndExtractClaims(c)
 	if err != nil {
-		fmt.Println("INVALID TOKEN")
 		return baseResponse(c, http.StatusUnauthorized, messages.UNAUTHORIZED)
 	}
+
 	username := claims.Username
-	fmt.Println("VALID TOKEN, username", username)
 
 	if err := h.usersUsecase.ChangePassword(reqBody, username); err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
-			fmt.Println("REQUEST ERROR", er.Error())
 			return baseResponse(c, er.StatusCode, er.Error())
 		} else {
 			return baseResponse(c, http.StatusInternalServerError, messages.INTERNAL_SERVER_ERROR)

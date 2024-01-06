@@ -18,7 +18,6 @@ import (
 // - 201 Created ; Update password success
 // - 400 bad request (invalid format password)
 // - 401 Unautorize ; invalid reset password
-// - 422 ; New password == Old password
 // - 500 internal server error
 func (h *usersHttpHandler) ResetPassword(c echo.Context) error {
 	reqBody := new(models.ResetPassword)

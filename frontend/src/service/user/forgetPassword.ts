@@ -7,7 +7,7 @@ export const forgetPassword = async (email: string) => {
     //TODO : Test the environment mode
     const apiUrl =
       import.meta.env.MODE === "production"
-        ? import.meta.env.VITE_AUTH_API_URL
+        ? "http://auth-service:8082"
         : "http://localhost:8082";
     const response = await axios.post(`${apiUrl}/forget-password/${email}`);
     return response.data.status;

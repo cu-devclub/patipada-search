@@ -1,13 +1,14 @@
 import { AuthenForm } from "../../components/user/forms";
-import { MessageToast, Logo } from "../../components";
-import { Flex, Heading, VStack, Text, HStack, Button } from "@chakra-ui/react";
+import { MessageToast } from "../../components";
+import { Heading,  Text, HStack, Button } from "@chakra-ui/react";
 import { login } from "../../service/user";
-import { ToastStatus,Role } from "../../constant";
+import { Role, ToastStatus } from "../../constant";
 import { setCookie } from "typescript-cookie";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { LoginDTO } from "../../models/user";
 import { useState } from "react";
-import {ReturnError} from "../../service/error";
+import { ReturnError } from "../../service/error";
+import { UserBasePage } from "./UserBasePage";
 /**
  * Admin Login Page Component.
  *
@@ -17,7 +18,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { addToast } = MessageToast();
   const [formError, setformError] = useState(false);
-
+  const location = useLocation();
   /**
    * Submits a login request using the given username and password.
    *
@@ -38,10 +39,17 @@ const LoginPage = () => {
           status: ToastStatus.SUCCESS,
         });
         setCookie("token", response.token);
-        setCookie("username",username)
-        setCookie("role",response.role)
-        if (response.role == Role.ADMIN || response.role == Role.SUPER_ADMIN) navigate("/user");
-        else navigate("/")
+        setCookie("username", username);
+        setCookie("role", response.role);
+        if (response.role == Role.ADMIN || response.role == Role.SUPER_ADMIN) {
+          navigate("/admin/choosePage");
+        } else {
+          if (location.state?.from) {
+            navigate(location.state.from);
+          } else {
+            navigate("/");
+          }
+        }
       })
       .catch((error: ReturnError) => {
         setformError(true);
@@ -53,17 +61,7 @@ const LoginPage = () => {
   };
 
   return (
-    <Flex
-      w="100%"
-      minH="100svh"
-      bg="gray.600"
-      justify={"flex-start"}
-      align={"center"}
-      direction={"column"}
-      pt={12}
-    >
-      <Logo size="7xs" />
-      <VStack spacing={0} pb={4}>
+    <UserBasePage>
         <Heading
           fontSize={"5xl"}
           color={"whiteAlpha.900"}
@@ -79,14 +77,17 @@ const LoginPage = () => {
           <Button
             variant="brand_link"
             fontSize={"lg"}
-            onClick={() => navigate("/user/register")}
+            onClick={() =>
+              navigate("/user/register", {
+                state: { from: location.state?.from },
+              })
+            }
           >
             สมัครเลย
           </Button>
         </HStack>
-      </VStack>
-      <AuthenForm submit={submit} formError={formError} />
-    </Flex>
+        <AuthenForm submit={submit} formError={formError} locationState={location.state?.from}/>
+    </UserBasePage>
   );
 };
 

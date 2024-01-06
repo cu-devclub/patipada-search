@@ -1,25 +1,20 @@
 import { DataItem } from "../../models/qa";
-import {
-  Box,
-  VStack,
-  Text,
-  AspectRatio,
-  Flex,
-  IconButton,
-  HStack,
-  Highlight,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, VStack, Text, Flex, Highlight } from "@chakra-ui/react";
 import Answer from "./Answer.tsx";
-import { timeToSeconds } from "../../functions";
-import { RepeatIcon } from "@chakra-ui/icons";
+import YoutubeVideo from "./YoutubeVideo.tsx";
 import { useEffect, useState } from "react";
-
+import { getCookie } from "typescript-cookie";
+import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
+import { VdoRef } from "./YoutubeVideo.tsx";
+import TimesAndTools from "./TimesAndTools.tsx";
+import React from "react";
 interface QAProps {
-    data: DataItem;
-    query: string;
-    tokens: string[];
+  data: DataItem;
+  query: string;
+  tokens: string[];
 }
+
 /**
  * Renders a QA video component with the given data, query, and tokens.
  *
@@ -30,28 +25,19 @@ interface QAProps {
  */
 function QA_Vdo({ data, query, tokens }: QAProps) {
   const [isQueryTheQuestion, SetisQueryTheQuestion] = useState(false);
-  const startTime = timeToSeconds(data.startTime);
-  const endTime = timeToSeconds(data.endTime);
-  const youtubeURL = `https://www.youtube.com/embed/${data.youtubeURL}?start=${startTime}&end=${endTime}`;
-  
+  const token = getCookie("token"); //TODO : check token is valid
+  const navigate = useNavigate();
+  const vdoRef = useRef<VdoRef | null>(null);
+
   useEffect(() => {
     if (query == data.question) {
-      // For Highlighting the question 
+      // For Highlighting the question
       SetisQueryTheQuestion(true);
     }
   }, [query, data.question]);
-  
-  /**
-   * Replays the video by updating the source of the iframe element.
-   *
-   * @param {string} data.question - The id of the iframe element.
-   * @return {void} This function does not return anything.
-   */
-  const replay = () => {
-    const iframe = document.getElementById(data.question) as HTMLImageElement;
-    if (iframe) {
-      iframe.src = youtubeURL;
-    }
+
+  const handleReplay = () => {
+    vdoRef.current?.replay();
   };
 
   return (
@@ -63,7 +49,14 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
     >
       <Box w={{ base: "100%", lg: "65%" }}>
         <VStack spacing={1} alignItems="flex-start">
-          <HStack spacing={2} alignItems="center">
+          <TimesAndTools
+            data={data}
+            token={token}
+            handleReplay={handleReplay}
+            navigate={navigate}
+          />
+          {/* //TODO : Check new component */}
+          {/* <HStack spacing={2} alignItems="center">
             <Text as="b" color="blue">
               เวลาเริ่มต้น {data.startTime} เวลาสิ้นสุด {data.endTime}
             </Text>
@@ -77,10 +70,27 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
               <IconButton
                 aria-label="Play Again"
                 icon={<RepeatIcon />}
-                onClick={replay}
+                onClick={handleReplay}
               />
             </Tooltip>
-          </HStack>
+            {token && (
+              <Tooltip
+                hasArrow
+                label="กดเพื่อเสนอข้อแก้ไข"
+                bg="gray.300"
+                color="black"
+                placement="right"
+              >
+                <IconButton
+                  aria-label="Edit"
+                  icon={<EditIcon />}
+                  onClick={() =>
+                    navigate(`/contributor/edit-record/${data.index}`)
+                  }
+                />
+              </Tooltip>
+            )}
+          </HStack> */}
 
           {isQueryTheQuestion == false ? (
             <Text variant="question">
@@ -98,14 +108,13 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
         </VStack>
       </Box>
       <Box w={{ base: "100%", lg: "35%" }}>
-        <AspectRatio maxW={["560px"]} maxH="300px" ratio={1}>
-          <iframe
-            id={data.question}
-            title={data.question}
-            src={youtubeURL}
-            allowFullScreen
-          />
-        </AspectRatio>
+        <YoutubeVideo
+          ref={vdoRef}
+          youtubeURL={data.youtubeURL}
+          question={data.question}
+          startTime={data.startTime}
+          endTime={data.endTime}
+        />
       </Box>
     </Flex>
   );

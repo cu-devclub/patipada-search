@@ -2,7 +2,6 @@ import { EmailIcon } from "@chakra-ui/icons";
 import {
   Box,
   FormControl,
-  Flex,
   FormLabel,
   Input,
   Stack,
@@ -12,42 +11,43 @@ import {
   Text,
   VStack,
   FormErrorMessage,
+  Spinner,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { isValidEmail,handleEnterKeyPress } from "../../../functions";
+import { isValidEmail, handleEnterKeyPress } from "../../../functions";
 interface FormProps {
   submit: (email: string) => void;
   formSuccess: boolean;
   emailError: boolean;
+  isLoading: boolean;
 }
 
 export default function ForgetPasswordForm({
   submit,
   formSuccess,
   emailError,
+  isLoading,
 }: FormProps) {
   const [email, setEmail] = useState("");
   const [submitCount, setsubmitCount] = useState(0);
   const [tempCredential, setTempCredential] = useState({
     email: "",
   });
-    const verifyChangeCredential =
-      tempCredential.email != email 
+  const verifyChangeCredential = tempCredential.email != email;
 
-  const navigate = useNavigate();
   const iconColor = formSuccess ? "green.400" : "gray.600";
   const emailFieldVariant = formSuccess
     ? `success_authen_field`
     : `authen_field`;
   const isEmailInvalid =
-    (submitCount > 0 && !isValidEmail(email)) || (emailError && !verifyChangeCredential);
+    (submitCount > 0 && !isValidEmail(email)) ||
+    (emailError && !verifyChangeCredential);
   const errMessage = emailError ? "ไม่พบ email นี้ในระบบ" : "อีเมลไม่ถูกต้อง";
 
   const submitForm = () => {
     setsubmitCount(submitCount + 1);
     if (isEmailInvalid || !isValidEmail(email)) return;
-    setTempCredential({ email:email });
+    setTempCredential({ email: email });
     submit(email);
   };
 
@@ -74,6 +74,15 @@ export default function ForgetPasswordForm({
             <Button variant="brand" onClick={submitForm}>
               ส่งอีเมล
             </Button>
+            {isLoading && (
+              <Spinner
+                thickness="4px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="blue.500"
+                size="xl"
+              />
+            )}
             {formSuccess && (
               <Text color="green.400">
                 ระบบได้ส่งลิ้งค์สำหรับเปลี่ยนรหัสผ่านไปที่อีเมลล์ของท่านแล้ว
@@ -82,15 +91,6 @@ export default function ForgetPasswordForm({
           </VStack>
         </Stack>
       </Box>
-      <Flex justify="flex-end">
-        <Button
-          variant="brand_link"
-          onClick={() => navigate("/user/login")}
-          color="blue.100"
-        >
-          กลับหน้าเข้าสู่ระบบ
-        </Button>
-      </Flex>
     </Box>
   );
 }

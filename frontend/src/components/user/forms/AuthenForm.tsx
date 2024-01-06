@@ -24,9 +24,10 @@ import { PASSWORD_REQUIRED_LENGTH } from "../../../constant";
 interface FormProps {
   submit: (username: string, password: string) => void;
   formError: boolean;
+  locationState: string;
 }
 
-export default function AuthenForm({ submit, formError }: FormProps) {
+export default function AuthenForm({ submit, formError, locationState }: FormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
@@ -44,8 +45,8 @@ export default function AuthenForm({ submit, formError }: FormProps) {
     ? "ชื่อผู้ใช้งานหรือรหัสผ่านผิด"
     : "รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร";
 
-  const verifyChangeCredential = 
-      tempCredential.username != username || tempCredential.password != password;
+  const verifyChangeCredential =
+    tempCredential.username != username || tempCredential.password != password;
 
   const isUsernameInvalid =
     (submitCount > 0 && !isValueExist(username)) ||
@@ -112,7 +113,7 @@ export default function AuthenForm({ submit, formError }: FormProps) {
             <Flex direction="column" align={"end"}>
               <Button
                 variant="brand_link"
-                onClick={() => navigate("/user/forget-password")}
+                onClick={() => navigate("/user/forget-password", {state: { from: locationState }})}
               >
                 ลืมรหัสผ่าน
               </Button>
