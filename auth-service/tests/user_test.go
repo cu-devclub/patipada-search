@@ -49,3 +49,4 @@ func getResetPasswordToken(cfg config.Config, email string) (string, error) {
 	return token, err
 }
 
+// TODO : Request maker function
