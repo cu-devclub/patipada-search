@@ -112,6 +112,7 @@ To run this project, you will need to add the following environment variables to
     .
     ├── auth-db                     # initialize authentication database
     ├── auth-service
+    ├── data-management-service
     ├── elastic                     # initialize elasticSearch
     ├── frontend
     ├── .github/workflows           # Workflow files
