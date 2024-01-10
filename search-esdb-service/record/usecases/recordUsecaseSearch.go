@@ -1,6 +1,9 @@
 package usecases
 
-import "search-esdb-service/record/models"
+import (
+	"fmt"
+	"search-esdb-service/record/models"
+)
 
 // Search searches for records in the specified index using the given query.
 //
@@ -12,15 +15,17 @@ import "search-esdb-service/record/models"
 // - *models.SearchRecordStruct: The search results containing the matching records.
 // - error: An error if the search operation fails.
 func (r *recordUsecaseImpl) Search(indexName, query string, amount int) (*models.SearchRecordStruct, error) {
-	// search the record 
+	// search the record
 	records, err := r.recordRepository.Search(indexName, query, amount)
 	if err != nil {
+		fmt.Println("Error searching records: ", err)
 		return nil, err
 	}
 
 	// extract tokens from query
 	tokens, err := r.recordRepository.AnalyzeQueryKeyword(query)
 	if err != nil {
+		fmt.Println("Error extracting tokens: ", err)
 		return nil, err
 	}
 

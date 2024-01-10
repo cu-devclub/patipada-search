@@ -33,7 +33,7 @@ func NewGinServer(cfg *config.Config, db *database.Database, v *validator.Valida
 func (g *ginServer) Start() {
 	// Allow CORS from frontend
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{g.cfg.App.FrontendURL}
+	config.AllowOrigins = []string{g.cfg.App.FrontendURL, "http://localhost:5173"}
 	g.app.Use(cors.New(config))
 
 	g.initializeRequestHttpHandler()
@@ -84,6 +84,8 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	// - 404 Not Found if no request with the provided request ID is found.
 	// - 500 Internal Server Error if an internal server error occurs.
 	g.app.GET("/requests/:requestID", requestHandlers.GetRequestByRequestID)
+
+	g.app.GET("/requests/record/:index", requestHandlers.GetRequestByRecordIndex)
 
 	// PUT /request route is used to update a request.
 	//

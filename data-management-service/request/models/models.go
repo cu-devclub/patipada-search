@@ -12,8 +12,8 @@ type (
 		YoutubeURL string    `json:"youtubeURL" binding:"required" validate:"required"`
 		Question   string    `json:"question" binding:"required" validate:"required"`
 		Answer     string    `json:"answer" binding:"required" validate:"required"`
-		StartTime  string    `json:"startTime" binding:"required" validate:"required,youtubeTime"`
-		EndTime    string    `json:"endTime" binding:"required" validate:"required,youtubeTime"`
+		StartTime  string    `json:"startTime" binding:"required" validate:"required"`
+		EndTime    string    `json:"endTime" binding:"required" validate:"required"`
 		CreatedAt  time.Time `json:"created_at,omitempty"`
 		UpdatedAt  time.Time `json:"updated_at,omitempty"`
 		Status     string    `json:"status" validate:"omitempty,oneof=pending approved rejected"` // "pending", "approved", "rejected"

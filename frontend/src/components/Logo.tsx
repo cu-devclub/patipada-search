@@ -1,3 +1,4 @@
+import React from "react";
 import logo from "/Dhammanava.svg";
 import { Image } from "@chakra-ui/react";
 const Logo = ({size}) => {

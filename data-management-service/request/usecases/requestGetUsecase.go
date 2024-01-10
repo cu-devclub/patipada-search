@@ -50,3 +50,18 @@ func (r *requestUsecase) GetRequestByRequestID(requestID string) (*models.Reques
 
 	return modelsRequest, nil
 }
+
+func (r *requestUsecase) GetRequestByRecordIndex(index string) (*models.Request, *errors.RequestError) {
+	// TODO : verified record index 
+	entitiesRequest, err := r.requestRepositories.GetRequestByRecordIndex(index)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, errors.CreateError(404, messages.ERR_REQUEST_NOT_EXISTS)
+		}
+		return nil, errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
+	}
+
+	modelsRequest := helper.EntityToModels(entitiesRequest)
+
+	return modelsRequest, nil
+}

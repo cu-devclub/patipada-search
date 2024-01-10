@@ -30,7 +30,7 @@ func (g *ginServer) Start() {
 
 	// Allow CORS from frontend
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{g.cfg.App.FrontendURL}
+	config.AllowOrigins = []string{g.cfg.App.FrontendURL,"http://localhost:5173"}
 	g.app.Use(cors.New(config))
 
 	g.initializeRecordHttpHandler()

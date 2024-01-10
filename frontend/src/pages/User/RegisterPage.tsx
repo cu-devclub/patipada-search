@@ -15,6 +15,7 @@ import { setCookie } from "typescript-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ReturnError } from "../../service/error";
 import { UserBasePage } from "./UserBasePage";
+import React from "react";
 const RegisterPage = () => {
   const { addToast } = MessageToast();
   const navigate = useNavigate();

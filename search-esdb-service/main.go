@@ -17,9 +17,12 @@ func main() {
 	cfg := config.GetConfig()
 	log.Println("Config initialized:", cfg)
 
+	log.Println("Connecting to database...")
 	db := database.NewElasticDatabase(&cfg)
 	log.Println("Success connect to database:")
 
+	log.Println("Starting migration...")
 	recordMigrator.RecordMigrate(&cfg, db)
+	log.Println("Migration finished")
 	server.NewGinServer(&cfg, db.GetDB()).Start()
 }

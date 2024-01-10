@@ -1,27 +1,37 @@
 import { VStack, Tooltip, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { CommentTiptap } from "../../Tiptap";
-
 interface CommentableTextFieldProps {
   heading: string;
-  defaultValue: string;
+  textValue: string;
+  htmlValue: string;
+  isOtherFormEditing: boolean;
+  setFormEditing: (isEditing: boolean) => void;
+  confirm: (html: string) => void;
 }
 
 function CommentableTextField({
   heading,
-  defaultValue,
+  textValue,
+  htmlValue,
+  isOtherFormEditing,
+  setFormEditing,
+  confirm,
 }: CommentableTextFieldProps) {
   const [edit, setedit] = useState(false);
-
   return (
     <VStack w="full" spacing={0} align="start">
       <Text py={1} fontWeight={"semibold"}>
         {heading}
       </Text>
-      {edit ? (
+      {edit  ? (
         <CommentTiptap
-          defaultValue={defaultValue}
-          cancel={() => setedit(false)}
+          defaultValue={htmlValue}
+          cancel={() => {
+            setedit(false);
+            setFormEditing(false);
+          }}
+          confirm={confirm}
         />
       ) : (
         <Tooltip label="click to highlight">
@@ -31,9 +41,13 @@ function CommentableTextField({
             _hover={{
               background: "gray.200",
             }}
-            onClick={() => setedit(true)}
+            onClick={() => {
+              if (isOtherFormEditing) return;
+              setedit(true);
+              setFormEditing(true);
+            }}
           >
-            {defaultValue}
+            {textValue}
           </Text>
         </Tooltip>
       )}

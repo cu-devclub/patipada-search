@@ -3,7 +3,6 @@ package handlers
 import (
 	"data-management/messages"
 	"data-management/request/models"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -48,15 +47,14 @@ import (
 // The body of the request should be a JSON object that matches the structure of the models.Request struct.
 func (r *requestHandler) InsertRequest(c *gin.Context) {
 	var request models.Request
-	if err := c.ShouldBind(&request); err != nil {
-		log.Println("Error Inserting : ", request, "When Binding request:", err)
+
+	if err := c.ShouldBindJSON(&request); err != nil {
 		responseJSON(c, http.StatusBadRequest, messages.BAD_REQUEST, nil)
 		return
 	}
-
-	err := r.requestUsecase.InsertRequest(&request)
-	if err != nil {
-		responseJSON(c, err.StatusCode, err.Error(), nil)
+	er := r.requestUsecase.InsertRequest(&request)
+	if er != nil {
+		responseJSON(c, er.StatusCode, er.Error(), nil)
 		return
 	}
 

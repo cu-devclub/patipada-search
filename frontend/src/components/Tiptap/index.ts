@@ -1,2 +1,3 @@
 import CommentTiptap from "./CommentTiptap";
-export { CommentTiptap };
+import TimeCommentTiptap from "./TimeCommentTiptap";
+export { CommentTiptap, TimeCommentTiptap };

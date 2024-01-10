@@ -7,7 +7,7 @@ import { DataItem, SearchResultInterface } from "../../models/qa";
  * @param {string} query - The search query string.
  * @return {Promise<SearchResultInterface>} - A promise that resolves with the search results.
  */
-export const search = async (query: string) => {
+export const search = async (query: string): Promise<SearchResultInterface> => {
   try {
     //TODO : Test the environment mode
     const apiUrl =

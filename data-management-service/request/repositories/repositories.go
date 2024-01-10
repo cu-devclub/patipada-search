@@ -94,4 +94,7 @@ type Repositories interface {
 	//
 	// If no document matches the filter, the function returns a nil Request and an error.
 	GetRequestByRequestID(requestID string) (*entities.Request, error)
+
+
+	GetRequestByRecordIndex(index string) (*entities.Request, error)
 }

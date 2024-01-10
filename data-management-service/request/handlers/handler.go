@@ -74,4 +74,7 @@ type Handlers interface {
 	// Usage :
 	//	router.GET("/requests/:requestID", requestHandler.GetRequestByRequestID)
 	GetRequestByRequestID(c *gin.Context)
+
+
+	GetRequestByRecordIndex(c *gin.Context)
 }

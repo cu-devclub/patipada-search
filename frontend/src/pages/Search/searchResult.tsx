@@ -5,6 +5,7 @@ import { SearchResultInterface, DataItem } from "../../models/qa";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Pagination from "@choc-ui/paginator";
+import React from "react";
 
 /**
  * Render the search result page.

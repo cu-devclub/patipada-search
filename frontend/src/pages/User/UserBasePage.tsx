@@ -19,7 +19,6 @@ import { Logo } from "../../components";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import {AnimatedBackground} from "../../components";
 interface BasePageProps {
   children: ReactNode;
 }
@@ -29,7 +28,6 @@ export const UserBasePage: React.FC<BasePageProps> = ({ children }) => {
   const cancelRef = React.useRef<HTMLButtonElement | null>(null);
   const navigate = useNavigate();
   return (
-    <AnimatedBackground>
       <Flex
         w="100%"
         minH="100svh"
@@ -37,6 +35,7 @@ export const UserBasePage: React.FC<BasePageProps> = ({ children }) => {
         align={"center"}
         direction={"column"}
         pt={12}
+        bg="gray.700"
       >
         <Tooltip label="กลับหน้าค้นหาข้อมูล">
           <Box position="absolute" top={["2", "4"]} left={["2", "4"]}>
@@ -77,6 +76,5 @@ export const UserBasePage: React.FC<BasePageProps> = ({ children }) => {
           </AlertDialogContent>
         </AlertDialog>
       </Flex>
-    </AnimatedBackground>
   );
 };

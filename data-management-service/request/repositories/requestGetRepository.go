@@ -62,3 +62,15 @@ func (r *requestRepositories) GetRequestByRequestID(requestID string) (*entities
 
 	return request, nil
 }
+
+func (r *requestRepositories) GetRequestByRecordIndex(index string) (*entities.Request, error) {
+	var request *entities.Request
+
+	filter := bson.M{"index": index}
+	err := r.requestCollection.FindOne(context.Background(), filter).Decode(&request)
+	if err != nil {
+		return nil, err
+	}
+
+	return request, nil
+}

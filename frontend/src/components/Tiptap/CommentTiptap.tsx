@@ -16,7 +16,7 @@ import {
   Text,
   ButtonGroup,
 } from "@chakra-ui/react";
-import { setTimeout } from "../../functions/time";
+// import { setTimeout } from "../../functions/time";
 import { getCookie } from "typescript-cookie";
 const dateTimeFormat = "dd.MM.yyyy HH:mm";
 
@@ -26,12 +26,12 @@ interface CommentInstance {
 }
 
 interface TipTapProps {
-  defaultValue?: string;
+  defaultValue: string;
   cancel: () => void;
+  confirm: (html: string) => void;
 }
-// TODO : When save, save to local storage 
-// TODO : fetching comment to check if there is any comment
-const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
+
+const CommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
   const username = getCookie("username");
   const editor = useEditor({
     extensions: [StarterKit, Comment],
@@ -98,13 +98,14 @@ const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
     });
 
     setAllComments(tempComments);
+
   };
 
   const setCurrentComment = (editor: any) => {
     const newVal = editor.isActive("comment");
 
     if (newVal) {
-      setTimeout(50, () => setShowCommentMenu(newVal));
+      setTimeout(() => setShowCommentMenu(newVal), 50);
 
       setShowAddCommentSection(!editor.state.selection.empty);
 
@@ -163,14 +164,21 @@ const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
       editor?.chain().setComment(commentWithUuid).run();
     }
 
-    setTimeout(0.1, () => setCommentText(""));
+    setTimeout(() => setCommentText(""), 0.1);
 
     // force user to unselect
     editor?.commands.focus(editor?.state.doc.content.size);
   };
 
-  React.useEffect((): any => setTimeout(100, findCommentsAndStoreValues), []);
+  const submit = () => {
+    confirm(editor?.getHTML() || defaultValue);
+    cancel();
+  };
 
+  React.useEffect(() => {
+    const timeoutId = setTimeout(findCommentsAndStoreValues, 100);
+    return () => clearTimeout(timeoutId); // This is the cleanup function
+  }, []);
   return (
     <Flex
       dir="row"
@@ -272,7 +280,9 @@ const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
         <Button variant="cancel" onClick={cancel}>
           ยกเลิก
         </Button>
-        <Button variant="success">ยืนยัน</Button>
+        <Button variant="success" onClick={submit}>
+          ยืนยัน
+        </Button>
       </ButtonGroup>
     </Flex>
   );

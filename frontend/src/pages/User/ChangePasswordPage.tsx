@@ -7,6 +7,7 @@ import { changePassword } from "../../service/user";
 import { ReturnError } from "../../service/error";
 import { getCookie } from "typescript-cookie";
 import { UserBasePage } from "./UserBasePage";
+import React from "react";
 function ChangePasswordPage() {
   const token = getCookie("token") || "";
   const username = getCookie("username") || "";

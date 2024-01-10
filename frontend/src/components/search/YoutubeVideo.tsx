@@ -20,7 +20,6 @@ const YoutubeVideo = forwardRef<VdoRef, VdoProps>(
     const displayEndTime = timeToSeconds(endTime);
     const displayYoutubeURL = `https://www.youtube.com/embed/${youtubeURL}?start=${displayStartTime}&end=${displayEndTime}`;
 
-    console.log("🚀 ~ file: YoutubeVideo.tsx:23 ~ displayYoutubeURL:", displayYoutubeURL)
     const replay = () => {
       const iframe = document.getElementById(question) as HTMLImageElement;
       if (iframe) {

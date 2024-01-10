@@ -12,7 +12,7 @@ up_build:  build_auth build_search build_data
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service
 	@echo "Docker images built and started!"
 
 ####### AUTH SERVICE #######
@@ -35,6 +35,16 @@ down_auth:
 	@echo "Stopping auth service..."
 	docker compose -f docker-compose.dev.yml down auth-service
 	@echo "Auth service stopped!"
+
+## up_dev_auth: stops db container and rebuild and start go server
+up_dev_auth:
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down auth-db
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d auth-db
+	@echo "Docker images built and started!"
+	cd auth-service && go run main.go
+	@echo "Auth service development server started!"
 #################################
 
 ###### Search Service ######
@@ -58,13 +68,23 @@ down_search:
 	docker compose -f docker-compose.dev.yml down search-service
 	@echo "Search service stopped!"
 
+## up_dev_search: stops db container and rebuild and start go server
+up_dev_search:
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down elastic-db
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d elastic-db
+	@echo "Docker images built and started!"
+	cd search-esdb-service && go run main.go
+	@echo "Search service development server started!"
+
 #################################
 
 ###### Data Management Service ######
 ## up_build_data: stops docker compose (if running), builds projects and starts docker compose
 up_build_data: build_data
 	@echo "Stopping docker images (if running...)"
-	docker compose -f docker-compose.dev.yml down data-service
+	docker compose -f docker-compose.dev.yml down data-service data-db
 	@echo "Building (when required) and starting docker images..."
 	docker compose -f docker-compose.dev.yml up --build -d data-service
 	@echo "Docker images built and started!"
@@ -81,6 +101,16 @@ down_data:
 	@echo "Stopping data service..."
 	docker compose -f docker-compose.dev.yml down data-service
 	@echo "Data service stopped!"
+
+## up_dev_data: stops db container and rebuild and start go server
+up_dev_data:
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down data-db
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d data-db
+	@echo "Docker images built and started!"
+	cd data-management-service && go run main.go
+	@echo "Data service development server started!"
 
 #################################
 

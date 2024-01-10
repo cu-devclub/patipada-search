@@ -17,6 +17,7 @@ import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { search } from "../../service/search";
 import { SearchResultInterface } from "../../models/qa";
+import React from "react";
 
 interface SearchOptions {
   key: string;
@@ -33,7 +34,6 @@ async function filterResults(term) {
   let data: SearchOptions[] = [];
   try {
     const response = await search(term);
-    console.log(response)
     if (response) {
       data = response.data.map((item) => ({
         key: item.index,
@@ -152,7 +152,7 @@ function SearchField({
           <AutoCompleteInput
             onChange={onChangeInputHandler}
             variant="search_bar"
-            value={searchParam}
+            value={searchParam || ""}
             placeholder="ค้นหาเลย"
             h={["50", "70"]}
             fontSize={["md", "lg", "xl"]}

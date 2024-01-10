@@ -74,7 +74,6 @@ const (
 // Takes a *config.Config and a database.Database as parameters.
 // Does not return anything.
 func RecordMigrate(cfg *config.Config, es database.Database) {
-	log.Println("RECORD MIGRATION---------")
 	client := es.GetDB()
 	indexName := "record"
 	exists, err := indexExists(client, indexName)
@@ -87,6 +86,7 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 	}
 
 	// Create the index
+	log.Println("INDEX DOES NOT EXIST, CREATING INDEX")
 	res, err := client.Indices.Create(
 		indexName,
 		client.Indices.Create.WithBody(strings.NewReader(CREATE_INDEX_ICU_TOKENIZER)),
@@ -94,15 +94,19 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 	if err != nil {
 		panic(err)
 	}
-	log.Print(res)
+	log.Print("CREATING INDEX RESPONSE: ", res)
 
 	// Convert csv file
-	records, err := ConvertCSVFilesInDirectory(cfg.Static.DataPath)
 	log.Println("CONVERTING CSV-----------")
+	records, err := ConvertCSVFilesInDirectory(cfg.Static.DataPath)
 	if err != nil {
 		panic(err)
 	}
 
+	log.Println("CHECKING CLUSTER HEALTH")
+	es.CheckClusterHealth()
+	
+	log.Println("INSERTING DATA TO ES-----------")
 	// bulk insert records to es
 	recordESRepository := repositories.NewRecordESRepository(es.GetDB())
 	if err := recordESRepository.BulkInsert(records); err != nil {
@@ -120,9 +124,10 @@ func indexExists(client *elasticsearch.Client, indexName string) (bool, error) {
 	// Check if the index exists using the Indices.Exists API
 	res, err := client.Indices.Exists([]string{indexName})
 	if err != nil {
+		log.Println("Error checking if the index exists:", err)
 		return false, err
 	}
-
+	log.Println("INDEX EXISTS : " ,res.StatusCode != 404)
 	return res.StatusCode != 404, nil
 }
 
@@ -133,6 +138,7 @@ func indexExists(client *elasticsearch.Client, indexName string) (bool, error) {
 // entities.Record structs and an error.
 func ConvertCSVFilesInDirectory(directoryPath string) ([]*entities.Record, error) {
 	// Find file
+	log.Println("FIND DATA IN DIRECTORY: ", directoryPath)
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -147,6 +153,7 @@ func ConvertCSVFilesInDirectory(directoryPath string) ([]*entities.Record, error
 
 	var records []*entities.Record
 
+	log.Println("CONVERTING CSV TO JSON")
 	// Read Files in directory (in case more than 1 file)
 	for _, entry := range dir {
 		// Check if the entry is a regular file and has a .csv extension

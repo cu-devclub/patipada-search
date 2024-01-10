@@ -1,6 +1,7 @@
 import { RepeatIcon, EditIcon } from '@chakra-ui/icons';
 import { HStack, Tooltip, IconButton,Text } from '@chakra-ui/react';
 import { DataItem } from '../../models/qa';
+import React from 'react';
 
 interface TimesAndToolsProps {
     data: DataItem;

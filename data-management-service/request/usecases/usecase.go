@@ -48,6 +48,9 @@ type UseCase interface {
 	// - Error 500 if internal server error
 	GetRequestByRequestID(requestID string) (*models.Request, *errors.RequestError)
 
+
+	GetRequestByRecordIndex(index string) (*models.Request, *errors.RequestError)
+	
 	// UpdateRequest updates a request in the MongoDB collection.
 	//	The function takes a pointer to a models.Request object as input. The Request object is first validated
 	// and then converted to an entity using the helper.ModelsToEntity function. The UpdatedAt field of the entity

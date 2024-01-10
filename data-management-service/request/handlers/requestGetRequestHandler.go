@@ -47,3 +47,15 @@ func (r *requestHandler) GetRequestByRequestID(c *gin.Context) {
 
 	responseJSON(c, 200, "OK", modelsRequest)
 }
+
+
+func (r *requestHandler) GetRequestByRecordIndex(c *gin.Context) {
+	index := c.Param("index")
+	modelsRequest, err := r.requestUsecase.GetRequestByRecordIndex(index)
+	if err != nil {
+		responseJSON(c, err.StatusCode, err.Error(), nil)
+		return
+	}
+
+	responseJSON(c, 200, "OK", modelsRequest)
+}

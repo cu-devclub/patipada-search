@@ -32,7 +32,7 @@ func (s *echoServer) Start() {
 
 	s.App.Use(middleware.Logger())
 	s.App.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{s.cfg.App.FrontendURL},
+		AllowOrigins: []string{s.cfg.App.FrontendURL, "http://localhost:5173"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 	}))
 
