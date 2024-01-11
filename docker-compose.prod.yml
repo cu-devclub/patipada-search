@@ -1,0 +1,146 @@
+version: '3'
+services:
+  search-service:
+    image: dhammanava-search-image:latest
+    container_name: search-container
+    environment:
+      ESDB_URL: http://elastic-db:9200
+      ESDB_USERNAME: ${ESDB_USERNAME}
+      ESDB_PASSWORD: ${ESDB_PASSWORD}
+      FRONTEND_URL: http://frontend:5173
+    ports:
+      - 8081:8081
+    depends_on:
+      - elastic-db
+    networks:
+      - backbone
+
+  elastic-db:
+    image: dhammanava-elastic-image
+    container_name: elastic-container
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    ports:
+      - 9200:9200
+    networks:
+      - backbone
+
+  frontend:
+    image: dhammanava-frontend-image:latest
+    container_name: frontend-container
+    ports:
+      - 5173:8080
+    networks:
+      - backbone
+
+  # kibana:
+  #   image: docker.elastic.co/kibana/kibana:8.10.4
+  #   ports:
+  #     - 5601:5601
+  #   environment:
+  #     - ELASTICSEARCH_URL=http://elastic-db:9200
+  #   depends_on:
+  #     - elastic-db
+  #   networks:
+  #     - backbone
+
+  auth-service:
+    container_name: auth-container
+    image: dhammanava-auth-image:latest
+    environment:
+      - FRONTEND_URL=http://frontend:5173
+      - JWT_KEY=${JWT_KEY} 
+      - DATABASE_HOST=auth-db
+      - DATABASE_USER=${AUTH_DB_USER}
+      - DATABASE_PASSWORD=${AUTH_DB_PASSWORD}
+      - EMAIL_SENDER_EMAIL=${SENDER_EMAIL}
+      - EMAIL_SENDER_PASSWORD=${SENDER_PASSWORD}
+      - LINK_URL=${LINK_URL}
+      - SUPER_ADMIN_PASSWORD=${SUPER_ADMIN_PASSWORD}
+      - SUPER_ADMIN_EMAIL=${SUPER_ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - USER_PASSWORD=${USER_PASSWORD}
+      - USER_EMAIL=${USER_EMAIL}
+    ports:
+      - 8082:8082
+    depends_on:
+      - auth-db
+    networks:
+      - backbone
+
+  #* Copy ./auth-db to server in `.github/workflows/set-up.yml` before run docker-compose up
+  auth-db:
+    image: postgres:latest
+    container_name: auth-postgres-container
+    environment:
+      POSTGRES_DB: Authen
+      POSTGRES_USER: ${AUTH_DB_USER}
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - ./auth-db:/docker-entrypoint-initdb.d
+      - ./volumes/database/auth:/var/lib/postgresql/data
+    networks:
+      - backbone
+
+  data-service:
+    container_name: data-container
+    image: dhammanava-data-image:latest
+    environment:
+       FRONTEND_URL: http://frontend:5173
+       MONGO_DB_HOST: data-db
+       MONGO_DB_PORT: 27017
+       MONGO_DB_USER: ${DATA_MNGMNT_DB_USER}
+       MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
+       MONGO_DB_NAME: record
+    ports:
+      - 8083:8083
+    depends_on:
+      - data-db
+    networks:
+      - backbone
+
+  data-db: 
+    image: mongo:latest
+    container_name: data-mongo-container
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_DATABASE: record
+      MONGO_INITDB_ROOT_USERNAME: ${DATA_MNGMNT_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
+    volumes:
+      - ./volumes/database/mongo-data:/data/db
+
+      
+  #* Already run (set up ssl) don't need to run again
+  nginx:
+    image: nginx:latest
+    container_name: nginx_container
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - backbone
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot/www/:/var/www/certbot
+      - ./certbot/conf/:/etc/letsencrypt
+
+  #* Already run (set up ssl) don't need to run again
+  certbot:
+    image: certbot/certbot:latest
+    networks:
+      - backbone
+    volumes:
+      - ./certbot/www/:/var/www/certbot
+      - ./certbot/conf/:/etc/letsencrypt
+    command: certonly --webroot -w /var/www/certbot --force-renewal --email naruemon.npr@gmail.com -d search.dhammanava.net --agree-tos
+
+networks:
+  backbone:
+    driver: bridge
