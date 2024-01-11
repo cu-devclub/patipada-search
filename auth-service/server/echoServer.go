@@ -14,9 +14,9 @@ import (
 )
 
 type echoServer struct {
-	App *echo.Echo
-	db  *gorm.DB
-	cfg *config.Config
+	App  *echo.Echo
+	db   *gorm.DB
+	cfg  *config.Config
 }
 
 func NewEchoServer(cfg *config.Config, db *gorm.DB) Server {
@@ -138,7 +138,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 500 internal server error
 	s.App.GET("/verify-reset-token/:token", usersHttpHandler.VerifyResetToken)
 
-	// Verify Token to verify the time valid of auth token 
+	// Verify Token to verify the time valid of auth token
 	// Header - Authorization : <token>
 	//
 	// Response
@@ -150,7 +150,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 
 	// Authorize to verify the user authorization
 	// Header - Authorization : <token>
-	// 
+	//
 	// Query Params
 	// - requiredRole (string) ; one of admin, super-admin, user
 	//

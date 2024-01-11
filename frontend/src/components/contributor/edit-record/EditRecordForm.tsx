@@ -23,7 +23,6 @@ import { TimesAndTools } from "../../search";
 import React from "react";
 import CommentableTextField from "./CommentableTextField";
 import CommentableTimeField from "./CommentableTimeField";
-import { extractStringFromHTML } from "../../../functions";
 import { useNavigate } from "react-router-dom";
 interface EditRecordFormProps {
   data: Request;
@@ -34,7 +33,6 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
   const vdoRef = useRef<VdoRef | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isConfirm, setisConfirm] = useState(false);
-  const [isSomeFormEditing, setSomeFormEditing] = useState(false)
   const modalTitle = isConfirm
     ? "ยืนยันคำขอแก้ไขใช่หรือไม่"
     : "ออกจากหน้าคำขอแก้ไขใช่หรือไม่";
@@ -43,19 +41,15 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
     : "หากออกจากหน้าคำขอแก้ไขคำขอแก้ไขนี้จะถูกยกเลิก";
   const [startTime, setStartTime] = useState({
     htmlValue: data.startTime,
-    textValue: extractStringFromHTML(data.startTime),
   });
   const [endTime, setEndTime] = useState({
     htmlValue: data.endTime,
-    textValue: extractStringFromHTML(data.endTime),
   });
   const [question, setQuestion] = useState({
     htmlValue: data.question,
-    textValue: extractStringFromHTML(data.question),
   });
   const [answer, setAnswer] = useState({
     htmlValue: data.answer,
-    textValue: extractStringFromHTML(data.answer),
   });
 
   const handleReplay = () => {
@@ -87,53 +81,37 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
         <VStack order={{ base: 2, md: 1 }} px={2}>
           <CommentableTimeField
             htmlValue={startTime.htmlValue}
-            textValue={startTime.textValue}
             heading={"เวลาเริ่มต้น"}
-            isOtherFormEditing={isSomeFormEditing}
-            setFormEditing={setSomeFormEditing}
-            confirm={(html: string) =>
+            setHTML={(html: string) =>
               setStartTime({
                 htmlValue: html,
-                textValue: extractStringFromHTML(html),
               })
             }
           />
           <CommentableTimeField
             htmlValue={endTime.htmlValue}
-            textValue={endTime.textValue}
             heading={"เวลาสิ้นสุด"}
-            isOtherFormEditing={isSomeFormEditing}
-            setFormEditing={setSomeFormEditing}
-            confirm={(html: string) => {
+            setHTML={(html: string) =>
               setEndTime({
                 htmlValue: html,
-                textValue: extractStringFromHTML(html),
-              });
-            }}
+              })
+            }
           />
           <CommentableTextField
             htmlValue={question.htmlValue}
-            textValue={question.textValue}
             heading={"คำถาม"}
-            isOtherFormEditing={isSomeFormEditing}
-            setFormEditing={setSomeFormEditing}
-            confirm={(html: string) =>
+            setHTML={(html: string) =>
               setQuestion({
                 htmlValue: html,
-                textValue: extractStringFromHTML(html),
               })
             }
           />
           <CommentableTextField
             htmlValue={answer.htmlValue}
-            textValue={answer.textValue}
             heading={"คำตอบ"}
-            isOtherFormEditing={isSomeFormEditing}
-            setFormEditing={setSomeFormEditing}
-            confirm={(html: string) =>
+            setHTML={(html: string) =>
               setAnswer({
                 htmlValue: html,
-                textValue: extractStringFromHTML(html),
               })
             }
           />

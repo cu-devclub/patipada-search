@@ -50,8 +50,16 @@ func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, *errors.RequestErr
 		return nil, errors.CreateError(http.StatusBadRequest, messages.MISSING_AUTHORIZATION)
 	}
 
-	secretKey := config.GetConfig().App.JWTKey
+	claims,err := ValidateAndExtractToken(tokenString)
+	if err != nil {
+		return nil, err
+	}
 
+	return claims, nil
+}
+
+func ValidateAndExtractToken(tokenString string) (*CustomClaims, *errors.RequestError) {
+	secretKey := config.GetConfig().App.JWTKey
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})

@@ -42,6 +42,7 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
 ### 
 
     .
+    ├── auth_proto              # gRPC with auth service      
     ├── config            
     ├── database                    
     ├── errors                  # Custom errors

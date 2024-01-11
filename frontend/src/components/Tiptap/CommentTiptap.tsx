@@ -14,7 +14,6 @@ import {
   Textarea,
   HStack,
   Text,
-  ButtonGroup,
 } from "@chakra-ui/react";
 // import { setTimeout } from "../../functions/time";
 import { getCookie } from "typescript-cookie";
@@ -27,11 +26,10 @@ interface CommentInstance {
 
 interface TipTapProps {
   defaultValue: string;
-  cancel: () => void;
-  confirm: (html: string) => void;
+  setHTML: (html: string) => void;  
 }
 
-const CommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
+const CommentTiptap = ({ defaultValue,setHTML }: TipTapProps) => {
   const username = getCookie("username");
   const editor = useEditor({
     extensions: [StarterKit, Comment],
@@ -73,20 +71,15 @@ const CommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
   const [allComments, setAllComments] = React.useState<any[]>([]);
 
   const findCommentsAndStoreValues = () => {
-    const proseMirror = document.querySelector(".ProseMirror");
-
-    const comments = proseMirror?.querySelectorAll("span[data-comment]");
+    const parser = new DOMParser();
+    const htmlText = editor?.getHTML() || defaultValue;
+    const doc = parser.parseFromString(htmlText, "text/html");
+    const comments = doc.querySelectorAll("span[data-comment]");
 
     const tempComments: any[] = [];
 
-    if (!comments) {
-      setAllComments([]);
-      return;
-    }
-
     comments.forEach((node) => {
       const nodeComments = node.getAttribute("data-comment");
-
       const jsonComments = nodeComments ? JSON.parse(nodeComments) : null;
 
       if (jsonComments !== null) {
@@ -98,9 +91,7 @@ const CommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
     });
 
     setAllComments(tempComments);
-
   };
-
   const setCurrentComment = (editor: any) => {
     const newVal = editor.isActive("comment");
 
@@ -168,11 +159,8 @@ const CommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
 
     // force user to unselect
     editor?.commands.focus(editor?.state.doc.content.size);
-  };
 
-  const submit = () => {
-    confirm(editor?.getHTML() || defaultValue);
-    cancel();
+    setHTML(editor?.getHTML() || defaultValue);
   };
 
   React.useEffect(() => {
@@ -276,14 +264,7 @@ const CommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
           );
         })}
       </Flex>
-      <ButtonGroup position="absolute" bottom={0} right={0}>
-        <Button variant="cancel" onClick={cancel}>
-          ยกเลิก
-        </Button>
-        <Button variant="success" onClick={submit}>
-          ยืนยัน
-        </Button>
-      </ButtonGroup>
+      {/* TODO: sent html */}
     </Flex>
   );
 };

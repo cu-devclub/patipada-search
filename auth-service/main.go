@@ -23,5 +23,8 @@ func main() {
 		return
 	}
 
+	go server.GRPCListen()
+
 	server.NewEchoServer(&cfg, db.GetDb()).Start()
+
 }

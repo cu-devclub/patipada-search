@@ -8,6 +8,10 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
+// TODO : make all GET request can filter by status 
+// If status is empty, return all request
+// If status is not empty, return request with status
+// If status is not valid("pending","approved","rejected"), return empty 
 
 // GetAllRequest retrieves all requests from the request repositories.
 //

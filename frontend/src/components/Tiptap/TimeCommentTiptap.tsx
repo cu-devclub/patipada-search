@@ -14,7 +14,6 @@ import {
   Textarea,
   HStack,
   Text,
-  ButtonGroup,
   NumberInput,
   NumberDecrementStepper,
   NumberIncrementStepper,
@@ -33,10 +32,9 @@ interface CommentInstance {
 
 interface TipTapProps {
   defaultValue: string;
-  cancel: () => void;
-  confirm: (html: string) => void;
+  setHTML: (html: string) => void;
 }
-const TimeCommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
+const TimeCommentTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
   const { hours, minutes, seconds } = splitTime(defaultValue);
   const [hourState, setHourState] = React.useState(hours);
   const [minuteState, setMinuteState] = React.useState(minutes);
@@ -82,20 +80,15 @@ const TimeCommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
   const [allComments, setAllComments] = React.useState<any[]>([]);
 
   const findCommentsAndStoreValues = () => {
-    const proseMirror = document.querySelector(".ProseMirror");
-
-    const comments = proseMirror?.querySelectorAll("span[data-comment]");
+    const parser = new DOMParser();
+    const htmlText = editor?.getHTML() || defaultValue;
+    const doc = parser.parseFromString(htmlText, "text/html");
+    const comments = doc.querySelectorAll("span[data-comment]");
 
     const tempComments: any[] = [];
 
-    if (!comments) {
-      setAllComments([]);
-      return;
-    }
-
     comments.forEach((node) => {
       const nodeComments = node.getAttribute("data-comment");
-
       const jsonComments = nodeComments ? JSON.parse(nodeComments) : null;
 
       if (jsonComments !== null) {
@@ -134,7 +127,7 @@ const TimeCommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
     if (!commentText.trim().length) return;
 
     editor?.commands.selectAll();
-    
+
     const activeCommentInstance: CommentInstance = JSON.parse(
       JSON.stringify(activeCommentsInstance)
     );
@@ -178,11 +171,8 @@ const TimeCommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
 
     // force user to unselect
     editor?.commands.focus(editor?.state.doc.content.size);
-  };
+    setHTML(editor?.getHTML() || defaultValue);
 
-  const submit = () => {
-    confirm(editor?.getHTML() || defaultValue);
-    cancel();
   };
 
   React.useEffect(() => {
@@ -194,7 +184,6 @@ const TimeCommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
     setHourState(e);
     const fullTimeText = generateTime(e, minuteState, secondState);
     setCommentText(fullTimeText);
-    console.log("🚀 ~ file: TimeCommentTiptap.tsx:198 ~ handleChangeHour ~ fullTimeText:", fullTimeText)
   };
 
   const handleChangeMinute = (e: any) => {
@@ -231,7 +220,7 @@ const TimeCommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
                 size="xs"
                 maxW={16}
                 min={0}
-                max={3}
+                max={12}
                 defaultValue={hourState}
                 onChange={handleChangeHour}
               >
@@ -345,14 +334,6 @@ const TimeCommentTiptap = ({ defaultValue, cancel, confirm }: TipTapProps) => {
           );
         })}
       </Flex>
-      <ButtonGroup position="absolute" bottom={0} right={0}>
-        <Button variant="cancel" onClick={cancel}>
-          ยกเลิก
-        </Button>
-        <Button variant="success" onClick={submit}>
-          ยืนยัน
-        </Button>
-      </ButtonGroup>
     </Flex>
   );
 };
