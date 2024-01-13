@@ -36,7 +36,7 @@ type UsersHandler interface {
 	// - 400 bad request ; some field missing or input invalid
 	// - 401 unauthorized ;  username or password incorrect
 	// - 500 internal server error
-	Login(c echo.Context) error
+	Login(c echo.Context) error 
 
 	// Request the link to reset password
 	// Link when sent to input email if valid
@@ -48,7 +48,7 @@ type UsersHandler interface {
 	// - 400 bad request (invalid email)
 	// - 404 User not found (email not exists)
 	// - 500 internal server error
-	ForgetPassword(c echo.Context) error
+	ForgetPassword(c echo.Context) error 
 
 	// Reset Password
 	// Parameters(JSON)
@@ -107,16 +107,4 @@ type UsersHandler interface {
 	// - 500 internal server error
 	VerifyToken(c echo.Context) error
 
-	// Authorize to verify the user authorization
-	// Header - Authorization : <token>
-	//
-	// Query Params
-	// - requiredRole (string) ; one of admin, super-admin, user
-	//
-	// Response
-	// - 200 OK & result (true/false)
-	// - 400 Bad request ; missing token
-	// - 401 Unauthorize ; invalid token
-	// - 500 internal server error
-	Authorize(c echo.Context) error
 }

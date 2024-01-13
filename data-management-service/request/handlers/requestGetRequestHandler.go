@@ -6,56 +6,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// GetAllRequests handles the HTTP request for retrieving all requests.
-// It uses the requestUsecase to get all requests and sends the response in JSON format.
-//
-// Response :
-// - 200 OK if success and return all requests in JSON format
-// - 500 Internal Server Error if internal server error
-//
-// Usage :
-//
-//	router.GET("/requests", requestHandler.GetAllRequests)
-func (r *requestHandler) GetAllRequests(c *gin.Context) {
-	modelsRequests, err := r.requestUsecase.GetAllRequests()
+// GetRequest is a handler function for the GET /request endpoint.
+// It retrieves requests based on the provided query parameters: status, username, requestID, index, and approvedBy.
+// If a query parameter is an empty string, it will not be included in the filter.
+// The function responds with a JSON object that includes the matching requests.
+// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
+//  error status codes 
+// - 400 (Bad Request) and 
+// - 500 (Internal Server Error).
+func (r *requestHandler) GetRequest(c *gin.Context) {
+	status := c.Query("status")
+	username := c.Query("username")
+	requestID := c.Query("requestID")
+	index := c.Query("index")
+	approvedBy := c.Query("approvedBy")
+	modelsRequest, err := r.requestUsecase.GetRequest(status, username, requestID, index, approvedBy)
 	if err != nil {
 		responseJSON(c, err.StatusCode, err.Error(), nil)
 		return
 	}
 
-	responseJSON(c, 200, messages.SUCCESS_GET_REQUEST, modelsRequests)
-}
-
-// GetRequestByRequestID handles the HTTP request for retrieving a request by its RequestID.
-// It uses the requestUsecase to get the request and sends the response in JSON format.
-//
-// Response :
-// - 200 OK if success and return the request in JSON format
-// - 404 Not Found if no request found
-// - 500 Internal Server Error if internal server error
-//
-// Usage :
-//
-//	router.GET("/requests/:requestID", requestHandler.GetRequestByRequestID)
-func (r *requestHandler) GetRequestByRequestID(c *gin.Context) {
-	requestID := c.Param("requestID")
-	modelsRequest, err := r.requestUsecase.GetRequestByRequestID(requestID)
-	if err != nil {
-		responseJSON(c, err.StatusCode, err.Error(), nil)
-		return
-	}
-
-	responseJSON(c, 200, "OK", modelsRequest)
-}
-
-
-func (r *requestHandler) GetRequestByRecordIndex(c *gin.Context) {
-	index := c.Param("index")
-	modelsRequest, err := r.requestUsecase.GetRequestByRecordIndex(index)
-	if err != nil {
-		responseJSON(c, err.StatusCode, err.Error(), nil)
-		return
-	}
-
-	responseJSON(c, 200, "OK", modelsRequest)
+	responseJSON(c, 200, messages.SUCCESS_GET_REQUEST, modelsRequest)
 }

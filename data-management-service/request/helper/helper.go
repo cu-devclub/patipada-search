@@ -55,3 +55,12 @@ func EntityToModels(e *entities.Request) (m *models.Request) {
 	}
 	return m
 }
+
+func Contains(s string, arr []string) bool {
+	for _, a := range arr {
+		if a == s {
+			return true
+		}
+	}
+	return false
+}

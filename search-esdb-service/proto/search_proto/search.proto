@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package search_proto;
+
+option go_package = "/search_proto";
+
+service SearchService {
+    rpc SearchRecord(SearchRequest) returns (SearchResponse);
+}
+
+message SearchRequest {
+    string query = 1;
+}
+
+message SearchResponse {
+    bool isFounded = 1;
+}

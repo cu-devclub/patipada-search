@@ -39,7 +39,7 @@ func TestChangePassword(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		//Change password back 
+		//Change password back
 		m = models.ChangePassword{
 			OldPassword: m.NewPassword,
 			NewPassword: roleCredentials.Password,

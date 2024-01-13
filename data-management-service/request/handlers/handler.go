@@ -43,7 +43,23 @@ type Handlers interface {
 	InsertRequest(c *gin.Context)
 
 	// UpdateRequest updates a request using the gin context.
-	// It first binds the request body to a models.Request struct.
+	// The function first tries to bind the JSON body of the request to a models.Request struct.
+	// The models.Request struct has the following fields:
+	//
+	//  ID : The ID of the request. It is a string and is required.
+	//  RequestID:  The ID of the request. It is a string and is required.
+	//	Index:      The index of the request. It is a string and is required.
+	//	YoutubeURL: The URL of the YouTube video for the request. It is a string and is required.
+	//	Question:   The question of the request. It is a string and is required.
+	//	Answer:     The answer of the request. It is a string and is required.
+	//	StartTime:  The start time of the request in the YouTube video. It is a string and is required.
+	//	EndTime:    The end time of the request in the YouTube video. It is a string and is required.
+	//	CreatedAt:  The creation time of the request. It is a time.Time and is optional.
+	//	UpdatedAt:  The update time of the request. It is a time.Time and is optional.
+	//	By: 	   The user who created the request. It is a string.
+	//  ApprovedBy: The user who approved the request. It is a string.
+	//  Status:     The status of the request. It is a string.
+	//
 	// Success
 	// - 200 OK if success and return the updated request in JSON format
 	//
@@ -52,29 +68,13 @@ type Handlers interface {
 	// - 500 Internal Server Error if internal server error
 	UpdateRequest(c *gin.Context)
 
-	// GetAllRequests handles the HTTP request for retrieving all requests.
-	// It uses the requestUsecase to get all requests and sends the response in JSON format.
-	//
-	// Response :
-	// - 200 OK if success and return all requests in JSON format
-	// - 500 Internal Server Error if internal server error
-	//
-	// Usage :
-	//	router.GET("/requests", requestHandler.GetAllRequests)
-	GetAllRequests(c *gin.Context)
-
-	// GetRequestByRequestID handles the HTTP request for retrieving a request by its RequestID.
-	// It uses the requestUsecase to get the request and sends the response in JSON format.
-	//
-	// Response :
-	// - 200 OK if success and return the request in JSON format
-	// - 404 Not Found if no request found
-	// - 500 Internal Server Error if internal server error
-	//
-	// Usage :
-	//	router.GET("/requests/:requestID", requestHandler.GetRequestByRequestID)
-	GetRequestByRequestID(c *gin.Context)
-
-
-	GetRequestByRecordIndex(c *gin.Context)
+	// GetRequest is a handler function for the GET /request endpoint.
+	// It retrieves requests based on the provided query parameters: status, username, requestID, index, and approvedBy.
+	// If a query parameter is an empty string, it will not be included in the filter.
+	// The function responds with a JSON object that includes the matching requests.
+	// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
+	//  error status codes
+	// - 400 (Bad Request) and
+	// - 500 (Internal Server Error).
+	GetRequest(c *gin.Context)
 }

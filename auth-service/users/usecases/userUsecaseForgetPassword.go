@@ -8,6 +8,7 @@ import (
 	"auth-service/users/helper"
 	"auth-service/users/models"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/go-playground/validator"
@@ -28,12 +29,14 @@ func (u *UsersUsecaseImpl) ForgetPassword(in *models.ForgetPassword) (string, er
 	// Validate data
 	validator := validator.New()
 	if err := validator.Struct(in); err != nil {
+		log.Println("Forget Password : Error while validating request body: ", err)
 		return "", errors.CreateError(400, err.Error())
 	}
 
 	// Check if email exists
 	users, err := u.usersRepository.GetAllUsersData()
 	if err != nil {
+		log.Println("Forget Password : Error while getting all users data: ", err)
 		return "", err
 	}
 	user := &entities.Users{}
@@ -44,35 +47,40 @@ func (u *UsersUsecaseImpl) ForgetPassword(in *models.ForgetPassword) (string, er
 	}
 
 	if helper.GetUserFromUserLists(users, user.Username) == nil {
+		log.Println("Forget Password : not found user from request email")
 		return "", errors.CreateError(404, messages.USER_NOT_FOUND)
 	}
-
 
 	// if current token is not expire yet
 	// extend the time from now on and not change the token also not send the email
 	if user.ResetTokenExpiresAt.After(time.Now()) {
 		user.ResetTokenExpiresAt = time.Now().Add(15 * time.Minute)
+		log.Println("Forget Password : Token is not expire yet,  Updating user (token time): ", user)
 		err = u.usersRepository.UpdateUser(user)
 		if err != nil {
+			log.Println("Forget Password : Error while updating user(token time): ", err)
 			return "", err
 		}
-		return user.ResetToken,nil
+		return user.ResetToken, nil
 	}
 
-
+	log.Println("Token already expired, Generate new token .....")
 	//Generate Token
 	resetPasswordToken := helper.GenerateResetToken()
 	resetPasswordExpireTime := helper.GenerateResetTokenExpiration()
 
 	user.ResetToken = resetPasswordToken
 	user.ResetTokenExpiresAt = resetPasswordExpireTime
-
+	log.Println("Forget Password : Updating user(token time): ", user)
 	err = u.usersRepository.UpdateUser(user)
 	if err != nil {
+		log.Println("Forget Password : Error while updating user(token time): ", err)
 		return "", err
 	}
 
 	// Sending email
+	log.Println("Sending email to ", in.Email," ......")
+	
 	cfg := config.GetConfig()
 	subject := "Reset Password"
 	resetLink := fmt.Sprintf("%s/user/reset-password/%s", cfg.Link.URL, resetPasswordToken)
@@ -94,5 +102,11 @@ func (u *UsersUsecaseImpl) ForgetPassword(in *models.ForgetPassword) (string, er
 		BCC:         nil,
 	}
 
-	return resetPasswordToken, u.UserEmailing.SendEmail(e)
+	err = u.UserEmailing.SendEmail(e)
+	if err != nil {
+		log.Println("Forget Password : Error while sending email: ", err)
+		return "", err
+	}
+
+	return resetPasswordToken, err
 }

@@ -6,6 +6,7 @@ import (
 	"data-management/request/entities"
 	"data-management/request/helper"
 	"data-management/request/models"
+	"log"
 	"time"
 )
 
@@ -41,21 +42,30 @@ import (
 //	    log.Fatal(err)
 //	}
 func (r *requestUsecase) InsertRequest(request *models.Request) *errors.RequestError {
+	log.Println("Insert request; Request: ", request)
 	if err := r.validator.Validate(request); err != nil {
+		log.Println("Error validate request; Request: ", request, "Error: ", err)
 		return errors.CreateError(400, messages.BAD_REQUEST)
 	}
 
-	// validate request index
-	err := r.requestRepositories.ValidateRecordIndex(request.Index)
-	if err != nil {
-		return errors.CreateError(400, messages.ERR_RECORD_INDEX_NOT_EXISTS)
+	// validate record index
+	result,err := r.requestRepositories.ValidateRecordIndex(request.Index); 
+	if err != nil || result == false {
+		log.Println("Error validate record index; Request: ", request, "Error: ", err)
+		return errors.CreateError(400, messages.BAD_REQUEST)
 	}
 
-	// TODO : validate username
+	result,err = r.requestRepositories.ValidateUsername(request.By); 
+	if err != nil || result == false {
+		log.Println("Error validate username; Request: ", request, "Error: ", err)
+		return errors.CreateError(400, messages.BAD_REQUEST)
+	}
+
 
 	// populate request entity
 	requestID, err := helper.GenerateRequestID(r.requestRepositories)
 	if err != nil {
+		log.Println("Error generate request ID; Error: ", err)
 		return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
 	}
 
@@ -77,6 +87,7 @@ func (r *requestUsecase) InsertRequest(request *models.Request) *errors.RequestE
 	// insert request entity
 	objId, err := r.requestRepositories.InsertRequest(&requestEntity)
 	if err != nil {
+		log.Println("Error insert request entity; RequestEntity: ", requestEntity, "Error: ", err)
 		return errors.CreateError(500, messages.ERR_INSERT_REQUEST)
 	}
 
@@ -87,5 +98,6 @@ func (r *requestUsecase) InsertRequest(request *models.Request) *errors.RequestE
 	request.UpdatedAt = requestEntity.UpdatedAt
 	request.Status = requestEntity.Status
 
+	log.Println("Success insert request")
 	return nil
 }

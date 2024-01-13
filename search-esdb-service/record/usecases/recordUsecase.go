@@ -23,4 +23,6 @@ type RecordUsecase interface {
 	// - *models.SearchRecordStruct: The search results containing the matching records.
 	// - error: An error if the search operation fails.
 	Search(indexName, query string, amount int) (*models.SearchRecordStruct, error)
+
+	SearchByRecordIndex(indexName, recordIndex string) (*models.Record, error)
 }

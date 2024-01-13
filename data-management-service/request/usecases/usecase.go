@@ -31,26 +31,6 @@ type UseCase interface {
 	// Finally, it populates the original models.Request struct with the requestID, CreatedAt, UpdatedAt, and Status fields from the entities.Request struct.
 	InsertRequest(request *models.Request) *errors.RequestError
 
-	// GetAllRequests retrieves all request from the request repositories.
-	//
-	// Return
-	// - if no error, return slice of model Request
-	// - if no data return nil
-	// - Error 500 if internal server error
-	GetAllRequests() ([]*models.Request, *errors.RequestError)
-
-	// GetRequestByRequestID retrieves a Request from the Request repositories by its requestID.
-	// It takes a requestID as an argument.
-	//
-	// Return
-	// - if no error, return model Request
-	// - Error 404 if no Request found
-	// - Error 500 if internal server error
-	GetRequestByRequestID(requestID string) (*models.Request, *errors.RequestError)
-
-
-	GetRequestByRecordIndex(index string) (*models.Request, *errors.RequestError)
-	
 	// UpdateRequest updates a request in the MongoDB collection.
 	//	The function takes a pointer to a models.Request object as input. The Request object is first validated
 	// and then converted to an entity using the helper.ModelsToEntity function. The UpdatedAt field of the entity
@@ -61,4 +41,23 @@ type UseCase interface {
 	// - 400 : Bad request (validation error)
 	// - 500 : internal server error
 	UpdateRequest(request *models.Request) *errors.RequestError
+
+	// GetRequest retrieves requests based on the provided parameters.
+	// It validates the parameters, creates a filter from them, and then retrieves the requests from the repository.
+	// If a parameter is an empty string, it will not be included in the filter.
+	// If an error occurs during the operation, it will be returned along with a nil slice.
+	//
+	// Parameters:
+	//
+	//	status: The status of the requests to retrieve.
+	//	username: The username associated with the requests to retrieve.
+	//	requestID: The ID of the request to retrieve.
+	//	index: The index of the request to retrieve.
+	//	approvedBy: The username of the user who approved the requests to retrieve.
+	//
+	// Returns:
+	//   - []*models.Request: A slice of pointers to the matching requests. If no requests match the filter, the slice will be empty.
+	//   - *errors.RequestError: An error that occurred during the operation, if any.
+	//       - status of 400 or 500
+	GetRequest(status, username, requestID, index, approvedBy string) ([]*models.Request, *errors.RequestError)
 }

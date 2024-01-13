@@ -1,6 +1,7 @@
 package main
 
 import (
+	"data-management/communication"
 	"data-management/config"
 	"data-management/database"
 	"data-management/server"
@@ -9,7 +10,6 @@ import (
 )
 
 func main() {
-	// TODO : Implementing token authorization
 	log.Println("Initializing config...")
 	config.InitializeViper("./")
 	log.Println("Getting config...")
@@ -21,6 +21,8 @@ func main() {
 
 	validate := validator.NewValidator()
 
+	comm := communication.NewgRPC(&cfg)
+
 	log.Println("Starting server...")
-	server.NewGinServer(&cfg, &db, &validate).Start()
+	server.NewGinServer(&cfg, &db, &validate, comm).Start()
 }

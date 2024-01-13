@@ -2,6 +2,7 @@ package models
 
 import (
 	"auth-service/users/helper"
+	"fmt"
 )
 
 type RegisterDto struct {
@@ -16,6 +17,10 @@ func (r *RegisterDto) MockData() {
 	r.Password = "test-password"
 	r.Email = helper.GenerateRandomEmail()
 	r.Role = "user"
+}
+
+func (r *RegisterDto) ToString() string {
+	return fmt.Sprintf("Username: %s, Email: %s, Role: %s", r.Username, r.Email, r.Role)
 }
 
 type LoginDto struct {

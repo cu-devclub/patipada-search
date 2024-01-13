@@ -19,3 +19,37 @@ type (
 		Tokens []string  `json:"tokens"`
 	}
 )
+
+func (s *SearchRecordStruct) ToString() string {
+	return `{
+		"results": ` + s.ResultsToString() + `,
+		"tokens": ` + s.TokensToString() + `
+	}`
+}
+
+func (s *SearchRecordStruct) ResultsToString() string {
+	var results string
+	for _, result := range s.Results {
+		results += result.ToString() + ","
+	}
+	return "[" + results[:len(results)-1] + "]"
+}
+
+func (r *Record) ToString() string {
+	return `{
+		"index": "` + r.Index + `",
+		"youtubeURL": "` + r.YoutubeURL + `",
+		"question": "` + r.Question + `",
+		"answer": "` + r.Answer + `",
+		"startTime": "` + r.StartTime + `",
+		"endTime": "` + r.EndTime + `"
+	}`
+}
+
+func (s *SearchRecordStruct) TokensToString() string {
+	var tokens string
+	for _, token := range s.Tokens {
+		tokens += `"` + token + `",`
+	}
+	return "[" + tokens[:len(tokens)-1] + "]"
+}

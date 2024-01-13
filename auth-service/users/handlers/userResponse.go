@@ -1,6 +1,10 @@
 package handlers
 
-import "github.com/labstack/echo/v4"
+import (
+	"log"
+
+	"github.com/labstack/echo/v4"
+)
 
 type baseResponseStruct struct {
 	Message string `json:"message"`
@@ -33,6 +37,7 @@ func baseResponse(c echo.Context, responseCode int, message string) error {
 }
 
 func loginResponse(c echo.Context, responseCode int, message string, token string, role string) error {
+	log.Println("Login Logs ; Status Code :", responseCode, "Message:", message)
 	return c.JSON(responseCode, &loginResponseStruct{
 		Token:   token,
 		Role:    role,
@@ -41,6 +46,7 @@ func loginResponse(c echo.Context, responseCode int, message string, token strin
 }
 
 func registerResponse(c echo.Context, responseCode int, message string, userID string) error {
+	log.Println("Register Logs ; Status Code :", responseCode, "Message:", message)
 	return c.JSON(responseCode, &registerResponseStruct{
 		Message: message,
 		UserID:  userID,
@@ -48,6 +54,7 @@ func registerResponse(c echo.Context, responseCode int, message string, userID s
 }
 
 func verifyTokenResponse(c echo.Context, responseCode int, message string, valid bool) error {
+	log.Println("Verify Token Logs ; Status Code :", responseCode, "Message:", message)
 	return c.JSON(responseCode, &verifyTokenStruct{
 		Message: message,
 		Result:  valid,
@@ -55,6 +62,7 @@ func verifyTokenResponse(c echo.Context, responseCode int, message string, valid
 }
 
 func forgetPasswordResponse(c echo.Context, responseCode int, message string, token string) error {
+	log.Println("Forget Password Logs ; Status Code :", responseCode, "Message:", message)
 	return c.JSON(responseCode, &forgetPasswordStruct{
 		Message: message,
 		Token:   token,

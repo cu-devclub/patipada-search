@@ -1,8 +1,10 @@
-// entity for record domain 
+// entity for record domain
 // entity is a data model use to deals with data
-// in the low level e.g. data in db or migration files 
+// in the low level e.g. data in db or migration files
 
 package entities
+
+import "search-esdb-service/record/models"
 
 type (
 	Record struct {
@@ -22,3 +24,14 @@ type (
 		Position    int    `json:"position"`
 	}
 )
+
+func (e *Record) ToModels() *models.Record {
+	return &models.Record{
+		Index:      e.Index,
+		YoutubeURL: e.YoutubeURL,
+		Question:   e.Question,
+		Answer:     e.Answer,
+		StartTime:  e.StartTime,
+		EndTime:    e.EndTime,
+	}
+}

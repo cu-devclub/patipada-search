@@ -24,5 +24,13 @@ func main() {
 	log.Println("Starting migration...")
 	recordMigrator.RecordMigrate(&cfg, db)
 	log.Println("Migration finished")
-	server.NewGinServer(&cfg, db.GetDB()).Start()
+
+	s := server.NewGinServer(&cfg, db.GetDB())
+
+	log.Println("Starting gRPC server...")
+	go server.GRPCListen(s, &cfg)
+
+	log.Println("Starting HTTP server on Port", cfg.App.Port, "...")
+	s.Start()
+
 }

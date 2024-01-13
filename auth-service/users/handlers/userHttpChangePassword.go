@@ -5,12 +5,13 @@ import (
 	"auth-service/jwt"
 	"auth-service/messages"
 	"auth-service/users/models"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
-// Change Password
+// Change Password : Manual change password
 // Header Authorization - token
 // Parameter(JSON)
 // - oldPassword (string) ; old password ; 8 <= length <= 50
@@ -22,17 +23,21 @@ import (
 // - 401 Unauthorize ; invalid old password
 // - 500 internal server error
 func (h *usersHttpHandler) ChangePassword(c echo.Context) error {
+	log.Println("Change Password : Starting handler")
 	reqBody := new(models.ChangePassword)
 	if err := c.Bind(reqBody); err != nil {
 		return baseResponse(c, http.StatusBadRequest, messages.BAD_REQUEST)
+		
 	}
 
 	claims, err := jwt.ValidateAndExtractClaims(c)
 	if err != nil {
 		return baseResponse(c, http.StatusUnauthorized, messages.UNAUTHORIZED)
+		
 	}
 
 	username := claims.Username
+	log.Println("Change Password : Username: ", username)
 
 	if err := h.usersUsecase.ChangePassword(reqBody, username); err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
@@ -40,6 +45,7 @@ func (h *usersHttpHandler) ChangePassword(c echo.Context) error {
 		} else {
 			return baseResponse(c, http.StatusInternalServerError, messages.INTERNAL_SERVER_ERROR)
 		}
+		
 	}
 	return baseResponse(c, http.StatusOK, messages.SUCCESSFUL_CHANGE_PASSWORD)
 }

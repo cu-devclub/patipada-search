@@ -12,10 +12,11 @@ type (
 		DB  Database
 	}
 	App struct {
-		Port        int
-		GRPCPort    int
-		FrontendURL string
-		AuthService string
+		Port          int
+		GRPCPort      int
+		FrontendURL   string
+		AuthService   string
+		SearchService string
 	}
 	Database struct {
 		Host     string
@@ -40,10 +41,11 @@ func InitializeViper(path string) {
 func GetConfig() Config {
 	return Config{
 		App: App{
-			Port:        viper.GetInt("APP_PORT"),
-			GRPCPort:    viper.GetInt("GRPC_PORT"),
-			FrontendURL: viper.GetString("FRONTEND_URL"),
-			AuthService: viper.GetString("AUTH_SERVICE"),
+			Port:          viper.GetInt("APP_PORT"),
+			GRPCPort:      viper.GetInt("GRPC_PORT"),
+			FrontendURL:   viper.GetString("FRONTEND_URL"),
+			AuthService:   viper.GetString("AUTH_SERVICE"),
+			SearchService: viper.GetString("SEARCH_SERVICE"),
 		},
 		DB: Database{
 			Host:     viper.GetString("MONGO_DB_HOST"),

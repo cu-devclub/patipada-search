@@ -4,6 +4,7 @@ import (
 	"auth-service/errors"
 	"auth-service/messages"
 	"auth-service/users/models"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -20,9 +21,11 @@ import (
 // - 404 User not found (email not exists)
 // - 500 internal server error
 func (h *usersHttpHandler) ForgetPassword(c echo.Context) error {
+	log.Println("Forget Password : Starting handler")
 	email := c.Param("email")
 	if email == "" {
 		return forgetPasswordResponse(c, http.StatusBadRequest, messages.BAD_REQUEST, "")
+
 	}
 
 	in := &models.ForgetPassword{

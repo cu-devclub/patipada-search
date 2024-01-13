@@ -26,6 +26,10 @@ func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
 	}
 }
 
+func (g *ginServer) GetDB() *elasticsearch.Client {
+	return g.db
+}
+
 func (g *ginServer) Start() {
 
 	// Allow CORS from frontend

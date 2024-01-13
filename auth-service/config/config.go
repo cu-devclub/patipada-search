@@ -17,6 +17,7 @@ type (
 
 	App struct {
 		Port        int
+		GRPCPort	int
 		FrontendURL string
 		JWTKey      string
 		RolesMap    map[string]int
@@ -82,6 +83,7 @@ func GetConfig() Config {
 	return Config{
 		App: App{
 			Port:        viper.GetInt("SERVER_PORT"),
+			GRPCPort:    viper.GetInt("GRPC_PORT"),
 			FrontendURL: viper.GetString("FRONTEND_URL"),
 			JWTKey:      viper.GetString("JWT_KEY"),
 			RolesMap:    rolesMap,

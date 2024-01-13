@@ -16,6 +16,7 @@ type (
 	App struct {
 		Port        int
 		FrontendURL string
+		GRPCPort    int
 	}
 	ESDB struct {
 		URL      string
@@ -43,6 +44,7 @@ func GetConfig() Config {
 		App: App{
 			Port:        viper.GetInt("SERVER_PORT"),
 			FrontendURL: viper.GetString("FRONTEND_URL"),
+			GRPCPort:    viper.GetInt("GRPC_PORT"),
 		},
 		ESDB: ESDB{
 			URL:      viper.GetString("ESDB_URL"),

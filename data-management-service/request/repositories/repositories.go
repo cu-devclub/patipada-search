@@ -2,13 +2,15 @@ package repositories
 
 import (
 	"data-management/request/entities"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 type Repositories interface {
 
 	// InsertRequest inserts a new Request into the MongoDB Request collection.
 	// It takes a pointer to an entities.Request as an argument.
-	// The function will return an objectID and error if the insertion fails, 
+	// The function will return an objectID and error if the insertion fails,
 	// otherwise it will return "", nil.
 	//
 	// Usage:
@@ -20,7 +22,7 @@ type Repositories interface {
 	//	}
 	InsertRequest(request *entities.Request) (string, error)
 
-	ValidateRecordIndex(request string) error
+	ValidateRecordIndex(request string) (bool, error)
 
 	// UpdateRequest updates a request in the MongoDB collection.
 	//
@@ -68,33 +70,29 @@ type Repositories interface {
 	// This will generate a unique RequestID for each new Request, like "REQ1", "REQ2", etc.
 	IncrementRequestCounter() (int, error)
 
-	// GetAllRequests retrieves all Requests from the MongoDB collection.
-	// It returns a slice of pointers to the Requests ; if no data return nil
-	// and any error encountered.
+	// GetRequest retrieves requests from the database based on the provided filter.
+	// The filter is a map where the key is the field name and the value is the value to match.
+	// If the filter is empty, all requests will be returned.
+	// If an error occurs during the operation, it will be returned along with a nil slice.
 	//
-	// The function works as follows:
-	//  1. It calls the Find method on the RequestCollection with an empty filter (bson.M{}), which matches all documents in the collection.
-	//  2. If an error occurs during the Find operation, it returns the error and a nil slice.
-	//  3. It iterates over the cursor returned by the Find method. For each document in the cursor:
-	//     a. It decodes the document into a Request struct.
-	//     b. If an error occurs during decoding, it returns the error and a nil slice.
-	//     c. It appends the Request struct to the Requests slice.
-	//  4. After all documents have been processed, it returns the Requests slice and a nil error.
-	GetAllRequests() ([]*entities.Request, error)
-
-	// GetRequestByRequestID retrieves a Request from the Request repositories by its request ID.
-	// It returns a pointer to the Request and an error.
+	// Parameters:
+	//   filter: A map representing the filter to apply to the requests. The key is the field name and the value is the value to match.
 	//
-	// The function works as follows:
-	// 1. It creates a filter that matches documents where the request_id field is equal to the provided requestID.
-	// 2. It calls the FindOne method on the RequestCollection with the filter, which returns the first document that matches the filter.
-	// 3. It decodes the returned document into a Request struct.
-	// 4. If an error occurs during the FindOne operation or the decoding, it returns a nil Request and the error.
-	// 5. If no error occurs, it returns the Request and a nil error.
+	// Returns:
+	//   []*entities.Request: A slice of pointers to the matching requests. If no requests match the filter, the slice will be empty.
+	//   error: An error that occurred during the operation, if any.
+	GetRequest(filter bson.M) ([]*entities.Request, error)
+
+	// ValidateUsername checks if the provided username is valid.
+	// It uses the communication client's VerifyUsername method to perform the check.
+	// If an error occurs during the operation, it will be returned along with a false boolean.
 	//
-	// If no document matches the filter, the function returns a nil Request and an error.
-	GetRequestByRequestID(requestID string) (*entities.Request, error)
+	// Parameters:
+	//   username: The username to validate.
+	//
+	// Returns:
+	//   bool: A boolean indicating whether the username is valid. True if the username is valid, false otherwise.
+	//   error: An error that occurred during the operation, if any.
 
-
-	GetRequestByRecordIndex(index string) (*entities.Request, error)
+	ValidateUsername(username string) (bool, error)
 }

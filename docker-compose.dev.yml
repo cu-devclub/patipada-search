@@ -24,7 +24,7 @@ services:
     image: dhammanava-elastic-image
     build:
       context: ./elastic
-    environment:
+    environment: 
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}

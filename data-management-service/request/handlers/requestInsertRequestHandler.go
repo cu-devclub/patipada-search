@@ -3,6 +3,7 @@ package handlers
 import (
 	"data-management/messages"
 	"data-management/request/models"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -49,6 +50,7 @@ func (r *requestHandler) InsertRequest(c *gin.Context) {
 	var request models.Request
 
 	if err := c.ShouldBindJSON(&request); err != nil {
+		log.Println("Error binding JSON Handler; Error: ", err)
 		responseJSON(c, http.StatusBadRequest, messages.BAD_REQUEST, nil)
 		return
 	}

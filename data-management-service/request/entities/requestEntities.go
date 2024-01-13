@@ -2,11 +2,13 @@ package entities
 
 import (
 	"time"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 type (
 	Request struct {
-		ID string `bson:"_id,omitempty" json:"id,omitempty"`
+		ID         string    `bson:"_id,omitempty" json:"id,omitempty"`
 		RequestID  string    `bson:"request_id"`
 		Index      string    `bson:"index"`
 		YoutubeURL string    `bson:"youtubeURL"`
@@ -19,6 +21,14 @@ type (
 		Status     string    `bson:"status"` // "pending", "approved", "rejected"
 		By         string    `bson:"by"`
 		ApprovedBy string    `bson:"approved_by"`
+	}
+
+	Filter struct {
+		Status     string `bson:"status"`
+		By         string `bson:"by"`
+		RequestID  string `bson:"request_id"`
+		Index      string `bson:"index"`
+		ApprovedBy string `bson:"approved_by"`
 	}
 )
 
@@ -33,4 +43,26 @@ func (r *Request) MockData() {
 	r.UpdatedAt = time.Now()
 	r.Status = "pending"
 	r.By = "user1"
+}
+
+func (f *Filter) ConvertToBsonM() (bson.M, error) {
+	data, err := bson.Marshal(f)
+	if err != nil {
+		return nil, err
+	}
+
+	var m bson.M
+	err = bson.Unmarshal(data, &m)
+	if err != nil {
+		return nil, err
+	}
+
+	// Remove empty fields from filter
+	for key, value := range m {
+		if value == "" {
+			delete(m, key)
+		}
+	}
+
+	return m, nil
 }

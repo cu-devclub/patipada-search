@@ -29,6 +29,8 @@ type RecordRepository interface {
 	// - error: An error if any occurred during the search operation.
 	Search(indexName, query string, amount int) ([]*entities.Record, error)
 
+	SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, error)
+
 	// BulkInsert inserts multiple records into the Elasticsearch index.
 	//
 	// qars: A slice of pointers to Record entities representing the records to be inserted.

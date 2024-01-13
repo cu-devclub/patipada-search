@@ -38,7 +38,7 @@ go run main.go
 
 ## API Reference
 
-Postman documentation : // Not available yet
+Postman documentation : [link](https://documenter.getpostman.com/view/14178897/2s9YsNdVnb)
 
 ## Tech stack
 
