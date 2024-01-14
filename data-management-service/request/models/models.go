@@ -16,9 +16,10 @@ type (
 		EndTime    string    `json:"endTime" binding:"required" validate:"required"`
 		CreatedAt  time.Time `json:"created_at,omitempty"`
 		UpdatedAt  time.Time `json:"updated_at,omitempty"`
-		Status     string    `json:"status" validate:"omitempty,oneof=pending approved rejected"` // "pending", "approved", "rejected"
+		Status     string    `json:"status" validate:"omitempty,oneof=pending reviewed"` // "pending", "reviewed"
 		By         string    `json:"by" binding:"required" validate:"required"`
 		ApprovedBy string    `json:"approved_by,omitempty"`
+		CommentUID string    `json:"comment_uid,omitempty"`
 	}
 )
 

@@ -45,3 +45,24 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 	baseResponse(c, 200, records)
 
 }
+
+
+func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
+	// retrieve query
+	recordIndex := c.Param("recordIndex")
+	if recordIndex == "" {
+		baseResponse(c, 400, messages.BAD_REQUEST)
+		return
+	}
+
+	record, err := r.recordUsecase.SearchByRecordIndex("record", recordIndex)
+	if err != nil {
+		baseResponse(c, 500, messages.INTERNAL_SERVER_ERROR)
+		return
+	}
+	if record == nil {
+		baseResponse(c, 404, messages.NOT_FOUND)
+		return
+	}
+	baseResponse(c, 200, record)
+}

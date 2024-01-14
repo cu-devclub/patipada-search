@@ -4,8 +4,6 @@
 
 package entities
 
-import "search-esdb-service/record/models"
-
 type (
 	Record struct {
 		Index      string `json:"index"`
@@ -16,6 +14,14 @@ type (
 		EndTime    string `json:"endTime"`
 	}
 
+	UpdateRecord struct {
+		DocumentID string `json:"documentID"`
+		StartTime  string `json:"startTime"`
+		EndTime    string `json:"endTime"`
+		Question   string `json:"question"`
+		Answer     string `json:"answer"`
+	}
+
 	Token struct {
 		Token       string `json:"token"`
 		StartOffset int    `json:"start_offset"`
@@ -24,14 +30,3 @@ type (
 		Position    int    `json:"position"`
 	}
 )
-
-func (e *Record) ToModels() *models.Record {
-	return &models.Record{
-		Index:      e.Index,
-		YoutubeURL: e.YoutubeURL,
-		Question:   e.Question,
-		Answer:     e.Answer,
-		StartTime:  e.StartTime,
-		EndTime:    e.EndTime,
-	}
-}

@@ -60,4 +60,21 @@ type UseCase interface {
 	//   - *errors.RequestError: An error that occurred during the operation, if any.
 	//       - status of 400 or 500
 	GetRequest(status, username, requestID, index, approvedBy string) ([]*models.Request, *errors.RequestError)
+
+	// GetLastestRequestOfRecord retrieves the latest request of a record based on the provided index.
+	// It validates the index, creates a filter from it, and then retrieves the requests from the repository.
+	// The function then finds the latest request based on the `updated_at` field.
+	// If an error occurs during the operation, the function returns an error along with a nil pointer.
+	// If no requests match the filter, the function returns a nil pointer and a nil error.
+	//
+	// Parameters:
+	//   index: The index of the record.
+	//
+	// Returns:
+	//   - *models.Request: A pointer to the latest request. If no requests match the filter, the pointer will be nil.
+	//   - *errors.RequestError: An error that occurred during the operation, if any.
+	//          Possible status codes are
+	//			400 (Bad Request) and
+	//          500 (Internal Server Error).
+	GetLastestRequestOfRecord(index string) (*models.Request, *errors.RequestError)
 }

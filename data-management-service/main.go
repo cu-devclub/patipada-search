@@ -22,6 +22,7 @@ func main() {
 	validate := validator.NewValidator()
 
 	comm := communication.NewgRPC(&cfg)
+	// comm := communication.NewTempgRPC()
 
 	log.Println("Starting server...")
 	server.NewGinServer(&cfg, &db, &validate, comm).Start()

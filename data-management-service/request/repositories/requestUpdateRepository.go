@@ -64,3 +64,19 @@ func (r *requestRepositories) UpdateRequest(request *entities.Request) error {
 
 	return nil
 }
+
+
+func (r *requestRepositories) UpdateRecord(record *entities.Record) (bool,error) {
+	result, err := r.communicationClient.UpdateRecord(&entities.Record{
+		Index: record.Index,
+		Question: record.Question,
+		Answer: record.Answer,
+		StartTime: record.StartTime,
+		EndTime: record.EndTime,
+	})
+	if err != nil {
+		return false, err
+	}
+
+	return result,nil
+}

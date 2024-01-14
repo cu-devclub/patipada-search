@@ -37,6 +37,7 @@ func (g *ginServer) Start() {
 	// Allow CORS from frontend
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{g.cfg.App.FrontendURL, "http://localhost:5173"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	g.app.Use(cors.New(config))
 	g.initializeRequestHttpHandler()
 	g.app.Run(fmt.Sprintf(":%d", g.cfg.App.Port))
@@ -53,16 +54,30 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	userRoutes := g.app.Group("/")
 	userRoutes.Use(g.AuthMiddleware("user"))
 
-	// GET /requests route is used to retrieve requests based on the provided query parameters:
+	// GET /requests route is used to retrieve requests based on the provided
+	// Query parameters:
 	// status, username, requestID, index, and approvedBy.
 	// If a query parameter is an empty string, it will not be included in the filter.
 	// The function responds with a JSON object that includes the matching requests.
 	// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
-	// Possible status codes are:
+	//
+	// Response , Possible status codes are:
 	//   200: The operation was successful. The response body contains the matching requests.
 	//   400: Bad Request. The request was invalid or cannot be served. The exact error is provided in the response.
 	//   500: Internal Server Error. The server encountered an unexpected condition which prevented it from fulfilling the request.
 	userRoutes.GET("/requests", requestHandlers.GetRequest)
+
+	// GetLastestRequestOfRecord is a handler function for the GET /request/latest endpoint.
+	// Query Parameters:
+	// 	- index: The index of the record.
+	// It retrieves the latest request of a record based on the provided index query parameter.
+	// The function responds with status 200 and a JSON object that includes the latest request.
+	// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
+	//
+	// Possible error status codes are
+	// 		400 (Bad Request) and
+	// 		500 (Internal Server Error).
+	userRoutes.GET("/request/latestRecord", requestHandlers.GetLastestRequestOfRecord)
 
 	// POST /requests is a route that inserts a new request into the database.
 	// It expects a JSON body that matches the structure of the models.Request struct.

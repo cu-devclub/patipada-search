@@ -38,3 +38,4 @@ func (r *requestRepositories) GetRequest(filter bson.M) ([]*entities.Request, er
 
 	return requests, nil
 }
+

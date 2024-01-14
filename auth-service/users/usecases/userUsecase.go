@@ -114,4 +114,16 @@ type UsersUsecase interface {
 
 	VerifyUsername(username string) (bool, error)
 
+	// Authorize to verify the user authorization
+	// Header - Authorization : <token>
+	//
+	// Query Params
+	// - requiredRole (string) ; one of admin, super-admin, user
+	//
+	// Response
+	// - 200 OK & result (true/false)
+	// - 400 Bad request ; missing token
+	// - 401 Unauthorize ; invalid token
+	// - 500 internal server error
+	Authorize(c echo.Context, requireRole string) (bool, *errors.RequestError)
 }

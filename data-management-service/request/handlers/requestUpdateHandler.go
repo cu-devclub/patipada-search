@@ -36,12 +36,15 @@ import (
 // - 400 Bad Request if the binding fails or some fields are error
 // - 500 Internal Server Error if internal server error
 func (r *requestHandler) UpdateRequest(c *gin.Context) {
+	log.Println("Update request handler : starting handler .....")
 	var request models.Request
 	if err := c.ShouldBind(&request); err != nil {
 		log.Println("Error binding JSON Handler; Error: ", err)
 		responseJSON(c, http.StatusBadRequest, messages.BAD_REQUEST, nil)
 		return
 	}
+	
+	log.Println("Update request handler: staring requet...",request)
 
 	err := r.requestUsecase.UpdateRequest(&request)
 	if err != nil {

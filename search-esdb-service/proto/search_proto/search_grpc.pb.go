@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SearchServiceClient interface {
 	SearchRecord(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchResponse, error)
+	UpdateRecord(ctx context.Context, in *UpdateRecordRequest, opts ...grpc.CallOption) (*UpdateRecordResponse, error)
 }
 
 type searchServiceClient struct {
@@ -42,11 +43,21 @@ func (c *searchServiceClient) SearchRecord(ctx context.Context, in *SearchReques
 	return out, nil
 }
 
+func (c *searchServiceClient) UpdateRecord(ctx context.Context, in *UpdateRecordRequest, opts ...grpc.CallOption) (*UpdateRecordResponse, error) {
+	out := new(UpdateRecordResponse)
+	err := c.cc.Invoke(ctx, "/search_proto.SearchService/UpdateRecord", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SearchServiceServer is the server API for SearchService service.
 // All implementations must embed UnimplementedSearchServiceServer
 // for forward compatibility
 type SearchServiceServer interface {
 	SearchRecord(context.Context, *SearchRequest) (*SearchResponse, error)
+	UpdateRecord(context.Context, *UpdateRecordRequest) (*UpdateRecordResponse, error)
 	mustEmbedUnimplementedSearchServiceServer()
 }
 
@@ -56,6 +67,9 @@ type UnimplementedSearchServiceServer struct {
 
 func (UnimplementedSearchServiceServer) SearchRecord(context.Context, *SearchRequest) (*SearchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchRecord not implemented")
+}
+func (UnimplementedSearchServiceServer) UpdateRecord(context.Context, *UpdateRecordRequest) (*UpdateRecordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRecord not implemented")
 }
 func (UnimplementedSearchServiceServer) mustEmbedUnimplementedSearchServiceServer() {}
 
@@ -88,6 +102,24 @@ func _SearchService_SearchRecord_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SearchService_UpdateRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRecordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SearchServiceServer).UpdateRecord(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/search_proto.SearchService/UpdateRecord",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SearchServiceServer).UpdateRecord(ctx, req.(*UpdateRecordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SearchService_ServiceDesc is the grpc.ServiceDesc for SearchService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +130,10 @@ var SearchService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchRecord",
 			Handler:    _SearchService_SearchRecord_Handler,
+		},
+		{
+			MethodName: "UpdateRecord",
+			Handler:    _SearchService_UpdateRecord_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

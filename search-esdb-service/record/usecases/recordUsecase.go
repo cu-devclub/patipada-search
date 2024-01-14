@@ -25,4 +25,6 @@ type RecordUsecase interface {
 	Search(indexName, query string, amount int) (*models.SearchRecordStruct, error)
 
 	SearchByRecordIndex(indexName, recordIndex string) (*models.Record, error)
+
+	UpdateRecord(record *models.UpdateRecord) error
 }

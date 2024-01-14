@@ -41,7 +41,7 @@ func TestUpdateRequest(t *testing.T) {
 		m.ID = id
 		m.RequestID = requestID
 		m.Question = "Question Updated"
-		m.Status = "approved"
+		m.Status = "reviewed"
 		m.ApprovedBy = "super-admin"
 		req = createNewRequestFromDataType("PUT", "/request", m)
 		w = httptest.NewRecorder()

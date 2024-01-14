@@ -2,7 +2,9 @@ package usecases
 
 import (
 	"log"
+	"search-esdb-service/record/helper"
 	"search-esdb-service/record/models"
+	"search-esdb-service/util"
 )
 
 // Search searches for records in the specified index using the given query.
@@ -32,7 +34,7 @@ func (r *recordUsecaseImpl) Search(indexName, query string, amount int) (*models
 	responseRecords := make([]*models.Record, 0)
 
 	for _, record := range records {
-		responseRecords = append(responseRecords, record.ToModels())
+		responseRecords = append(responseRecords, helper.RecordEntityToModels(record))
 	}
 
 	response := &models.SearchRecordStruct{
@@ -43,16 +45,20 @@ func (r *recordUsecaseImpl) Search(indexName, query string, amount int) (*models
 }
 
 func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (*models.Record, error) {
-	// search the record
-	records, err := r.recordRepository.SearchByRecordIndex(indexName, recordIndex)
+	str, err := util.DecreaseIndexForSearchByIndex(recordIndex)
 	if err != nil {
-		if err.Error() == "Elasticsearch error: 404 Not Found" {
-			log.Println("Record not found")
-			return nil, nil
-		}
-		log.Println("Error searching records: ", err)
 		return nil, err
 	}
-	response := records.ToModels()
+	// search the record
+	records, err := r.recordRepository.SearchByRecordIndex(indexName, str)
+	if err != nil {
+		if err.Error() == "Elasticsearch error: 404 Not Found" {
+			return nil, nil
+		} else if err.Error() != "Elasticsearch error: 405 Method Not Allowed" {
+			// 405 is because gRPC we can ignore it
+			return nil, err
+		}
+	}
+	response := helper.RecordEntityToModels(records)
 	return response, nil
 }

@@ -11,8 +11,10 @@ import (
 // If a query parameter is an empty string, it will not be included in the filter.
 // The function responds with a JSON object that includes the matching requests.
 // If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
-//  error status codes 
-// - 400 (Bad Request) and 
+//
+//	error status codes
+//
+// - 400 (Bad Request) and
 // - 500 (Internal Server Error).
 func (r *requestHandler) GetRequest(c *gin.Context) {
 	status := c.Query("status")
@@ -21,6 +23,29 @@ func (r *requestHandler) GetRequest(c *gin.Context) {
 	index := c.Query("index")
 	approvedBy := c.Query("approvedBy")
 	modelsRequest, err := r.requestUsecase.GetRequest(status, username, requestID, index, approvedBy)
+	if err != nil {
+		responseJSON(c, err.StatusCode, err.Error(), nil)
+		return
+	}
+
+	responseJSON(c, 200, messages.SUCCESS_GET_REQUEST, modelsRequest)
+}
+
+// GetLastestRequestOfRecord is a handler function for the GET /request/latest endpoint.
+// Query Parameters:
+//   - index: The index of the record.
+//
+// It retrieves the latest request of a record based on the provided index query parameter.
+// The function responds with a JSON object that includes the latest request.
+// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
+//
+// Possible error status codes are
+//
+//	400 (Bad Request) and
+//	500 (Internal Server Error).
+func (r *requestHandler) GetLastestRequestOfRecord(c *gin.Context) {
+	index := c.Query("index")
+	modelsRequest, err := r.requestUsecase.GetLastestRequestOfRecord(index)
 	if err != nil {
 		responseJSON(c, err.StatusCode, err.Error(), nil)
 		return

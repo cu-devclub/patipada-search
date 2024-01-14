@@ -1,6 +1,6 @@
-// models for record domain 
+// models for record domain
 // model is a data model use to deals with data
-// in the high level e.g. response to frontend  
+// in the high level e.g. response to frontend
 
 package models
 
@@ -14,9 +14,17 @@ type (
 		EndTime    string `json:"endTime"`
 	}
 
+	UpdateRecord struct {
+		DocumentID string `json:"documentID"`
+		StartTime  string `json:"startTime"`
+		EndTime    string `json:"endTime"`
+		Question   string `json:"question"`
+		Answer     string `json:"answer"`
+	}
+
 	SearchRecordStruct struct {
 		Results []*Record `json:"results"`
-		Tokens []string  `json:"tokens"`
+		Tokens  []string  `json:"tokens"`
 	}
 )
 

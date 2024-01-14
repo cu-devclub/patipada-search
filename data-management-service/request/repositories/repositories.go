@@ -93,6 +93,7 @@ type Repositories interface {
 	// Returns:
 	//   bool: A boolean indicating whether the username is valid. True if the username is valid, false otherwise.
 	//   error: An error that occurred during the operation, if any.
-
 	ValidateUsername(username string) (bool, error)
+
+	UpdateRecord(record *entities.Record) (bool,error)
 }

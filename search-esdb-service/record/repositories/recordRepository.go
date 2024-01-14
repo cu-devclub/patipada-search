@@ -36,4 +36,6 @@ type RecordRepository interface {
 	// qars: A slice of pointers to Record entities representing the records to be inserted.
 	// Returns an error if there was an issue inserting the records.
 	BulkInsert(qars []*entities.Record) error
+
+	UpdateRecord(record *entities.UpdateRecord) error
 }

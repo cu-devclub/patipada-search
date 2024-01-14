@@ -152,6 +152,19 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 500 internal server error
 	s.App.GET("/verify-token", usersHttpHandler.VerifyToken)
 
+	// Authorize to verify the user authorization
+	// Header - Authorization : <token>
+	// 
+	// Query Params
+	// - requiredRole (string) ; one of admin, super-admin, user
+	//
+	// Response
+	// - 200 OK & result (true/false)
+	// - 400 Bad request ; missing token or invalid requires role
+	// - 401 Unauthorize ; invalid token
+	// - 500 internal server error
+	s.App.GET("/authorize", usersHttpHandler.Authorize)
+	
 	// Remove user by username & requestor role must be higher
 	// Header - Authorization : <token>
 	// Parameters (Route Param) :

@@ -41,34 +41,69 @@ import (
 //	    log.Fatal(err)
 //	}
 func (r *requestUsecase) UpdateRequest(request *models.Request) *errors.RequestError {
-	log.Println("Update request; Request: ", request)
+	log.Println("Update request usecase; Request: ", request)
 	// validate the request
+
+	log.Println("Update request usecase; Validating request ....")
 	if err := r.validator.Validate(request); err != nil {
 		log.Println("Error validate request; Request: ", request, "Error: ", err)
 		return errors.CreateError(400, messages.BAD_REQUEST)
 	}
 
 	// check valid record index
-	result,err := r.requestRepositories.ValidateRecordIndex(request.Index); 
+	log.Println("Update request usecase; Validating record index ....")
+	result, err := r.requestRepositories.ValidateRecordIndex(request.Index)
 	if err != nil || result == false {
 		log.Println("Error validate record index; Request: ", request, "Error: ", err)
 		return errors.CreateError(400, messages.BAD_REQUEST)
 	}
 
 	// check valid by
-	result,err = r.requestRepositories.ValidateUsername(request.By); 
+	log.Println("Update request usecase; Validating username ....")
+	result, err = r.requestRepositories.ValidateUsername(request.By)
 	if err != nil || result == false {
 		log.Println("Error validate username; Request: ", request, "Error: ", err)
 		return errors.CreateError(400, messages.BAD_REQUEST)
 	}
 
 	// check valid approved by
-	result,err = r.requestRepositories.ValidateUsername(request.ApprovedBy); 
+	log.Println("Update request usecase; Validating approved by ....")
+	result, err = r.requestRepositories.ValidateUsername(request.ApprovedBy)
 	if err != nil || result == false {
 		log.Println("Error validate approved by; Request: ", request, "Error: ", err)
 		return errors.CreateError(400, messages.BAD_REQUEST)
 	}
 
+	// ---  Get all requests that has the same record Index by Get usecase
+	log.Println("Update request usecase; Getting all requests ....")
+	requests, er := r.GetRequest("", "", "", request.Index, "")
+	if er != nil {
+		log.Println("Error get request; Request: ", request, "Error: ", er, "ERR == nil", er != nil)
+		return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
+	}
+
+	// ---  Update all request that come before the current request by setting status to "reviewed"
+	for _, req := range requests {
+		if req.UpdatedAt.After(request.UpdatedAt) {
+			continue
+		}
+
+		if req.ID == request.ID {
+			continue
+		}
+
+		log.Println("Updating usecase ; update old request; Request: ", req)
+		req.Status = "reviewed"
+		requestEntitiy := helper.ModelsToEntity(req)
+		requestEntitiy.UpdatedAt = time.Now()
+		if err := r.requestRepositories.UpdateRequest(requestEntitiy); err != nil {
+			log.Println("Error update request; Request: ", request, "Error: ", err)
+			return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
+		}
+	}
+
+	// --- Update the current request
+	log.Println("Update request usecase; Updating request ....")
 	requestEntitiy := helper.ModelsToEntity(request)
 	requestEntitiy.UpdatedAt = time.Now()
 	if err := r.requestRepositories.UpdateRequest(requestEntitiy); err != nil {
@@ -79,6 +114,16 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) *errors.RequestE
 		return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
 	}
 
-	log.Println("Update request success")
+	recordEntity := helper.RequestToRecordsEntity(requestEntitiy)
+	recordEntity.ExtractHTML()
+
+	// --- Update the record by sending plain text of `startTime`,`endTime`,`question`,`answer` to the record (search) service
+	log.Println("Update request usecase; Updating record ....")
+	result, err = r.requestRepositories.UpdateRecord(recordEntity)
+	if err != nil || result == false {
+		log.Println("Error update record; Request: ", request, "Error: ", err)
+		return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
+	}
+
 	return nil
 }

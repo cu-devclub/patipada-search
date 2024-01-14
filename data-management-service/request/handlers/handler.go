@@ -77,4 +77,16 @@ type Handlers interface {
 	// - 400 (Bad Request) and
 	// - 500 (Internal Server Error).
 	GetRequest(c *gin.Context)
+
+	// GetLastestRequestOfRecord is a handler function for the GET /request/latest endpoint.
+	// Query Parameters: 
+	// 	- index: The index of the record.
+	// It retrieves the latest request of a record based on the provided index query parameter.
+	// The function responds with a JSON object that includes the latest request.
+	// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
+	// 
+	// Possible error status codes are
+	// 		400 (Bad Request) and
+	// 		500 (Internal Server Error).
+	GetLastestRequestOfRecord(c *gin.Context)
 }
