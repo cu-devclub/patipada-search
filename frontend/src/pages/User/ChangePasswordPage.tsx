@@ -7,14 +7,13 @@ import { changePassword } from "../../service/user";
 import { ReturnError } from "../../service/error";
 import { getCookie } from "typescript-cookie";
 import { UserBasePage } from "./UserBasePage";
-import React from "react";
 function ChangePasswordPage() {
   const token = getCookie("token") || "";
   const username = getCookie("username") || "";
   const navigate = useNavigate();
   const { addToast } = MessageToast();
   const [oldPasswordError, setOldPasswordError] = useState(false); // not equal in db Password
-  
+
   const submit = async (oldPassword: string, newPassword: string) => {
     if (username == "" || token == "") return;
     await changePassword(token, oldPassword, newPassword)
@@ -32,7 +31,7 @@ function ChangePasswordPage() {
         });
         if (err.status == 401) {
           setOldPasswordError(true);
-        } 
+        }
       });
   };
 

@@ -1,14 +1,12 @@
-import React from "react";
 import logo from "/Dhammanava.svg";
 import { Image } from "@chakra-ui/react";
-const Logo = ({size}) => {
+interface Props {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  size: any;
+}
+const Logo = ({ size }:Props) => {
   return (
-    <Image
-      boxSize={size}
-      src={logo}
-      alt="Dhammanava"
-      objectFit="contain"
-    />
+    <Image boxSize={size} src={logo} alt="Dhammanava" objectFit="contain" />
   );
 };
 

@@ -64,11 +64,11 @@ const TimeCommentTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
 
   const [commentText, setCommentText] = React.useState("");
 
-  const [showCommentMenu, setShowCommentMenu] = React.useState(false);
+  const [, setShowCommentMenu] = React.useState(false);
 
-  const [isTextSelected, setIsTextSelected] = React.useState(false);
+  const [, setIsTextSelected] = React.useState(false);
 
-  const [showAddCommentSection, setShowAddCommentSection] =
+  const [, setShowAddCommentSection] =
     React.useState(true);
 
   const formatDate = (d: any) =>
@@ -178,6 +178,7 @@ const TimeCommentTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
   React.useEffect(() => {
     const timeoutId = setTimeout(findCommentsAndStoreValues, 100);
     return () => clearTimeout(timeoutId); // This is the cleanup function
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChangeHour = (e: any) => {

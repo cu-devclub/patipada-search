@@ -1,10 +1,9 @@
 import { Flex, VStack, Divider } from "@chakra-ui/react";
 import QA_Vdo from "./QA_Vdo.tsx";
 import { SearchResultInterface } from "../../models/qa";
-
 /**
  * Renders the list of search results component.
- * The structure is 
+ * The structure is
  * Search Result list
  *  |- QA_Vdo (Question, Answer, Video)
  *    |- Answer (text and `Read more & Read Less` button)

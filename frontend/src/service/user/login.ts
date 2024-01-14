@@ -1,7 +1,8 @@
-import axios from "axios";
+import axios from '../axiosInstance';
 import { CreateCustomError, ReturnError } from "../error";
 import { LoginDTO } from "../../models/user";
 import { ToastStatus, ERR_Messages } from "../../constant";
+import { authURL } from '../../constant/serviceURL';
 /**
  * Authenticates a user by sending a login request to the server.
  *
@@ -11,15 +12,11 @@ import { ToastStatus, ERR_Messages } from "../../constant";
  */
 export const login = async (loginDTO: LoginDTO) => {
   try {
-    //TODO : Test the environment mode
-    const apiUrl =
-      import.meta.env.MODE === "production"
-        ? "http://auth-service:8082"
-        : "http://localhost:8082";
-    const response = await axios.post(`${apiUrl}/login`, {
+    const response = await axios.post(`${authURL}/login`, {
       username: loginDTO.username,
       password: loginDTO.password,
     });
+    axios.defaults.headers.common["Authorization"] = `${response.data.token}`;
     return response.data;
   } catch (error: unknown) {
     const requestError = CreateCustomError(error);

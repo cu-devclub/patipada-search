@@ -1,6 +1,6 @@
 import { AuthenForm } from "../../components/user/forms";
 import { MessageToast } from "../../components";
-import { Heading,  Text, HStack, Button } from "@chakra-ui/react";
+import { Heading, Text, HStack, Button } from "@chakra-ui/react";
 import { login } from "../../service/user";
 import { Role, ToastStatus } from "../../constant";
 import { setCookie } from "typescript-cookie";
@@ -62,31 +62,35 @@ const LoginPage = () => {
 
   return (
     <UserBasePage>
-        <Heading
-          fontSize={"5xl"}
-          color={"whiteAlpha.900"}
-          letterSpacing={"tighter"}
-          textShadow={"0px 4px 4px rgba(0, 0, 0, 0.25)"}
+      <Heading
+        fontSize={"5xl"}
+        color={"whiteAlpha.900"}
+        letterSpacing={"tighter"}
+        textShadow={"0px 4px 4px rgba(0, 0, 0, 0.25)"}
+      >
+        ลงชื่อเข้าใช้งาน
+      </Heading>
+      <HStack spacing={2}>
+        <Text color={"whiteAlpha.900"} fontSize={"lg"}>
+          ยังไม่มีบัญชีใช่ไหม ?
+        </Text>
+        <Button
+          variant="brand_link"
+          fontSize={"lg"}
+          onClick={() =>
+            navigate("/user/register", {
+              state: { from: location.state?.from },
+            })
+          }
         >
-          ลงชื่อเข้าใช้งาน
-        </Heading>
-        <HStack spacing={2}>
-          <Text color={"whiteAlpha.900"} fontSize={"lg"}>
-            ยังไม่มีบัญชีใช่ไหม ?
-          </Text>
-          <Button
-            variant="brand_link"
-            fontSize={"lg"}
-            onClick={() =>
-              navigate("/user/register", {
-                state: { from: location.state?.from },
-              })
-            }
-          >
-            สมัครเลย
-          </Button>
-        </HStack>
-        <AuthenForm submit={submit} formError={formError} locationState={location.state?.from}/>
+          สมัครเลย
+        </Button>
+      </HStack>
+      <AuthenForm
+        submit={submit}
+        formError={formError}
+        locationState={location.state?.from}
+      />
     </UserBasePage>
   );
 };

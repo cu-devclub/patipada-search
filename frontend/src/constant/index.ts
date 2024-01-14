@@ -36,6 +36,7 @@ export const ERR_Messages = {
   INVALID_OLD_PASSWORD: "รหัสผ่านเดิมไม่ถูกต้อง",
   INVALID_TOKEN: "Token ไม่ถูกต้อง",
   MISSING_TOKEN: "ไม่พบ Token",
+  BAD_REQUEST: "คำขอผิดพลาด"
 };
 
 // Mapping user-friendly error messages to error message from server

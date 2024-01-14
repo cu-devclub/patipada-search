@@ -1,6 +1,5 @@
-import { Flex, Text,Heading } from "@chakra-ui/react";
+import { Flex, Text, Heading } from "@chakra-ui/react";
 import { Logo } from "../components";
-import React from "react";
 
 function NotFoundPage() {
   return (

@@ -12,7 +12,8 @@ import { SignOut } from "../../functions";
 
 import { MessageToast } from "..";
 import { useNavigate } from "react-router-dom";
-import React from "react";
+import { getCookie } from "typescript-cookie";
+import { useLocation } from "react-router-dom";
 
 interface UserAvatarProps {
   username: string;
@@ -20,7 +21,10 @@ interface UserAvatarProps {
 
 function UserAvatar({ username }: UserAvatarProps) {
   const { addToast } = MessageToast();
+  const location = useLocation();
+
   const navigate = useNavigate();
+  const role = getCookie("role");
   const signOut = () => {
     addToast({
       description: "ออกจากระบบสำเร็จ",
@@ -41,6 +45,21 @@ function UserAvatar({ username }: UserAvatarProps) {
         <Box w="full" h="full" pl={2}>
           <Text fontWeight={"semibold"}> สวัสดี {username}</Text>
         </Box>
+        {role == "admin" || role == "super-admin" ? (
+          <MenuItem
+            onClick={() =>
+              navigate(
+                location.pathname.startsWith("/admin")
+                  ? "/"
+                  : "/admin/dashboard"
+              )
+            }
+          >
+            {location.pathname.startsWith("/admin")
+              ? "หน้าค้นหา"
+              : "หน้าแอดมิน"}
+          </MenuItem>
+        ) : null}
         <MenuItem onClick={() => navigate("/contributor/pending-request")}>
           ติดตามคำขอแก้ไข
         </MenuItem>

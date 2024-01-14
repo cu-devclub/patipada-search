@@ -1,15 +1,11 @@
-import axios from "axios";
+import axios from '../axiosInstance';
 import { ERR_Messages, ToastStatus } from "../../constant";
 import { CreateCustomError, ReturnError } from "../error";
+import { authURL } from '../../constant/serviceURL';
 
 export const verifyResetPasswordToken = async (token: string) => {
   try {
-    //TODO : Test the environment mode
-    const apiUrl =
-      import.meta.env.MODE === "production"
-        ? "http://auth-service:8082"
-        : "http://localhost:8082";
-    const response = await axios.get(`${apiUrl}/verify-reset-token/${token}`);
+    const response = await axios.get(`${authURL}/verify-reset-token/${token}`);
     return response.data;
   } catch (error: unknown) {
     const requestError = CreateCustomError(error);
@@ -33,12 +29,7 @@ export const verifyResetPasswordToken = async (token: string) => {
 
 export const resetPassword = async (token: string, password: string) => {
   try {
-    //TODO : Test the environment mode
-    const apiUrl =
-      import.meta.env.MODE === "production"
-        ? "http://auth-service:8082"
-        : "http://localhost:8082";
-    const response = await axios.post(`${apiUrl}/reset-password`, {
+    const response = await axios.post(`${authURL}/reset-password`, {
       token: token,
       password: password,
     });

@@ -26,3 +26,14 @@ export const decodeHTMLText = (encodedString: string): string => {
   return doc.body.textContent || "";
 };
 
+export const convertStatusWord = (status: string): string => {
+  switch (status) {
+    case "pending":
+      return "รอการตรวจสอบ";
+    case "reviewed":
+      return "ตรวจสอบเรียบร้อย";
+    default:
+      return "";
+  }
+}
+

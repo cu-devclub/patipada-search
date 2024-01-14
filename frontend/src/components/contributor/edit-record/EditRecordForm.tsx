@@ -20,7 +20,6 @@ import { Request } from "../../../models/request";
 import { useRef, useState } from "react";
 import { VdoRef } from "../../search/YoutubeVideo";
 import { TimesAndTools } from "../../search";
-import React from "react";
 import CommentableTextField from "./CommentableTextField";
 import CommentableTimeField from "./CommentableTimeField";
 import { useNavigate } from "react-router-dom";

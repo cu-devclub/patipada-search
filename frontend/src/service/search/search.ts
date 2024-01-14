@@ -1,6 +1,7 @@
-import axios from "axios";
+import axios from '../axiosInstance';
 import { CreateCustomError } from "../error";
 import { DataItem, SearchResultInterface } from "../../models/qa";
+import { searchURL } from '../../constant/serviceURL';
 /**
  * Performs a search query using the specified query string.
  *
@@ -9,12 +10,8 @@ import { DataItem, SearchResultInterface } from "../../models/qa";
  */
 export const search = async (query: string): Promise<SearchResultInterface> => {
   try {
-    //TODO : Test the environment mode
-    const apiUrl =
-      import.meta.env.MODE === "production"
-        ? "http://search-service:8081"
-        : "http://localhost:8081";
-    const response = await axios.get(`${apiUrl}/search?query=${query}`);
+
+    const response = await axios.get(`${searchURL}/search?query=${query}`);
 
     const records: DataItem[] = response.data.results.map((item: DataItem) => {
       return {

@@ -1,5 +1,4 @@
 import { VStack, Text } from "@chakra-ui/react";
-import React from "react";
 import { CommentTiptap } from "../../Tiptap";
 interface CommentableTextFieldProps {
   heading: string;

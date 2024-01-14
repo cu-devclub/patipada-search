@@ -58,10 +58,11 @@ export const mapDataItemToRequest = (data: DataItem): Request => {
   };
 };
 
-export const mapResponseToRequest = (data): Request => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const mapResponseToRequest = (data:any): Request => {
   return {
     id: data.id,
-    requestID: data.requestID,
+    requestID: data.request_id,
     index: data.index,
     question: decodeHTMLText(data.question),
     answer: decodeHTMLText(data.answer),
@@ -69,8 +70,8 @@ export const mapResponseToRequest = (data): Request => {
     endTime: decodeHTMLText(data.endTime),
     youtubeURL: data.youtubeURL,
     status: data.status,
-    createdAt: data.createdAt,
-    updatedAt: data.updatedAt,
+    createdAt: data.created_at,
+    updatedAt: data.updated_at,
     by: data.by,
     ApproveBy: data.ApproveBy,
   };

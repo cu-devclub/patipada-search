@@ -1,7 +1,6 @@
 import { AspectRatio } from "@chakra-ui/react";
 import { forwardRef, useImperativeHandle } from "react";
 import { timeToSeconds } from "../../functions";
-import React from "react";
 
 interface VdoProps {
   question: string;
@@ -32,14 +31,14 @@ const YoutubeVideo = forwardRef<VdoRef, VdoProps>(
     }));
 
     return (
-        <AspectRatio maxW={["560px"]} maxH="300px" ratio={1}>
-          <iframe
-            id={question}
-            title={question}
-            src={displayYoutubeURL}
-            allowFullScreen
-          />
-        </AspectRatio>
+      <AspectRatio maxW={["560px"]} maxH="300px" ratio={1}>
+        <iframe
+          id={question}
+          title={question}
+          src={displayYoutubeURL}
+          allowFullScreen
+        />
+      </AspectRatio>
     );
   }
 );

@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { Box, IconButton, Highlight,Text } from "@chakra-ui/react";
+import { Box, IconButton, Highlight, Text } from "@chakra-ui/react";
 import { TriangleDownIcon, TriangleUpIcon } from "@chakra-ui/icons";
-import {useMaxChars} from "../../hook"; 
-
-
+import { useMaxChars } from "../../hook";
 
 /**
  * Renders the Answer component, which displays a text with optional highlighting and a "Read More" or "Read Less" button.

@@ -15,7 +15,6 @@ import { setCookie } from "typescript-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ReturnError } from "../../service/error";
 import { UserBasePage } from "./UserBasePage";
-import React from "react";
 const RegisterPage = () => {
   const { addToast } = MessageToast();
   const navigate = useNavigate();
@@ -100,33 +99,33 @@ const RegisterPage = () => {
 
   return (
     <UserBasePage>
-        <Heading
-          fontSize={["3xl","5xl"]}
-          color={"whiteAlpha.900"}
-          letterSpacing={"tighter"}
-          textShadow={"0px 4px 4px rgba(0, 0, 0, 0.25)"}
-          textAlign={"center"}
-          pb={2}
+      <Heading
+        fontSize={["3xl", "5xl"]}
+        color={"whiteAlpha.900"}
+        letterSpacing={"tighter"}
+        textShadow={"0px 4px 4px rgba(0, 0, 0, 0.25)"}
+        textAlign={"center"}
+        pb={2}
+      >
+        ลงทะเบียนสำหรับ <br />
+        Content Contributor
+      </Heading>
+      <RegisterForm
+        submit={submit}
+        usernameError={usernameError}
+        emailError={emailError}
+      />
+      <Flex alignSelf={"flex-end"}>
+        <Button
+          variant="brand_link"
+          color="blue.100"
+          onClick={() =>
+            navigate("/user/login", { state: { from: location.state?.from } })
+          }
         >
-           ลงทะเบียนสำหรับ <br/>
-          Content Contributor
-        </Heading>
-        <RegisterForm
-          submit={submit}
-          usernameError={usernameError}
-          emailError={emailError}
-        />
-        <Flex alignSelf={"flex-end"}>
-          <Button
-            variant="brand_link"
-            color="blue.100"
-            onClick={() =>
-              navigate("/user/login", { state: { from: location.state?.from } })
-            }
-          >
-            กลับหน้าเข้าสู่ระบบ
-          </Button>
-        </Flex>
+          กลับหน้าเข้าสู่ระบบ
+        </Button>
+      </Flex>
     </UserBasePage>
   );
 };

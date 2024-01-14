@@ -6,7 +6,6 @@ import { useState } from "react";
 import { ReturnError } from "../../service/error";
 import { UserBasePage } from "./UserBasePage";
 import { useNavigate, useLocation } from "react-router-dom";
-import React from "react";
 function ForgetPasswordPage() {
   const { addToast } = MessageToast();
   const navigate = useNavigate();

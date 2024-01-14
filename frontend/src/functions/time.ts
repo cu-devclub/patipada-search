@@ -1,9 +1,9 @@
-export const  timeToSeconds = (time) => {
+export const  timeToSeconds = (time:string) => {
   const [hours, minutes, seconds] = time.split(":").map(Number);
   return hours * 3600 + minutes * 60 + seconds;
 }
 
-export const setTimeout = (time, callback) => {
+export const setTimeout = (time: number, callback: TimerHandler) => {
   const milliseconds = time * 1000;
 
   // Use the global setTimeout function

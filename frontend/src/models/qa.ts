@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface DataItem {
   index: string;
   question: string;
@@ -24,7 +25,7 @@ export interface SearchResultInterface {
   tokens: string[];
 }
 
-export const mapResponseToDataItem = (data): DataItem => {
+export const mapResponseToDataItem = (data:any): DataItem => {
   return {
     index: data.index,
     question: data.question,

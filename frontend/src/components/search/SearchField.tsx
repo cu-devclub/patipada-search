@@ -17,7 +17,6 @@ import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { search } from "../../service/search";
 import { SearchResultInterface } from "../../models/qa";
-import React from "react";
 
 interface SearchOptions {
   key: string;
@@ -30,7 +29,7 @@ interface SearchOptions {
  * @param {any} term - The term to filter the results.
  * @return {Promise<SearchOptions[]>} The filtered results.
  */
-async function filterResults(term) {
+async function filterResults(term:string) {
   let data: SearchOptions[] = [];
   try {
     const response = await search(term);
@@ -46,7 +45,6 @@ async function filterResults(term) {
     return data;
   }
 }
-
 
 /**
  * Render a search field component. also controlling the search options
@@ -78,11 +76,12 @@ function SearchField({
   /**
    * Handles the change event of the input.
    * Add debounce timer to prevent multiple API calls
-   * 
+   *
    * @param {Event} evt - The event object.
    * @return {void} This function does not return anything.
    */
-  const onChangeInputHandler = (evt) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onChangeInputHandler = (evt: any) => {
     const inputValue = evt.target.value;
     setSearchParams(inputValue);
 
@@ -97,7 +96,7 @@ function SearchField({
       const results = await filterResults(inputValue);
       setOptions(results);
       setIsLoading(false);
-    }, 500); 
+    }, 500);
 
     // Save the timer ID for cleanup
     setDebounceTimer(timerId);
@@ -109,11 +108,12 @@ function SearchField({
    * @param {Event} evt - The event object representing the input selection.
    * @return {Promise<void>} A promise that resolves when the function completes.
    */
-  async function onSelectInputHandle(evt) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function onSelectInputHandle(evt:any) {
     let query = evt.item.value;
 
     // Check if the query is an option key (user selected from options)
-    // Have to do this because bug of choc-ui package 
+    // Have to do this because bug of choc-ui package
     // Where if the options have the same value it mark as the same key
     // and then when user selected, evt.item.value is the index(unable to read)
     // and then when search it will return empty
@@ -122,7 +122,7 @@ function SearchField({
       query = q.question;
     }
     const response = await search(query);
-    
+
     const tokens = [query, ...response.tokens];
 
     const searchResults: SearchResultInterface = {
@@ -137,7 +137,7 @@ function SearchField({
   }
 
   return (
-    <FormControl w={{base:"90%",lg:"50%"}} fontWeight="light">
+    <FormControl w={{ base: "90%", lg: "50%" }} fontWeight="light">
       <AutoComplete
         emptyState={<Text textAlign="center">ค้นหาเลย</Text>}
         openOnFocus
