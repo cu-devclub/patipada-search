@@ -8,11 +8,11 @@ up:
 	@echo "Docker images started!"
 
 ## up_build: stops docker compose (if running), builds all projects and starts docker compose
-up_build:  build_auth build_search build_data
+up_build:  build_auth build_search build_data build_frontend
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx
 	@echo "Docker images built and started!"
 
 ####### AUTH SERVICE #######
@@ -113,6 +113,44 @@ up_dev_data:
 	@echo "Data service development server started!"
 
 #################################
+
+##### Frontend Service #####
+## up_build_frontend: stops docker compose (if running), builds projects and starts docker compose
+up_build_frontend: build_frontend
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down frontend
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d frontend
+	@echo "Docker images built and started!"
+
+## down_frontend: stops the frontend service
+down_frontend:
+	@echo "Stopping frontend service..."
+	docker compose -f docker-compose.dev.yml down frontend
+	@echo "Frontend service stopped!"
+
+## build_frontend: builds the frontend binary as a linux executable
+build_frontend:
+	@echo "Building frontend binary..."
+	cd frontend && yarn build
+	@echo "Done!"
+
+#################################
+
+###### Nginx Service ######
+## up_build_nginx: stops docker compose (if running), builds projects and starts docker compose
+up_build_nginx: build_nginx
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down nginx
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d nginx
+	@echo "Docker images built and started!"
+
+## down_nginx : stops the nginx service
+down_nginx:
+	@echo "Stopping nginx service..."
+	docker compose -f docker-compose.dev.yml down nginx
+	@echo "Nginx service stopped!"
 
 ## down: stops all containers
 down:
