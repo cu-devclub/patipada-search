@@ -106,7 +106,9 @@ function SearchResultPage() {
           </Flex>
         </>
       )}
-      <Footer />
+      <Flex h="8xs" w="100%">
+        <Footer />
+      </Flex>
     </Grid>
   );
 }

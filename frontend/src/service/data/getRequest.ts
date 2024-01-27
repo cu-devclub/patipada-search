@@ -23,7 +23,7 @@ export const getRequestByRecordIndex = async (id: string): Promise<Request> => {
         createdAt: "",
         updatedAt: "",
         by: "",
-        ApproveBy: "",
+        approved_by: "",
       };
       return emptyRequest;
     }

@@ -2,6 +2,11 @@ export const extractStringFromHTML = (html: string): string => {
   return html.replace(/<[^>]*>?/gm, "");
 };
 
+export const checkIfCommentLeft = (html: string): boolean => {
+  // check if there is span tag in html
+  return html.includes("<span");
+};
+
 export const encodeHTMLText = (html: string): string => {
   return String(html).replace(/[&<>"']/g, (match) => {
     switch (match) {
@@ -19,7 +24,7 @@ export const encodeHTMLText = (html: string): string => {
         return match;
     }
   });
-}
+};
 
 export const decodeHTMLText = (encodedString: string): string => {
   const doc = new DOMParser().parseFromString(encodedString, "text/html");
@@ -35,5 +40,4 @@ export const convertStatusWord = (status: string): string => {
     default:
       return "";
   }
-}
-
+};

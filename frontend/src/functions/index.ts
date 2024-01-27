@@ -6,7 +6,8 @@ import {
   extractStringFromHTML,
   encodeHTMLText,
   decodeHTMLText,
-  convertStatusWord
+  convertStatusWord,
+  checkIfCommentLeft,
 } from "./request";
 export {
   isValidEmail,
@@ -22,5 +23,6 @@ export {
   generateTime,
   encodeHTMLText,
   decodeHTMLText,
-  convertStatusWord
+  convertStatusWord,
+  checkIfCommentLeft,
 };

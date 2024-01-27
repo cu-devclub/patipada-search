@@ -23,7 +23,7 @@ function AdminRequestPage() {
     })();
 
     const getRequest = async() => {
-        await getRequestByParams({status:"pending"})
+        await getRequestByParams({})
         .then((res) => {
           const r = res.map((item) => {
             item.startTime = extractStringFromHTML(item.startTime)

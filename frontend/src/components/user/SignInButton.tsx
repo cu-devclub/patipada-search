@@ -6,7 +6,7 @@ function SignInButton() {
     <Button
       variant={"brand"}
       fontSize={{ base: "12", lg: "16" }}
-      onClick={() => navigate('/user/login', { state: { from: location.pathname } })}
+      onClick={() => navigate('/user/login', { state: { from: location.pathname + location.search} })}
     >
       ลงชื่อเข้าใช้
     </Button>

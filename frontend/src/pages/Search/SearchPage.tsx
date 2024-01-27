@@ -56,7 +56,7 @@ const SearchPage = () => {
           />
         </VStack>
       </VStack>
-      <Flex w="100%">
+      <Flex w="100%" h="8xs">
         <Footer />
       </Flex>
     </Flex>

@@ -4,8 +4,8 @@ import * as React from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { format } from "date-fns/format";
-import "./Tiptap.scss";
-import { Comment } from "./extensions/comment";
+import "../Tiptap.scss";
+import { Comment } from "../extensions/comment";
 import { v4 as uuidv4 } from "uuid";
 import {
   Button,
@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 // import { setTimeout } from "../../functions/time";
 import { getCookie } from "typescript-cookie";
-import { splitTime, generateTime } from "../../functions";
+import { splitTime, generateTime } from "../../../functions";
 const dateTimeFormat = "dd.MM.yyyy HH:mm";
 
 interface CommentInstance {
@@ -43,6 +43,7 @@ const TimeCommentTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
   const editor = useEditor({
     extensions: [StarterKit, Comment],
     content: defaultValue || "",
+    editable: false,
     onUpdate({ editor }) {
       findCommentsAndStoreValues();
 
@@ -68,8 +69,7 @@ const TimeCommentTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
 
   const [, setIsTextSelected] = React.useState(false);
 
-  const [, setShowAddCommentSection] =
-    React.useState(true);
+  const [, setShowAddCommentSection] = React.useState(true);
 
   const formatDate = (d: any) =>
     d ? format(new Date(d), dateTimeFormat) : null;
@@ -172,13 +172,12 @@ const TimeCommentTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
     // force user to unselect
     editor?.commands.focus(editor?.state.doc.content.size);
     setHTML(editor?.getHTML() || defaultValue);
-
   };
 
   React.useEffect(() => {
     const timeoutId = setTimeout(findCommentsAndStoreValues, 100);
     return () => clearTimeout(timeoutId); // This is the cleanup function
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChangeHour = (e: any) => {

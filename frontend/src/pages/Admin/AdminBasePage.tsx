@@ -7,11 +7,13 @@ import { useNavigate } from "react-router-dom";
 interface AdminBasePageProps {
   children: ReactNode;
   activePage: string;
+  requestID?: string;
 }
 
 export const AdminBasePage: React.FC<AdminBasePageProps> = ({
   children,
   activePage,
+  requestID,
 }) => {
   const navigate = useNavigate();
   const pages = ["Dashboard", "Request", "Data", "Users"];
@@ -21,16 +23,20 @@ export const AdminBasePage: React.FC<AdminBasePageProps> = ({
       templateAreas={`"nav header"
                         "nav main"
                         "nav footer"`}
-      gridTemplateRows={"0.2fr 1fr 0.1fr"}
+      gridTemplateRows={"0.2fr 2fr 0.2fr"}
       gridTemplateColumns={"0.2fr 1fr"}
-      minH="100svh"
+      h="100svh"
       w="full"
       color="blackAlpha.700"
       fontWeight="bold"
     >
-      <GridItem pl="2" area={"header"}>
+      <GridItem pl="2" area={"header"} >
         <BaseHeader>
-          <Heading>{activePage}</Heading>
+          <Heading >
+            {requestID
+              ? "ยื่นคำขอแก้ไขเนื้อหา คำขอเลขที่ " + requestID
+              : activePage}
+          </Heading>
         </BaseHeader>
       </GridItem>
       <GridItem pl="2" bg="brand_orange.400" area={"nav"}>
@@ -46,10 +52,10 @@ export const AdminBasePage: React.FC<AdminBasePageProps> = ({
           ))}
         </VStack>
       </GridItem>
-      <GridItem pl="2" area={"main"}>
+      <GridItem pl="2" area={"main"} >
         {children}
       </GridItem>
-      <GridItem area={"footer"}>
+      <GridItem area={"footer"} h="8xs">
         <Footer />
       </GridItem>
     </Grid>

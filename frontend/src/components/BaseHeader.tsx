@@ -25,7 +25,7 @@ function BaseHeader({ children }: BaseHeaderProps) {
   const username = getCookie("username");
 
   return (
-    <VStack>
+    <VStack >
       <Flex
         px={4}
         pt={4}

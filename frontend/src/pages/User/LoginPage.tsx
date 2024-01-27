@@ -42,7 +42,9 @@ const LoginPage = () => {
         setCookie("username", username);
         setCookie("role", response.role);
         if (response.role == Role.ADMIN || response.role == Role.SUPER_ADMIN) {
-          navigate("/admin/choosePage");
+          navigate("/admin/choosePage", {
+            state: { from: location.state?.from },
+          });
         } else {
           if (location.state?.from) {
             navigate(location.state.from);

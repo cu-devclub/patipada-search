@@ -1,5 +1,12 @@
-import { getRequestByRecordIndex,getRequestByParams } from "./getRequest";
+import { getRequestByRecordIndex, getRequestByParams } from "./getRequest";
 
 import { insertRequest } from "./insertRequest";
 
-export { getRequestByRecordIndex, insertRequest,getRequestByParams };
+import { updateRequest } from "./updateRequest";
+
+export {
+  getRequestByRecordIndex,
+  insertRequest,
+  getRequestByParams,
+  updateRequest,
+};

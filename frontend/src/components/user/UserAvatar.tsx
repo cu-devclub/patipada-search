@@ -14,6 +14,10 @@ import { MessageToast } from "..";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "typescript-cookie";
 import { useLocation } from "react-router-dom";
+import { verifyToken } from "../../service/user";
+import { useEffect } from "react";
+import { ReturnError } from "../../service/error";
+
 
 interface UserAvatarProps {
   username: string;
@@ -25,6 +29,29 @@ function UserAvatar({ username }: UserAvatarProps) {
 
   const navigate = useNavigate();
   const role = getCookie("role");
+
+  useEffect(() => {
+    const verifyTokenAsync = async () => {
+        const token = getCookie("token");
+        await verifyToken(token || "")
+        .then((response) => {
+          if (response == false) {
+            SignOut();
+          }
+        })
+        .catch((error: ReturnError) => {
+          addToast({
+            description: error.message,
+            status: error.toastStatus,
+          });
+          SignOut();
+        });
+    }
+    
+    verifyTokenAsync();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const signOut = () => {
     addToast({
       description: "ออกจากระบบสำเร็จ",
@@ -32,6 +59,7 @@ function UserAvatar({ username }: UserAvatarProps) {
     });
     SignOut();
   };
+
   return (
     <Menu>
       <MenuButton

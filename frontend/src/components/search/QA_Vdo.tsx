@@ -49,7 +49,9 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
       <Box w={{ base: "100%", lg: "65%" }}>
         <VStack spacing={1} alignItems="flex-start">
           <TimesAndTools
-            data={data}
+            index={data.index}
+            startTime={data.startTime}
+            endTime={data.endTime}
             token={token}
             handleReplay={handleReplay}
             navigate={navigate}
@@ -74,7 +76,7 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
         <YoutubeVideo
           ref={vdoRef}
           youtubeURL={data.youtubeURL}
-          question={data.question}
+          id={data.index}
           startTime={data.startTime}
           endTime={data.endTime}
         />

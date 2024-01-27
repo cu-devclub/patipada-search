@@ -4,17 +4,10 @@ import * as React from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { format } from "date-fns/format";
-import "./Tiptap.scss";
-import { Comment } from "./extensions/comment";
+import "../Tiptap.scss";
+import { Comment } from "../extensions/comment";
 import { v4 as uuidv4 } from "uuid";
-import {
-  Button,
-  Box,
-  Flex,
-  Textarea,
-  HStack,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Box, Flex, Textarea, HStack, Text } from "@chakra-ui/react";
 // import { setTimeout } from "../../functions/time";
 import { getCookie } from "typescript-cookie";
 const dateTimeFormat = "dd.MM.yyyy HH:mm";
@@ -26,14 +19,15 @@ interface CommentInstance {
 
 interface TipTapProps {
   defaultValue: string;
-  setHTML: (html: string) => void;  
+  setHTML: (html: string) => void;
 }
 
-const CommentTiptap = ({ defaultValue,setHTML }: TipTapProps) => {
+const CommentTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
   const username = getCookie("username");
   const editor = useEditor({
     extensions: [StarterKit, Comment],
     content: defaultValue || "",
+    editable: false,
     onUpdate({ editor }) {
       findCommentsAndStoreValues();
 
@@ -59,8 +53,7 @@ const CommentTiptap = ({ defaultValue,setHTML }: TipTapProps) => {
 
   const [, setIsTextSelected] = React.useState(false);
 
-  const [, setShowAddCommentSection] =
-    React.useState(true);
+  const [, setShowAddCommentSection] = React.useState(true);
 
   const formatDate = (d: any) =>
     d ? format(new Date(d), dateTimeFormat) : null;
@@ -166,7 +159,7 @@ const CommentTiptap = ({ defaultValue,setHTML }: TipTapProps) => {
   React.useEffect(() => {
     const timeoutId = setTimeout(findCommentsAndStoreValues, 100);
     return () => clearTimeout(timeoutId); // This is the cleanup function
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <Flex

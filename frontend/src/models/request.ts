@@ -13,7 +13,7 @@ export interface Request {
   createdAt: string;
   updatedAt: string;
   by: string;
-  ApproveBy: string;
+  approved_by: string;
 }
 
 export interface InsertRequestModels {
@@ -40,6 +40,16 @@ export const mapRequestToInsertRequestModels = (
   };
 };
 
+export const createEncodeRequest = (data: Request): Request => {
+  return {
+    ...data,
+    question: encodeHTMLText(data.question),
+    answer: encodeHTMLText(data.answer),
+    startTime: encodeHTMLText(data.startTime),
+    endTime: encodeHTMLText(data.endTime),
+  };
+};
+
 export const mapDataItemToRequest = (data: DataItem): Request => {
   return {
     id: "",
@@ -54,12 +64,12 @@ export const mapDataItemToRequest = (data: DataItem): Request => {
     createdAt: "",
     updatedAt: "",
     by: "",
-    ApproveBy: "",
+    approved_by: "",
   };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const mapResponseToRequest = (data:any): Request => {
+export const mapResponseToRequest = (data: any): Request => {
   return {
     id: data.id,
     requestID: data.request_id,
@@ -73,7 +83,7 @@ export const mapResponseToRequest = (data:any): Request => {
     createdAt: data.created_at,
     updatedAt: data.updated_at,
     by: data.by,
-    ApproveBy: data.ApproveBy,
+    approved_by: data.approved_by,
   };
 };
 
@@ -91,5 +101,5 @@ export const mockData: Request = {
   createdAt: "2021-06-01T00:00:00.000Z",
   updatedAt: "2021-06-01T00:00:00.000Z",
   by: "1",
-  ApproveBy: "1",
+  approved_by: "1",
 };
