@@ -104,9 +104,10 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) *errors.RequestE
 
 	// --- Update the current request
 	log.Println("Update request usecase; Updating request ....")
-	requestEntitiy := helper.ModelsToEntity(request)
-	requestEntitiy.UpdatedAt = time.Now()
-	if err := r.requestRepositories.UpdateRequest(requestEntitiy); err != nil {
+	requestEntity := helper.ModelsToEntity(request)
+	requestEntity.UpdatedAt = time.Now()
+	requestEntity.Status = "reviewed"
+	if err := r.requestRepositories.UpdateRequest(requestEntity); err != nil {
 		log.Println("Error update request; Request: ", request, "Error: ", err)
 		if err == mongo.ErrNoDocuments {
 			return errors.CreateError(400, messages.BAD_REQUEST)
@@ -114,7 +115,7 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) *errors.RequestE
 		return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
 	}
 
-	recordEntity := helper.RequestToRecordsEntity(requestEntitiy)
+	recordEntity := helper.RequestToRecordsEntity(requestEntity)
 	recordEntity.ExtractHTML()
 
 	// --- Update the record by sending plain text of `startTime`,`endTime`,`question`,`answer` to the record (search) service
