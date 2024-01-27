@@ -13,7 +13,7 @@ services:
     restart:
       always
     ports:
-      - 8081:80
+      - 8081:8081
     depends_on:
       - elastic-db
     networks:
@@ -78,7 +78,7 @@ services:
       - USER_PASSWORD=${USER_PASSWORD}
       - USER_EMAIL=${USER_EMAIL}
     ports:
-      - 8082:80
+      - 8082:8082
     restart:
       always
     depends_on:
@@ -116,7 +116,7 @@ services:
        MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
        MONGO_DB_NAME: record
     ports:
-      - 8083:80
+      - 8083:8083
     restart:
       always
     depends_on:

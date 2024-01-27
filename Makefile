@@ -8,11 +8,18 @@ up:
 	@echo "Docker images started!"
 
 ## up_build: stops docker compose (if running), builds all projects and starts docker compose
-up_build:  build_auth build_search build_data build_frontend
+up_build:  build_auth build_search build_data build_frontend 
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
 	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx
+	@echo "Docker images built and started!"
+
+up_build_backend: build_auth build_search build_data
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service
 	@echo "Docker images built and started!"
 
 ####### AUTH SERVICE #######
@@ -139,12 +146,14 @@ build_frontend:
 
 ###### Nginx Service ######
 ## up_build_nginx: stops docker compose (if running), builds projects and starts docker compose
-up_build_nginx: build_nginx
+up_build_nginx:
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down nginx
 	@echo "Building (when required) and starting docker images..."
 	docker compose -f docker-compose.dev.yml up --build -d nginx
 	@echo "Docker images built and started!"
+
+
 
 ## down_nginx : stops the nginx service
 down_nginx:
