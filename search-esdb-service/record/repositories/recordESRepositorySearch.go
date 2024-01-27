@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
@@ -152,7 +151,7 @@ func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) 
 	}
 
 	doc := response["_source"]
-
+	docID := response["_id"].(string)
 	// Unescape fields (e.g., "question" and "answer") individually before appending them
 	unescapedDoc := make(map[string]interface{})
 	for key, value := range doc.(map[string]interface{}) {
@@ -164,43 +163,16 @@ func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) 
 			unescapedDoc[key] = value
 		}
 	}
-
-	index, ok := unescapedDoc["index"].(string)
-	if !ok {
-		return nil, errors.New("index field is missing or not a string")
-	}
-
-	youtubeURL, ok := unescapedDoc["youtubeURL"].(string)
-	if !ok {
-		return nil, errors.New("youtubeURL field is missing or not a string")
-	}
-	question, ok := unescapedDoc["question"].(string)
-	if !ok {
-		return nil, errors.New("question field is missing or not a string")
-	}
-	answer, ok := unescapedDoc["answer"].(string)
-	if !ok {
-		return nil, errors.New("answer field is missing or not a string")
-	}
-	startTime, ok := unescapedDoc["startTime"].(string)
-	if !ok {
-		return nil, errors.New("startTime field is missing or not a string")
-	}
-	endTime, ok := unescapedDoc["endTime"].(string)
-	if !ok {
-		return nil, errors.New("endTime field is missing or not a string")
-	}
+	unescapedDoc["id"] = docID
 
 	record := &entities.Record{
-		Index:      youtubeURL+"-"+index,
-		YoutubeURL: youtubeURL,
-		Question:   question,
-		Answer:     answer,
-		StartTime:  startTime,
-		EndTime:    endTime,
+		Index:      docID,
+		YoutubeURL: unescapedDoc["youtubeURL"].(string),
+		Question:   unescapedDoc["question"].(string),
+		Answer:     unescapedDoc["answer"].(string),
+		StartTime:  unescapedDoc["startTime"].(string),
+		EndTime:    unescapedDoc["endTime"].(string),
 	}
 
-	log.Println("REPOSITORY SEARCH BY RECORD INDEX", record)
-	log.Println("return 4")
 	return record, nil
 }
