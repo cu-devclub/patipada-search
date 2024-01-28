@@ -25,4 +25,6 @@ type RecordHandler interface {
 	// - 400: Bad request. (query not attached) or invalid amount
 	// - 500: An internal server error occurred.
 	Search(c *gin.Context)
+
+	SearchByRecordIndex(c *gin.Context)
 }

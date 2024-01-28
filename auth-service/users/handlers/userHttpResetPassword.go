@@ -9,7 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Reset Password
+// Reset Password : change password when forget password from reset link
 // Parameters(JSON)
 // - token (string) ; reset password token
 // - password (string) ; new password ; 8 <= length <= 50

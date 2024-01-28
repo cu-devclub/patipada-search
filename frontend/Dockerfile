@@ -1,18 +1,6 @@
-# Stage 1: Build stage
-FROM node:alpine as build
-WORKDIR /app
-COPY package.json ./
-COPY yarn.lock ./
-RUN yarn install --frozen-lockfile
-COPY . .
-# Set the NODE_ENV environment variable to 'production'
-ENV NODE_ENV=production
-
-RUN yarn build
-
-# Step 2: Set up the production environment
 FROM nginx:stable-alpine
-COPY --from=build /app/dist /usr/share/nginx/html
+ENV NODE_ENV=production
+COPY /dist /usr/share/nginx/html
 COPY deploy/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 8080

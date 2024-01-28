@@ -10,10 +10,11 @@ import (
 )
 
 func main() {
+	// TODO : Implementing log service 
 	log.Println("Initializing config")
 	config.InitializeViper("./")
 	cfg := config.GetConfig()
-	
+
 	db := database.NewPostgresDatabase(&cfg)
 	log.Println("Success connect to database")
 
@@ -23,5 +24,10 @@ func main() {
 		return
 	}
 
-	server.NewEchoServer(&cfg, db.GetDb()).Start()
+	s := server.NewEchoServer(&cfg, db.GetDb())
+
+	go server.GRPCListen(s,&cfg)
+
+	s.Start()
+
 }

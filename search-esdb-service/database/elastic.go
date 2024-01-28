@@ -49,11 +49,15 @@ func NewElasticDatabase(cfg *config.Config) Database {
 		panic("Error creating Elasticsearch client")
 	}
 
-	// Check the Elasticsearch cluster health
-	checkClusterHealth(client)
+	es := &elasticDatabase{
+		Db: client,
+	}
 
-	//* Check plugins => icu analyzer to extract token 
-	if err = checkPlugins(client); err != nil {
+	// Check the Elasticsearch cluster health
+	es.CheckClusterHealth()
+
+	//* Check plugins => icu analyzer to extract token
+	if err = es.checkPlugins(); err != nil {
 		panic("Error checking Plugins:")
 	}
 

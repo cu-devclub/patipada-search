@@ -1,6 +1,6 @@
-// entity for record domain 
+// entity for record domain
 // entity is a data model use to deals with data
-// in the low level e.g. data in db or migration files 
+// in the low level e.g. data in db or migration files
 
 package entities
 
@@ -12,6 +12,14 @@ type (
 		Answer     string `json:"answer"`
 		StartTime  string `json:"startTime"`
 		EndTime    string `json:"endTime"`
+	}
+
+	UpdateRecord struct {
+		DocumentID string `json:"documentID"`
+		StartTime  string `json:"startTime"`
+		EndTime    string `json:"endTime"`
+		Question   string `json:"question"`
+		Answer     string `json:"answer"`
 	}
 
 	Token struct {

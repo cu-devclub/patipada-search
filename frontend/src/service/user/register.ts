@@ -1,16 +1,13 @@
 // generate async function register that takes username, password, email, and role as parameters
 
-import axios from "axios";
+import axios from '../axiosInstance';
 import { CreateCustomError, ReturnError } from "../error";
 import { RegisterDTO } from "../../models/user";
 import { ERR_Messages, ToastStatus } from "../../constant";
+import { authURL } from '../../constant/serviceURL';
 export const register = async (registerDTO: RegisterDTO) => {
   try {
-    const apiUrl =
-      import.meta.env.MODE === "production"
-        ? "http://auth-service:8082"
-        : "http://localhost:8082";
-    const response = await axios.post(`${apiUrl}/register`, {
+    const response = await axios.post(`${authURL}/register`, {
       username: registerDTO.username,
       password: registerDTO.password,
       email: registerDTO.email,

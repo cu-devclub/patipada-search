@@ -8,9 +8,8 @@ import {
   ChangePasswordPage,
 } from "./pages/User";
 import NotFoundPage from "./pages/404";
-import { Dashboard as AdminDashboard, AdminChoosePage } from "./pages/Admin";
+import { Dashboard as AdminDashboard, AdminChoosePage, AdminRequestPage, AdminEditRequestPage } from "./pages/Admin";
 import { PendingRequestPage, EditRecordPage } from "./pages/Contributor";
-import React from "react";
 export default function App() {
   return (
     <BrowserRouter>
@@ -30,6 +29,8 @@ export default function App() {
         <Route path="/admin/">
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="choosePage" element={<AdminChoosePage />} />
+          <Route path="request" element={<AdminRequestPage />} />
+          <Route path="edit-request/:requestID" element={<AdminEditRequestPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

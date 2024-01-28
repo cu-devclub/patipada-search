@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import { VdoRef } from "./YoutubeVideo.tsx";
 import TimesAndTools from "./TimesAndTools.tsx";
-import React from "react";
 interface QAProps {
   data: DataItem;
   query: string;
@@ -25,7 +24,7 @@ interface QAProps {
  */
 function QA_Vdo({ data, query, tokens }: QAProps) {
   const [isQueryTheQuestion, SetisQueryTheQuestion] = useState(false);
-  const token = getCookie("token"); //TODO : check token is valid
+  const token = getCookie("token"); 
   const navigate = useNavigate();
   const vdoRef = useRef<VdoRef | null>(null);
 
@@ -50,47 +49,13 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
       <Box w={{ base: "100%", lg: "65%" }}>
         <VStack spacing={1} alignItems="flex-start">
           <TimesAndTools
-            data={data}
+            index={data.index}
+            startTime={data.startTime}
+            endTime={data.endTime}
             token={token}
             handleReplay={handleReplay}
             navigate={navigate}
           />
-          {/* //TODO : Check new component */}
-          {/* <HStack spacing={2} alignItems="center">
-            <Text as="b" color="blue">
-              เวลาเริ่มต้น {data.startTime} เวลาสิ้นสุด {data.endTime}
-            </Text>
-            <Tooltip
-              hasArrow
-              label="กดเพื่อเล่นวิดีโออีกครั้ง"
-              bg="gray.300"
-              color="black"
-              placement="right"
-            >
-              <IconButton
-                aria-label="Play Again"
-                icon={<RepeatIcon />}
-                onClick={handleReplay}
-              />
-            </Tooltip>
-            {token && (
-              <Tooltip
-                hasArrow
-                label="กดเพื่อเสนอข้อแก้ไข"
-                bg="gray.300"
-                color="black"
-                placement="right"
-              >
-                <IconButton
-                  aria-label="Edit"
-                  icon={<EditIcon />}
-                  onClick={() =>
-                    navigate(`/contributor/edit-record/${data.index}`)
-                  }
-                />
-              </Tooltip>
-            )}
-          </HStack> */}
 
           {isQueryTheQuestion == false ? (
             <Text variant="question">
@@ -111,7 +76,7 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
         <YoutubeVideo
           ref={vdoRef}
           youtubeURL={data.youtubeURL}
-          question={data.question}
+          id={data.index}
           startTime={data.startTime}
           endTime={data.endTime}
         />

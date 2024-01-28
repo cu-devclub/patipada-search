@@ -1,15 +1,11 @@
-import axios from 'axios';
+import axios from '../axiosInstance';
 import { CreateCustomError, ReturnError } from '../error';
 import { ToastStatus, ERR_Messages } from '../../constant';
+import { authURL } from '../../constant/serviceURL';
 
 export const forgetPassword = async (email: string) => {
   try {
-    //TODO : Test the environment mode
-    const apiUrl =
-      import.meta.env.MODE === "production"
-        ? "http://auth-service:8082"
-        : "http://localhost:8082";
-    const response = await axios.post(`${apiUrl}/forget-password/${email}`);
+    const response = await axios.post(`${authURL}/forget-password/${email}`);
     return response.data.status;
   } catch (error: unknown) {
      const requestError = CreateCustomError(error);

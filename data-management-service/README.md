@@ -38,12 +38,12 @@ go run main.go
 
 ## API Reference
 
-Postman documentation : // Not available yet
+Postman documentation : [link](https://documenter.getpostman.com/view/14178897/2s9YsNdVnb)
 
 ## Tech stack
 
 **Language** : Golang
-**Web Server** : Gin 
+**Web Server** : Gin
 **Database**: Mongo DB
 
 ## Project structure
@@ -53,6 +53,7 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
 ###
 
     .
+    ├── auth_proto              # gRPC with auth service
     ├── config
     ├── database
     ├── errors                  # Custom errors

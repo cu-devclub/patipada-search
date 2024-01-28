@@ -6,4 +6,5 @@ import (
 
 type Database interface {
 	GetDB() *elasticsearch.Client
+	CheckClusterHealth()
 }

@@ -10,11 +10,17 @@ require (
 	github.com/spf13/viper v1.18.1
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/crypto v0.16.0
+	google.golang.org/grpc v1.59.0
+	google.golang.org/protobuf v1.32.0
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
 )
 
-require gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+require (
+	github.com/golang/protobuf v1.5.3 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231120223509-83a465c0220f // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect

@@ -1,20 +1,26 @@
-import { RepeatIcon, EditIcon } from '@chakra-ui/icons';
-import { HStack, Tooltip, IconButton,Text } from '@chakra-ui/react';
-import { DataItem } from '../../models/qa';
-
+import { RepeatIcon, EditIcon } from "@chakra-ui/icons";
+import { HStack, Tooltip, IconButton, Text } from "@chakra-ui/react";
 interface TimesAndToolsProps {
-    data: DataItem;
-    token?: string;
-    handleReplay: () => void;
-    navigate: (path: string) => void;
+  index: string
+  startTime: string;
+  endTime: string;
+  token?: string;
+  handleReplay: () => void;
+  navigate: (path: string) => void;
 }
 
-
-function TimesAndTools({ data, token, handleReplay, navigate }: TimesAndToolsProps) {
+function TimesAndTools({
+  index,
+  startTime,
+  endTime,
+  token,
+  handleReplay,
+  navigate,
+}: TimesAndToolsProps) {
   return (
     <HStack spacing={2} alignItems="center">
       <Text as="b" color="blue">
-        เวลาเริ่มต้น {data.startTime} เวลาสิ้นสุด {data.endTime}
+        เวลาเริ่มต้น {startTime} เวลาสิ้นสุด {endTime}
       </Text>
       <Tooltip
         hasArrow
@@ -40,7 +46,7 @@ function TimesAndTools({ data, token, handleReplay, navigate }: TimesAndToolsPro
           <IconButton
             aria-label="Edit"
             icon={<EditIcon />}
-            onClick={() => navigate(`/contributor/edit-record/${data.index}`)}
+            onClick={() => navigate(`/contributor/edit-record/${index}`)}
           />
         </Tooltip>
       )}
@@ -48,4 +54,4 @@ function TimesAndTools({ data, token, handleReplay, navigate }: TimesAndToolsPro
   );
 }
 
-export default TimesAndTools
+export default TimesAndTools;

@@ -4,19 +4,11 @@ import * as React from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { format } from "date-fns/format";
-import "./Tiptap.scss";
-import { Comment } from "./extensions/comment";
+import "../Tiptap.scss";
+import { Comment } from "../extensions/comment";
 import { v4 as uuidv4 } from "uuid";
-import {
-  Button,
-  Box,
-  Flex,
-  Textarea,
-  HStack,
-  Text,
-  ButtonGroup,
-} from "@chakra-ui/react";
-import { setTimeout } from "../../functions/time";
+import { Button, Box, Flex, Textarea, HStack, Text } from "@chakra-ui/react";
+// import { setTimeout } from "../../functions/time";
 import { getCookie } from "typescript-cookie";
 const dateTimeFormat = "dd.MM.yyyy HH:mm";
 
@@ -26,16 +18,16 @@ interface CommentInstance {
 }
 
 interface TipTapProps {
-  defaultValue?: string;
-  cancel: () => void;
+  defaultValue: string;
+  setHTML: (html: string) => void;
 }
-// TODO : When save, save to local storage 
-// TODO : fetching comment to check if there is any comment
-const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
+
+const CommentTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
   const username = getCookie("username");
   const editor = useEditor({
     extensions: [StarterKit, Comment],
     content: defaultValue || "",
+    editable: false,
     onUpdate({ editor }) {
       findCommentsAndStoreValues();
 
@@ -57,12 +49,11 @@ const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
 
   const [commentText, setCommentText] = React.useState("");
 
-  const [showCommentMenu, setShowCommentMenu] = React.useState(false);
+  const [, setShowCommentMenu] = React.useState(false);
 
-  const [isTextSelected, setIsTextSelected] = React.useState(false);
+  const [, setIsTextSelected] = React.useState(false);
 
-  const [showAddCommentSection, setShowAddCommentSection] =
-    React.useState(true);
+  const [, setShowAddCommentSection] = React.useState(true);
 
   const formatDate = (d: any) =>
     d ? format(new Date(d), dateTimeFormat) : null;
@@ -73,20 +64,15 @@ const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
   const [allComments, setAllComments] = React.useState<any[]>([]);
 
   const findCommentsAndStoreValues = () => {
-    const proseMirror = document.querySelector(".ProseMirror");
-
-    const comments = proseMirror?.querySelectorAll("span[data-comment]");
+    const parser = new DOMParser();
+    const htmlText = editor?.getHTML() || defaultValue;
+    const doc = parser.parseFromString(htmlText, "text/html");
+    const comments = doc.querySelectorAll("span[data-comment]");
 
     const tempComments: any[] = [];
 
-    if (!comments) {
-      setAllComments([]);
-      return;
-    }
-
     comments.forEach((node) => {
       const nodeComments = node.getAttribute("data-comment");
-
       const jsonComments = nodeComments ? JSON.parse(nodeComments) : null;
 
       if (jsonComments !== null) {
@@ -99,12 +85,11 @@ const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
 
     setAllComments(tempComments);
   };
-
   const setCurrentComment = (editor: any) => {
     const newVal = editor.isActive("comment");
 
     if (newVal) {
-      setTimeout(50, () => setShowCommentMenu(newVal));
+      setTimeout(() => setShowCommentMenu(newVal), 50);
 
       setShowAddCommentSection(!editor.state.selection.empty);
 
@@ -163,14 +148,19 @@ const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
       editor?.chain().setComment(commentWithUuid).run();
     }
 
-    setTimeout(0.1, () => setCommentText(""));
+    setTimeout(() => setCommentText(""), 0.1);
 
     // force user to unselect
     editor?.commands.focus(editor?.state.doc.content.size);
+
+    setHTML(editor?.getHTML() || defaultValue);
   };
 
-  React.useEffect((): any => setTimeout(100, findCommentsAndStoreValues), []);
-
+  React.useEffect(() => {
+    const timeoutId = setTimeout(findCommentsAndStoreValues, 100);
+    return () => clearTimeout(timeoutId); // This is the cleanup function
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <Flex
       dir="row"
@@ -268,12 +258,6 @@ const CommentTiptap = ({ defaultValue, cancel }: TipTapProps) => {
           );
         })}
       </Flex>
-      <ButtonGroup position="absolute" bottom={0} right={0}>
-        <Button variant="cancel" onClick={cancel}>
-          ยกเลิก
-        </Button>
-        <Button variant="success">ยืนยัน</Button>
-      </ButtonGroup>
     </Flex>
   );
 };

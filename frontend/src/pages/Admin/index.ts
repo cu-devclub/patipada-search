@@ -1,3 +1,5 @@
 import Dashboard from "./AdminDashboard";
 import AdminChoosePage from "./AdminChoosePage";
-export { Dashboard, AdminChoosePage };
+import AdminRequestPage from "./AdminRequestPage";
+import AdminEditRequestPage from "./AdminEditRequestPage";
+export { Dashboard, AdminChoosePage,AdminRequestPage,AdminEditRequestPage };

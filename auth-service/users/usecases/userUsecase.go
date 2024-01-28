@@ -112,6 +112,8 @@ type UsersUsecase interface {
 	// - 500 internal server error
 	VerifyToken(c echo.Context) (bool, *errors.RequestError)
 
+	VerifyUsername(username string) (bool, error)
+
 	// Authorize to verify the user authorization
 	// Header - Authorization : <token>
 	//

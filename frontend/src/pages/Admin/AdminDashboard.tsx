@@ -1,9 +1,8 @@
-import { BaseHeader } from "../../components";
-import { Heading } from "@chakra-ui/react";
 import { AuthorizeAdmin } from "../../functions";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Role } from "../../constant";
+import { AdminBasePage } from "./AdminBasePage";
 function AdminDashboard() {
   const navigate = useNavigate();
   useEffect(() => {
@@ -13,13 +12,13 @@ function AdminDashboard() {
         navigate("/user/login");
       }
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <BaseHeader>
-      <Heading>Dashboard</Heading>
-    </BaseHeader>
+    <AdminBasePage activePage="Dashboard">
+      <></>
+    </AdminBasePage>
   );
 }
 

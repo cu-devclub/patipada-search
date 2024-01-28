@@ -1,10 +1,9 @@
 import { AspectRatio } from "@chakra-ui/react";
 import { forwardRef, useImperativeHandle } from "react";
 import { timeToSeconds } from "../../functions";
-import React from "react";
 
 interface VdoProps {
-  question: string;
+  id: string;
   startTime: string;
   endTime: string;
   youtubeURL: string;
@@ -15,14 +14,13 @@ export interface VdoRef {
 }
 
 const YoutubeVideo = forwardRef<VdoRef, VdoProps>(
-  ({ startTime, endTime, youtubeURL, question }: VdoProps, ref) => {
+  ({ startTime, endTime, youtubeURL, id }: VdoProps, ref) => {
     const displayStartTime = timeToSeconds(startTime);
     const displayEndTime = timeToSeconds(endTime);
     const displayYoutubeURL = `https://www.youtube.com/embed/${youtubeURL}?start=${displayStartTime}&end=${displayEndTime}`;
 
-    console.log("🚀 ~ file: YoutubeVideo.tsx:23 ~ displayYoutubeURL:", displayYoutubeURL)
     const replay = () => {
-      const iframe = document.getElementById(question) as HTMLImageElement;
+      const iframe = document.getElementById(id) as HTMLImageElement;
       if (iframe) {
         iframe.src = displayYoutubeURL;
       }
@@ -33,14 +31,14 @@ const YoutubeVideo = forwardRef<VdoRef, VdoProps>(
     }));
 
     return (
-        <AspectRatio maxW={["560px"]} maxH="300px" ratio={1}>
-          <iframe
-            id={question}
-            title={question}
-            src={displayYoutubeURL}
-            allowFullScreen
-          />
-        </AspectRatio>
+      <AspectRatio maxW={["560px"]} maxH="300px" ratio={1}>
+        <iframe
+          id={id}
+          title={id}
+          src={displayYoutubeURL}
+          allowFullScreen
+        />
+      </AspectRatio>
     );
   }
 );

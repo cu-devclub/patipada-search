@@ -7,7 +7,5 @@ type UsersRepository interface {
 	GetAllUsersData() ([]*entities.Users, error)
 	GetUserByUsername(username string) (*entities.Users, error)
 	UpdateUser(in *entities.Users) error
-	// ResetPassword(in *entities.ResetPassword) error
-	// StoreResetToken(userID string, in *entities.ResetToken) error
 	RemoveUser(username string) error
 }

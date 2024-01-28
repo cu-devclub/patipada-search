@@ -14,9 +14,9 @@ import (
 )
 
 type echoServer struct {
-	App *echo.Echo
-	db  *gorm.DB
-	cfg *config.Config
+	App  *echo.Echo
+	db   *gorm.DB
+	cfg  *config.Config
 }
 
 func NewEchoServer(cfg *config.Config, db *gorm.DB) Server {
@@ -32,7 +32,7 @@ func (s *echoServer) Start() {
 
 	s.App.Use(middleware.Logger())
 	s.App.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{s.cfg.App.FrontendURL},
+		AllowOrigins: []string{s.cfg.App.FrontendURL, "http://localhost:5173"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 	}))
 
@@ -42,6 +42,10 @@ func (s *echoServer) Start() {
 
 func (s *echoServer) GetHandler() *echo.Echo {
 	return s.App
+}
+
+func (s *echoServer) GetDB() *gorm.DB {
+	return s.db
 }
 
 // initializeUsersHttpHandler initializes the users HTTP handler.
@@ -104,7 +108,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 500 internal server error
 	s.App.POST("/forget-password/:email", usersHttpHandler.ForgetPassword)
 
-	// Reset Password
+	// Reset Password : change from reset password link
 	// Parameters(JSON)
 	// - token (string) ; reset password token
 	// - password (string) ; new password ; 8 <= length <= 50
@@ -116,7 +120,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 500 internal server error
 	s.App.POST("/reset-password", usersHttpHandler.ResetPassword)
 
-	// Change Password
+	// Change Password : manual change 
 	// Header Authorization - token
 	// Parameter(JSON)
 	// - oldPassword (string) ; old password ; 8 <= length <= 50
@@ -138,7 +142,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 500 internal server error
 	s.App.GET("/verify-reset-token/:token", usersHttpHandler.VerifyResetToken)
 
-	// Verify Token to verify the time valid of auth token 
+	// Verify Token to verify the time valid of auth token
 	// Header - Authorization : <token>
 	//
 	// Response
@@ -160,7 +164,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 401 Unauthorize ; invalid token
 	// - 500 internal server error
 	s.App.GET("/authorize", usersHttpHandler.Authorize)
-
+	
 	// Remove user by username & requestor role must be higher
 	// Header - Authorization : <token>
 	// Parameters (Route Param) :

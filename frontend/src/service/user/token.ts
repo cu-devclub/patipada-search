@@ -1,14 +1,12 @@
-import axios from "axios";
+import axios from '../axiosInstance';
 import { CreateCustomError, ReturnError } from "../error";
 import { ERR_Messages, ToastStatus } from "../../constant";
+import { authURL } from '../../constant/serviceURL';
 // use in contributor to verify their token
 export const verifyToken = async (token: string) => {
   try {
-    const apiUrl =
-      import.meta.env.MODE === "production"
-        ? "http://auth-service:8082"
-        : "http://localhost:8082";
-    const response = await axios.get(`${apiUrl}/verify-token`, {
+
+    const response = await axios.get(`${authURL}/verify-token`, {
       headers: {
         Authorization: token,
       },
@@ -43,12 +41,8 @@ export const verifyToken = async (token: string) => {
 // use in admin task to verify their token and role
 export const authorize = async (token: string, requireRole: string) => {
   try {
-    const apiUrl =
-      import.meta.env.MODE === "production"
-        ? "http://auth-service:8082"
-        : "http://localhost:8082";
     const response = await axios.get(
-      `${apiUrl}/authorize?requiredRole=${requireRole}`,
+      `${authURL}/authorize?requiredRole=${requireRole}`,
       {
         headers: {
           Authorization: token,

@@ -55,3 +55,14 @@ func EntityToModels(e *entities.Request) (m *models.Request) {
 	}
 	return m
 }
+
+func RequestToRecordsEntity(r *entities.Request) *entities.Record {
+	return &entities.Record{
+		Index:      r.Index,
+		YoutubeURL: r.YoutubeURL,
+		Question:   r.Question,
+		Answer:     r.Answer,
+		StartTime:  r.StartTime,
+		EndTime:    r.EndTime,
+	}
+}

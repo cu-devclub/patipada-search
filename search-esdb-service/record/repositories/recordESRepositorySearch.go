@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
 	"strings"
@@ -124,4 +125,54 @@ func buildElasticsearchQuery(query string) (string, error) {
 	}
 
 	return string(queryJSON), nil
+}
+
+func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, error) {
+	client := r.es
+
+	recordIndex = url.PathEscape(recordIndex)
+
+	// Perform the search request
+	res, err := client.Get(indexName, recordIndex)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	// Check the response status
+	if res.IsError() && res.StatusCode != 405 {
+		return nil, fmt.Errorf("Elasticsearch error: %s", res.Status())
+	}
+
+	// Decode the response
+	var response map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+
+	doc := response["_source"]
+	docID := response["_id"].(string)
+	// Unescape fields (e.g., "question" and "answer") individually before appending them
+	unescapedDoc := make(map[string]interface{})
+	for key, value := range doc.(map[string]interface{}) {
+		if stringValue, isString := value.(string); isString {
+			// Unescape the string value
+			unescapedValue := helper.UnescapeDoubleQuotes(stringValue)
+			unescapedDoc[key] = unescapedValue
+		} else {
+			unescapedDoc[key] = value
+		}
+	}
+	unescapedDoc["id"] = docID
+
+	record := &entities.Record{
+		Index:      docID,
+		YoutubeURL: unescapedDoc["youtubeURL"].(string),
+		Question:   unescapedDoc["question"].(string),
+		Answer:     unescapedDoc["answer"].(string),
+		StartTime:  unescapedDoc["startTime"].(string),
+		EndTime:    unescapedDoc["endTime"].(string),
+	}
+
+	return record, nil
 }

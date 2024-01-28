@@ -6,55 +6,130 @@ import {
   Center,
   HStack,
   Box,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { YoutubeVideo } from "../../search";
-import { DataItem } from "../../../models/qa";
-import { useRef } from "react";
+import { Request } from "../../../models/request";
+import { useRef, useState } from "react";
 import { VdoRef } from "../../search/YoutubeVideo";
 import { TimesAndTools } from "../../search";
-import React from "react";
 import CommentableTextField from "./CommentableTextField";
+import CommentableTimeField from "./CommentableTimeField";
+import { useNavigate } from "react-router-dom";
 interface EditRecordFormProps {
-  data: DataItem;
+  data: Request;
+  submit: (data: Request) => void;
 }
-function EditRecordForm({ data }: EditRecordFormProps) {
+
+function EditRecordForm({ data, submit }: EditRecordFormProps) {
+  const navigate = useNavigate();
   const vdoRef = useRef<VdoRef | null>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isConfirm, setisConfirm] = useState(false);
+  const modalTitle = isConfirm
+    ? "ยืนยันคำขอแก้ไขใช่หรือไม่"
+    : "ออกจากหน้าคำขอแก้ไขใช่หรือไม่";
+  const modalDescription = isConfirm
+    ? "หากยืนยันคำขอแก้ไขนี้จะถูกส่งให้ผู้ดูแลระบบตรวจสอบ"
+    : "หากออกจากหน้าคำขอแก้ไขคำขอแก้ไขนี้จะถูกยกเลิก";
+  const [startTime, setStartTime] = useState({
+    htmlValue: data.startTime,
+  });
+  const [endTime, setEndTime] = useState({
+    htmlValue: data.endTime,
+  });
+  const [question, setQuestion] = useState({
+    htmlValue: data.question,
+  });
+  const [answer, setAnswer] = useState({
+    htmlValue: data.answer,
+  });
 
   const handleReplay = () => {
     vdoRef.current?.replay();
   };
 
+  const confirm = () => {
+    if (isConfirm) {
+      // confirm to send request
+      data.startTime = startTime.htmlValue;
+      data.endTime = endTime.htmlValue;
+      data.question = question.htmlValue;
+      data.answer = answer.htmlValue;
+      submit(data);
+    } else {
+      // navigate back
+      navigate(-1);
+    }
+  };
+
   return (
     <Flex flex={1} w="full" p={{ base: 2, md: 4 }} direction="column">
       <Grid
-        templateColumns={{ base: "repeat(1, 1fr)", md: "70fr 30fr" }}
+        templateColumns={{ base: "repeat(1, 1fr)", md: "60fr 40fr" }}
         gap={6}
         w="full"
         p={2}
       >
-        {/* //TODO: start time, end time */}
         <VStack order={{ base: 2, md: 1 }} px={2}>
-          <CommentableTextField
-            defaultValue={data.question}
-            heading={"คำถาม"}
+          <CommentableTimeField
+            htmlValue={startTime.htmlValue}
+            heading={"เวลาเริ่มต้น"}
+            setHTML={(html: string) =>
+              setStartTime({
+                htmlValue: html,
+              })
+            }
           />
-          <CommentableTextField defaultValue={data.answer} heading={"คำตอบ"} />
+          <CommentableTimeField
+            htmlValue={endTime.htmlValue}
+            heading={"เวลาสิ้นสุด"}
+            setHTML={(html: string) =>
+              setEndTime({
+                htmlValue: html,
+              })
+            }
+          />
+          <CommentableTextField
+            htmlValue={question.htmlValue}
+            heading={"คำถาม"}
+            setHTML={(html: string) =>
+              setQuestion({
+                htmlValue: html,
+              })
+            }
+          />
+          <CommentableTextField
+            htmlValue={answer.htmlValue}
+            heading={"คำตอบ"}
+            setHTML={(html: string) =>
+              setAnswer({
+                htmlValue: html,
+              })
+            }
+          />
         </VStack>
-        <VStack
-          order={{ base: 1, md: 2 }}
-          align="center"
-        >
-          <Box w={{ base: "100%", lg: "60%" }}>
+        <VStack order={{ base: 1, md: 2 }} align="center">
+          <Box w={{ base: "100%", lg: "80%" }}>
             <YoutubeVideo
               ref={vdoRef}
               youtubeURL={data.youtubeURL}
-              question={data.question}
+              id={data.index}
               startTime={data.startTime}
               endTime={data.endTime}
             />
           </Box>
           <TimesAndTools
-            data={data}
+            index={data.index}
+            startTime={data.startTime}
+            endTime={data.endTime}
             handleReplay={handleReplay}
             navigate={() => {}}
           />
@@ -62,10 +137,43 @@ function EditRecordForm({ data }: EditRecordFormProps) {
       </Grid>
       <Center w="full">
         <HStack>
-          <Button variant="success">บันทึก</Button>
-          <Button variant="cancel">ยกเลิก</Button>
+          <Button
+            variant="cancel"
+            onClick={() => {
+              setisConfirm(false);
+              onOpen();
+            }}
+          >
+            ยกเลิก
+          </Button>
+          <Button
+            variant="success"
+            onClick={() => {
+              setisConfirm(true);
+              onOpen();
+            }}
+          >
+            บันทึก
+          </Button>
         </HStack>
       </Center>
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{modalTitle}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>{modalDescription}</ModalBody>
+
+          <ModalFooter>
+            <Button variant="cancel" mr={3} onClick={onClose}>
+              ยกเลิก
+            </Button>
+            <Button variant="success" onClick={confirm}>
+              ยืนยัน
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Flex>
   );
 }

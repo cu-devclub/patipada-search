@@ -4,6 +4,7 @@ import (
 	"auth-service/errors"
 	"auth-service/messages"
 	"auth-service/users/models"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -22,10 +23,15 @@ import (
 // - 401 unauthorized ;  username or password incorrect
 // - 500 internal server error
 func (h *usersHttpHandler) Login(c echo.Context) error {
+	log.Println("Login : Starting handler")
 	reqBody := new(models.LoginDto)
 	if err := c.Bind(reqBody); err != nil {
+		log.Println("Login : Error while binding request body: ", err)
 		return loginResponse(c, http.StatusBadRequest, messages.BAD_REQUEST, "", "")
+
 	}
+
+	log.Println("Login : Username: ", reqBody.Username)
 	token, role, err := h.usersUsecase.Authentication(reqBody)
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
@@ -33,6 +39,7 @@ func (h *usersHttpHandler) Login(c echo.Context) error {
 		} else {
 			return loginResponse(c, http.StatusInternalServerError, messages.INTERNAL_SERVER_ERROR, "", "")
 		}
+
 	}
 	return loginResponse(c, http.StatusOK, messages.SUCCESSFUL_LOGIN, token, role)
 

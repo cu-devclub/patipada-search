@@ -1,5 +1,5 @@
 import { SearchResults, HeaderSearch } from "../../components/search";
-import { Flex,Grid } from "@chakra-ui/react";
+import { Flex, Grid } from "@chakra-ui/react";
 import { Footer } from "../../components";
 import { SearchResultInterface, DataItem } from "../../models/qa";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -22,7 +22,7 @@ function SearchResultPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get("search");
 
-  // When query change; get the result from session storage 
+  // When query change; get the result from session storage
   useEffect(() => {
     if (query) {
       SetQueryMessage(query);
@@ -67,12 +67,7 @@ function SearchResultPage() {
   // --------------------------------------------
 
   return (
-    <Grid
-      templateRows="auto 1fr auto"
-      gap={4}
-      w="full"
-      minH="100svh"
-    >
+    <Grid templateRows="auto 1fr auto" gap={4} w="full" minH="100svh">
       {query && (
         <HeaderSearch
           query={query}
@@ -88,7 +83,10 @@ function SearchResultPage() {
             query={queryMessage}
             tokens={tokens}
           />
-          <Flex w={{ base: "100%", md: "80%", xl: "70%" }} justifyItems={"center"}>
+          <Flex
+            w={{ base: "100%", md: "80%", xl: "70%" }}
+            justifyItems={"center"}
+          >
             <Pagination
               current={currentPage}
               total={data.length}
@@ -108,7 +106,9 @@ function SearchResultPage() {
           </Flex>
         </>
       )}
-      <Footer />
+      <Flex h="8xs" w="100%">
+        <Footer />
+      </Flex>
     </Grid>
   );
 }

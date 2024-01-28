@@ -4,7 +4,6 @@ import (
 	"auth-service/config"
 	"auth-service/errors"
 	"auth-service/jwt"
-	"fmt"
 
 	"github.com/labstack/echo/v4"
 )
@@ -27,8 +26,6 @@ func (u *UsersUsecaseImpl) Authorize(c echo.Context, requireRole string) (bool, 
 		return false, errors.CreateError(err.StatusCode, err.Error())
 	}
 	// check if requireRole one of admin, super-admin, user
-	fmt.Println("require role", requireRole)
-	fmt.Println(requireRole != cfg.User.Admins.Role && requireRole != cfg.User.Users.Role && requireRole != cfg.User.SuperAdmin.Role )
 	if requireRole != cfg.User.Admins.Role && requireRole != cfg.User.Users.Role && requireRole != cfg.User.SuperAdmin.Role {
 		return false, errors.CreateError(400, "Invalid requireRole")
 	}

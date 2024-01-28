@@ -10,6 +10,8 @@ services:
       ESDB_USERNAME: ${ELASTIC_USERNAME}
       ESDB_PASSWORD: ${ELASTIC_PASSWORD}
       FRONTEND_URL: http://frontend:5173
+    restart:
+      always
     ports:
       - 8081:8081
     depends_on:
@@ -22,7 +24,7 @@ services:
     image: dhammanava-elastic-image
     build:
       context: ./elastic
-    environment:
+    environment: 
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
@@ -50,6 +52,8 @@ services:
       context: ./frontend
     ports:
       - 5173:8080
+    restart:
+      always
     networks:
       - backbone
 
@@ -75,6 +79,8 @@ services:
       - USER_EMAIL=${USER_EMAIL}
     ports:
       - 8082:8082
+    restart:
+      always
     depends_on:
       - auth-db
     networks:
@@ -89,6 +95,8 @@ services:
       POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
     ports:
       - 5432:5432
+    restart:
+      always
     volumes:
       - ./auth-db:/docker-entrypoint-initdb.d
       - ./volumes/database/auth:/var/lib/postgresql/data
@@ -109,6 +117,8 @@ services:
        MONGO_DB_NAME: record
     ports:
       - 8083:8083
+    restart:
+      always
     depends_on:
       - data-db
     networks:
@@ -123,9 +133,28 @@ services:
       MONGO_INITDB_DATABASE: record
       MONGO_INITDB_ROOT_USERNAME: ${DATA_MNGMNT_DB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
+    restart:
+      always
     volumes:
       - ./volumes/database/mongo-data:/data/db
+    networks:
+      - backbone
 
+  nginx : 
+    image: nginx:latest
+    container_name: nginx-container
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/nginx.dev.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - search-service
+      - auth-service
+      - data-service
+      - frontend
+    networks:
+      - backbone
+      
 networks:
   backbone:
     driver: bridge

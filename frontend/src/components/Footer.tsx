@@ -14,7 +14,7 @@ function Footer() {
   return (
     <Flex
       w="100%"
-      h="8xs"
+      h="100%"
       bg="brand_gray.500"
       direction="row"
       justify={{ xl: "flex-end", md: "center", base: "center" }}

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package auth_proto;
+
+option go_package = "/auth_proto";
+
+service AuthService {
+  rpc Authorization (AuthorizationRequest) returns (AuthorizationResponse);
+  rpc VerifyUsername (VerifyUsernameRequest) returns (VerifyUsernameResponse);
+}
+
+message AuthorizationRequest {
+  string token = 1;
+  string requiredRole = 2;
+}
+
+message AuthorizationResponse {
+  bool isAuthorized = 1;
+}
+
+message VerifyUsernameRequest {
+  string username = 1;
+}
+
+message VerifyUsernameResponse {
+  bool isVerified = 1;
+}
+
+
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative auth.proto

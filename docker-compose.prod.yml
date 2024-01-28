@@ -127,7 +127,7 @@ services:
     networks:
       - backbone
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf
       - ./certbot/www/:/var/www/certbot
       - ./certbot/conf/:/etc/letsencrypt
 

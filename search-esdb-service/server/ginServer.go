@@ -26,11 +26,16 @@ func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
 	}
 }
 
+func (g *ginServer) GetDB() *elasticsearch.Client {
+	return g.db
+}
+
 func (g *ginServer) Start() {
 
 	// Allow CORS from frontend
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{g.cfg.App.FrontendURL}
+	config.AllowOrigins = []string{g.cfg.App.FrontendURL,"http://localhost:5173"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	g.app.Use(cors.New(config))
 
 	g.initializeRecordHttpHandler()
@@ -69,5 +74,7 @@ func (g *ginServer) initializeRecordHttpHandler() {
 	// - 400: Bad request. (query not attached) or invalid amount
 	// - 500: An internal server error occurred.
 	g.app.GET("/search", recordHttpHandler.Search)
+
+	g.app.GET("/search/:recordIndex", recordHttpHandler.SearchByRecordIndex)
 
 }

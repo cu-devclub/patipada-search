@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
 
@@ -13,14 +12,14 @@ import (
 //
 // It takes a client of type *elasticsearch.Client as a parameter.
 // The function does not return anything.
-func checkClusterHealth(client *elasticsearch.Client) {
+func (es *elasticDatabase) CheckClusterHealth() {
 	// Create a request to check the cluster health
 	req := esapi.ClusterHealthRequest{
 		Pretty: true,
 	}
 
 	// Perform the request
-	res, err := req.Do(context.Background(), client)
+	res, err := req.Do(context.Background(), es.GetDB())
 	if err != nil {
 		fmt.Printf("Error checking cluster health: %s", err)
 		return
@@ -47,14 +46,14 @@ func checkClusterHealth(client *elasticsearch.Client) {
 //
 // It returns an error if there is an error performing the request or decoding the
 // JSON response. It also returns an error if no plugins are installed.
-func checkPlugins(client *elasticsearch.Client) error {
+func (es *elasticDatabase) checkPlugins() error {
 	// Create a request to check the installed plugins
 	req := esapi.CatPluginsRequest{
 		Format: "json", // Use JSON format for the response
 	}
 
 	// Perform the request
-	res, err := req.Do(context.Background(), client)
+	res, err := req.Do(context.Background(), es.GetDB())
 	if err != nil {
 		return err
 	}

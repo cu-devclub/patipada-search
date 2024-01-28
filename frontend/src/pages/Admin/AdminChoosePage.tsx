@@ -1,7 +1,9 @@
 import { Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 function AdminChoosePage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
   return (
     <Flex
       w="full"
@@ -13,7 +15,14 @@ function AdminChoosePage() {
     >
       <Heading>เลือกเว็บไซต์ที่ต้องการเข้าใช้งาน</Heading>
       <Stack direction={["column", "row"]}>
-        <Button variant="brand" onClick={() => navigate("/")}>
+        <Button variant="brand" onClick={() =>{
+          if (location.state?.from) {
+            navigate(location.state.from);
+          }
+          else {
+            navigate("/");
+          }
+        }}>
           <Text fontWeight={"normal"} fontSize={"24"} p={4}>
             ค้นหาข้อมูล
           </Text>

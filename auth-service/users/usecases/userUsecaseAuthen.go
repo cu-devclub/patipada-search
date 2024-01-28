@@ -6,6 +6,7 @@ import (
 	"auth-service/messages"
 	"auth-service/users/helper"
 	"auth-service/users/models"
+	"log"
 
 	"github.com/go-playground/validator"
 )
@@ -24,22 +25,28 @@ func (u *UsersUsecaseImpl) Authentication(in *models.LoginDto) (string, string, 
 	// Validate data
 	validator := validator.New()
 	if err := validator.Struct(in); err != nil {
+		log.Println("Authentication : Error while validating request body: ", err)
 		return "", "", errors.CreateError(400, err.Error())
 	}
 
 	user, err := u.usersRepository.GetUserByUsername(in.Username)
 	if err != nil {
+		log.Println("Authentication : Error while getting user by username: ", err)
 		return "", "", errors.CreateError(401, messages.WRONG_USERNAME_PASSWORD)
 	}
 
 	if err := helper.VerifyPassword(user.Password, in.Password+user.Salt); err != nil {
+		log.Println("Authentication : Error while verifying password: ", err)
 		return "", "", errors.CreateError(401, messages.WRONG_USERNAME_PASSWORD)
 	}
 
 	token, err := jwt.CreateToken(user.Username, user.Role)
 	if err != nil {
+		log.Println("Authentication : Error while creating token: ", err)
 		return "", "", err
 	}
+
+	log.Println("Authentication : Login Success",user.Username, " & Token created: ", token)
 
 	return token, user.Role, nil
 }
