@@ -6,6 +6,8 @@ This project leverages GitHub Actions for streamlined automation. While most var
 
 One crucial variable, `LINUX_HOST`, is intentionally exposed as a GitHub Secret. Despite its sensitive nature, this approach is adopted to simplify customization for developers cloning this project. The decision stems from the project's non-commercial orientation.
 
+`dev` directory is using for dev environment to test the workflows such as `act` because rsa private key do not work with local environment (work only in github secret environment somehow) so in local we need to use base64 private key instead
+
 # Why?
 
 The rationale behind this choice is to empower developers with a seamless experience. By making `LINUX_HOST` a secret, you can effortlessly clone this project and tailor the variable directly in your GitHub repository settings. This eliminates the need for code modifications for basic configuration adjustments.
@@ -40,3 +42,4 @@ This is done because not every service need to re-deploy when push to some branc
 17. USER_EMAIL
 18. DATA_MNGMNT_DB_USER
 19. DATA_MNGMNT_DB_PASSWORD
+20. LINUX_PRIVATE_KEY

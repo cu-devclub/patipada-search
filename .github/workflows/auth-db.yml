@@ -8,24 +8,19 @@ jobs:
         steps:
             - name: Checkout code
               uses: actions/checkout@v3
-            - name: Write private key
+     
+            - name: Set up SSH
               run: |
-                echo "${{ secrets.LINUX_PRIVATE_KEY }}" > id_rsa
-                chmod 600 id_rsa
-
-            - name: SSH to server and copy auth-db directory to server
-              run: |
-                scp -i id_rsa .gitignore ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+                mkdir -p ~/.ssh
+                echo "${{ secrets.LINUX_PRIVATE_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
+                chmod 700 ~/.ssh
+                chmod 600 ~/.ssh/id_rsa
+                ssh-keyscan -t rsa ${{ secrets.LINUX_HOST }} >> ~/.ssh/known_hosts
             
-            # - name: Set up SSH
-            #   run: |
-            #     mkdir -p ~/.ssh
-            #     echo "${{ secrets.LINUX_PRIVATE_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
-            #     chmod 700 ~/.ssh
-            #     chmod 600 ~/.ssh/id_rsa
-            #     ssh-keyscan -t rsa ${{ secrets.LINUX_HOST }} >> ~/.ssh/known_hosts
-                        
-            # - name: Copy auth-db directory to server
-            #   run: |
-            #     rm -rf auth-db
-            #     scp -i ~/.ssh/id_rsa ./auth-db ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+            - name: Remove directory on server
+              run: |
+                ssh -i ~/.ssh/id_rsa ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }} "rm -rf ~/dhammanava-search/auth-db"                        
+            
+            - name: Copy auth-db directory to server
+              run: |
+                scp -r -i ~/.ssh/id_rsa ./auth-db ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
