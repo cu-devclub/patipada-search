@@ -19,15 +19,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
-      - name: Make env file
-        uses: SpicyPizza/create-envfile@v1
-        with:
-          envkey_VITE_SEARCH_API_URLL: "http://search-service:8081"
-          envkey_VITE_AUTH_API_URL: "http://auth-service:8082"
-          file_name: .env.production
-          directory: frontend
-    
+        
       - name: Build and push docker image
         uses: docker/build-push-action@v2
         with: 

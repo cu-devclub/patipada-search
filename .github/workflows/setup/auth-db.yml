@@ -1,0 +1,23 @@
+name : Deploy new auth db (intial)
+on:
+  workflow_dispatch
+
+jobs:
+    deploy-auth-db: 
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+            
+            - name: Set up SSH
+              run: |
+                mkdir -p ~/.ssh
+                echo "${{ secrets.LINUX_PRIVATE_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
+                chmod 700 ~/.ssh
+                chmod 600 ~/.ssh/id_rsa
+                ssh-keyscan -t rsa ${{ secrets.LINUX_HOST }} >> ~/.ssh/known_hosts
+                        
+            - name: Copy auth-db directory to server
+              run: |
+                rm -rf auth-db
+                scp -i ~/.ssh/id_rsa ./auth-db ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
