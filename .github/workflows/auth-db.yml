@@ -16,8 +16,8 @@ jobs:
                 username: ${{ secrets.LINUX_USERNAME }}
                 key: ${{ secrets.LINUX_PRIVATE_KEY}}
                 script: |
-
-                  scp -r .gitignore ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+                  echo "TEST"
+            # scp -r .gitignore ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
             
             # - name: Set up SSH
             #   run: |
