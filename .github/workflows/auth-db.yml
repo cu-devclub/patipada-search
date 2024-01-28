@@ -10,14 +10,9 @@ jobs:
               uses: actions/checkout@v3
             
             - name: SSH to server and copy auth-db directory to server
-              uses: appleboy/ssh-action@master
-              with:
-                host: ${{ secrets.LINUX_HOST }}
-                username: ${{ secrets.LINUX_USERNAME }}
-                key: ${{ secrets.LINUX_PRIVATE_KEY}}
-                script: |
-                  echo "TEST"
-            # scp -r .gitignore ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+              run: |
+                ssh -i ${{ secrets.LINUX_PRIVATE_KEY }} ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }} 
+                scp -r .gitignore ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
             
             # - name: Set up SSH
             #   run: |
