@@ -11,8 +11,7 @@ jobs:
             
             - name: SSH to server and copy auth-db directory to server
               run: |
-                ssh -i ${{ secrets.LINUX_PRIVATE_KEY }} ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }} 
-                scp -r .gitignore ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+                scp -i ${{secrets.LINUX_PRIVATE_KEY}} .gitignore ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
             
             # - name: Set up SSH
             #   run: |
