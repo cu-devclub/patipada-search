@@ -1,6 +1,6 @@
-import { SearchResults, HeaderSearch } from "../../components/search";
-import { Flex, Grid } from "@chakra-ui/react";
-import { Footer } from "../../components";
+import { SearchResults } from "../../components/search";
+import { Flex, Grid, GridItem } from "@chakra-ui/react";
+import { Footer, HeaderSearch } from "../../components/layout";
 import { SearchResultInterface, DataItem } from "../../models/qa";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -67,48 +67,60 @@ function SearchResultPage() {
   // --------------------------------------------
 
   return (
-    <Grid templateRows="auto 1fr auto" gap={4} w="full" minH="100svh">
-      {query && (
-        <HeaderSearch
-          query={query}
-          searchParam={queryMessage}
-          setSearchParams={SetSearchParams}
-          performSearch={performSearch}
-        />
-      )}
-      {data != null && (
-        <>
-          <SearchResults
-            data={currentPageData}
-            query={queryMessage}
-            tokens={tokens}
+    <Grid
+      templateRows="0.2fr 2fr 0.2fr"
+      templateAreas={`" header"
+                        " main"
+                        " footer"`}
+      gap={4}
+      w="full"
+      h="100svh"
+    >
+      <GridItem pl="2" area={"header"} >
+        {query && (
+          <HeaderSearch
+            query={query}
+            searchParam={queryMessage}
+            setSearchParams={SetSearchParams}
+            performSearch={performSearch}
           />
-          <Flex
-            w={{ base: "100%", md: "80%", xl: "70%" }}
-            justifyItems={"center"}
-          >
-            <Pagination
-              current={currentPage}
-              total={data.length}
-              pageSize={itemsPerPage}
-              onChange={(current) => changePage(current)}
-              paginationProps={{
-                display: "flex",
-              }}
-              activeStyles={{
-                color: "black",
-                bg: "blackAlpha.200",
-              }}
-              hoverStyles={{
-                bg: "gray.300",
-              }}
+        )}
+      </GridItem>
+      <GridItem pl="2" area={"main"}>
+        {data != null && (
+          <>
+            <SearchResults
+              data={currentPageData}
+              query={queryMessage}
+              tokens={tokens}
             />
-          </Flex>
-        </>
-      )}
-      <Flex h="8xs" w="100%">
+            <Flex
+              w={{ base: "100%", md: "80%", xl: "70%" }}
+              justifyItems={"center"}
+            >
+              <Pagination
+                current={currentPage}
+                total={data.length}
+                pageSize={itemsPerPage}
+                onChange={(current) => changePage(current)}
+                paginationProps={{
+                  display: "flex",
+                }}
+                activeStyles={{
+                  color: "black",
+                  bg: "blackAlpha.200",
+                }}
+                hoverStyles={{
+                  bg: "gray.300",
+                }}
+              />
+            </Flex>
+          </>
+        )}
+      </GridItem>
+      <GridItem  area={"footer"} h="8xs" >
         <Footer />
-      </Flex>
+      </GridItem>
     </Grid>
   );
 }

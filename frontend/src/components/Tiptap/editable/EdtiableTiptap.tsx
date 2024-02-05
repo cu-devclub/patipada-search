@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import * as React from "react";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useState, useEffect } from "react";
+import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { format } from "date-fns/format";
 import "../Tiptap.scss";
 import { Comment } from "../extensions/comment";
-import {  Box, Flex, HStack, Text } from "@chakra-ui/react";
-const dateTimeFormat = "dd.MM.yyyy HH:mm";
+import {
+  getStartAndEndIndexOfComments,
+  removeCommentFromHTML,
+} from "../../../functions";
+import { CommentCard, TextEditor, Layout } from "../components";
+import { setCurrentComment } from "../../../functions/tiptap";
 
 interface CommentInstance {
   uuid?: string;
@@ -26,15 +29,11 @@ const EditableTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
     editable: true,
     onUpdate({ editor }) {
       findCommentsAndStoreValues();
-
-      setCurrentComment(editor);
+      setCurrentComment(editor, setActiveCommentsInstance);
       setHTML(editor?.getHTML() || defaultValue);
     },
-
     onSelectionUpdate({ editor }) {
-      setCurrentComment(editor);
-
-      setIsTextSelected(!!editor.state.selection.content().size);
+      setCurrentComment(editor, setActiveCommentsInstance);
     },
 
     editorProps: {
@@ -44,133 +43,95 @@ const EditableTiptap = ({ defaultValue, setHTML }: TipTapProps) => {
     },
   });
 
-  const [, setShowCommentMenu] = React.useState(false);
-
-  const [, setIsTextSelected] = React.useState(false);
-
-  const [, setShowAddCommentSection] = React.useState(true);
-
-  const formatDate = (d: any) =>
-    d ? format(new Date(d), dateTimeFormat) : null;
-
   const [activeCommentsInstance, setActiveCommentsInstance] =
-    React.useState<CommentInstance>({});
+    useState<CommentInstance>({});
 
-  const [allComments, setAllComments] = React.useState<any[]>([]);
+  const [allComments, setAllComments] = useState<any[]>([]);
 
   const findCommentsAndStoreValues = () => {
     const parser = new DOMParser();
     const htmlText = editor?.getHTML() || defaultValue;
     const doc = parser.parseFromString(htmlText, "text/html");
     const comments = doc.querySelectorAll("span[data-comment]");
-
     const tempComments: any[] = [];
-
+    const commentPosition = getStartAndEndIndexOfComments(htmlText);
+    let indexCounter = 0;
     comments.forEach((node) => {
       const nodeComments = node.getAttribute("data-comment");
       const jsonComments = nodeComments ? JSON.parse(nodeComments) : null;
 
       if (jsonComments !== null) {
+        const start = commentPosition[indexCounter][0];
+        const end = commentPosition[indexCounter][1];
         tempComments.push({
           node,
           jsonComments,
+          start,
+          end,
         });
+        indexCounter++;
       }
     });
 
     setAllComments(tempComments);
   };
-  const setCurrentComment = (editor: any) => {
-    const newVal = editor.isActive("comment");
 
-    if (newVal) {
-      setTimeout(() => setShowCommentMenu(newVal), 50);
-
-      setShowAddCommentSection(!editor.state.selection.empty);
-
-      const parsedComment = JSON.parse(editor.getAttributes("comment").comment);
-
-      parsedComment.comment =
-        typeof parsedComment.comments === "string"
-          ? JSON.parse(parsedComment.comments)
-          : parsedComment.comments;
-
-      setActiveCommentsInstance(parsedComment);
-    } else {
-      setActiveCommentsInstance({});
-    }
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     const timeoutId = setTimeout(findCommentsAndStoreValues, 100);
     return () => clearTimeout(timeoutId); // This is the cleanup function
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  return (
-    <Flex
-      dir="row"
-      className="tiptap"
-      w="100%"
-      bg="gray.100"
-      p={2}
-      borderRadius={"lg"}
-      position="relative"
-    >
-      <Box className="tiptap-Box" w="60%" fontWeight={"normal"}>
-        <EditorContent className="editor-content" editor={editor} />
-      </Box>
 
-      <Flex direction="column" pb={10}>
-        {allComments.map((comment, i) => {
-          return (
-            <Box
-              key={i + "external_comment"}
-              bg="gray.100"
-              shadow="lg"
-              my={2}
-              borderRadius={"md"}
-              w="sm"
-            >
-              {comment.jsonComments.comments.map(
-                (jsonComment: any, j: number) => {
-                  return (
-                    <Box
-                      key={`${j}_${Math.random()}`}
-                      p={3}
-                      border={
-                        comment.jsonComments.uuid ===
-                        activeCommentsInstance.uuid
-                          ? "2px"
-                          : "none"
-                      }
-                      borderColor={
-                        comment.jsonComments.uuid ===
-                        activeCommentsInstance.uuid
-                          ? "red.500"
-                          : "gray.300"
-                      }
-                    >
-                      <Flex direction="column">
-                        <HStack>
-                          <Text fontWeight={"semibold"}>
-                            {jsonComment.userName}
-                          </Text>
-                          <Text fontSize={"sm"}>
-                            {formatDate(jsonComment.time)}
-                          </Text>
-                        </HStack>
-                        <Text>{jsonComment.content}</Text>
-                      </Flex>
-                    </Box>
-                  );
-                }
-              )}
-            </Box>
-          );
-        })}
-      </Flex>
-    </Flex>
+  if (activeCommentsInstance.uuid) {
+    // user focus on some comment
+    // check if cursor at the end of the comment
+    // if yes, then unset comment mark
+    const cursorPosition = editor?.state.selection.from;
+    for (let i = 0; i < allComments.length; i++) {
+      if (cursorPosition === allComments[i].end) {
+        editor?.commands.unsetMark("comment");
+        break;
+      }
+    }
+  }
+
+  const resolveComment = (comment: any, time: string) => {
+    const newHTML = removeCommentFromHTML(
+      editor?.getHTML() || defaultValue,
+      comment.start.index,
+      comment.end.index,
+      time
+    );
+
+    editor?.commands.setContent(newHTML);
+    setHTML(newHTML);
+
+    const newComments = allComments.flatMap((c) => {
+      if (c.jsonComments.comments.length > 1) {
+        const updatedComments = c.jsonComments.comments.filter(
+          (com: any) => com.time !== time
+        );
+        return { ...c, jsonComments: { ...c.jsonComments, comments: updatedComments } };
+      } else if (c.jsonComments.uuid === comment.jsonComments.uuid) {
+        return [];
+      } else {
+        return c;
+      }
+    });
+
+    setAllComments(newComments);
+    findCommentsAndStoreValues();
+  };
+
+  return (
+    <Layout>
+      <TextEditor>
+        <EditorContent className="editor-content" editor={editor} />
+      </TextEditor>
+      <CommentCard allComments={allComments} resolveComment={resolveComment} />
+    </Layout>
   );
 };
 
 export default EditableTiptap;
+

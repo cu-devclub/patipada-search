@@ -6,13 +6,6 @@ import {
   Center,
   HStack,
   Box,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
 import { YoutubeVideo } from "../search";
@@ -25,6 +18,7 @@ import EditableTimeField from "./EditableTimeField";
 import { useNavigate } from "react-router-dom";
 import { checkIfCommentLeft, extractStringFromHTML } from "../../functions";
 import { MessageToast } from "..";
+import { ActionModal } from "../modal";
 interface EditRecordFormProps {
   data: Request;
   submit: (data: Request) => void;
@@ -46,7 +40,7 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
       ? "หากยืนยันระบบจะทำการสร้างคำขอแก้ไขใหม่ ต้องการยืนยันใช่หรือไม่"
       : "หากยืนยันคำขอแก้ไขนี้จะถูกส่งให้ผู้ดูแลระบบตรวจสอบ"
     : "หากออกจากหน้าคำขอแก้ไขคำขอแก้ไขนี้จะถูกยกเลิก";
-    
+
   const [startTime, setStartTime] = useState({
     isResolveComment: false,
     htmlValue: data.startTime,
@@ -71,7 +65,6 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
   };
 
   const confirm = () => {
-
     // check if comment left
     if (
       checkIfCommentLeft(startTime.htmlValue) ||
@@ -105,7 +98,7 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
   };
 
   return (
-    <Flex flex={1} w="full" p={{ base: 2, md: 4 }}  direction="column">
+    <Flex flex={1} w="full" p={{ base: 2, md: 4 }} direction="column">
       <Grid
         templateColumns={{ base: "repeat(1, 1fr)", md: "60fr 40fr" }}
         gap={6}
@@ -211,23 +204,13 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
           </Button>
         </HStack>
       </Center>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{modalTitle}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>{modalDescription}</ModalBody>
-
-          <ModalFooter>
-            <Button variant="cancel" mr={3} onClick={onClose}>
-              ยกเลิก
-            </Button>
-            <Button variant="success" onClick={confirm}>
-              ยืนยัน
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <ActionModal
+        openModal={isOpen}
+        closeModal={onClose}
+        modalTitle={modalTitle}
+        modalBody={modalDescription}
+        confirm={confirm}
+      />
     </Flex>
   );
 }

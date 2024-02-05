@@ -1,5 +1,5 @@
 import { Heading } from "@chakra-ui/react";
-import { BaseHeader } from "../../../components";
+import BaseHeader  from "./BaseHeader";
 
 function EditRecordHeader() {
   return (

@@ -1,5 +1,5 @@
 import { isValidEmail, isValueExist, isLengthEnough } from "./form";
-import { timeToSeconds, splitTime, generateTime } from "./time";
+import { timeToSeconds, splitTime, generateTime, formatDate } from "./time";
 import { handleEnterKeyPress } from "./keyboard";
 import { SignOut, ValidateToken, AuthorizeAdmin } from "./user";
 import {
@@ -9,6 +9,10 @@ import {
   convertStatusWord,
   checkIfCommentLeft,
 } from "./request";
+import {
+  getStartAndEndIndexOfComments,
+  removeCommentFromHTML,
+} from "./comment";
 export {
   isValidEmail,
   isValueExist,
@@ -25,4 +29,7 @@ export {
   decodeHTMLText,
   convertStatusWord,
   checkIfCommentLeft,
+  getStartAndEndIndexOfComments,
+  removeCommentFromHTML,
+  formatDate,
 };

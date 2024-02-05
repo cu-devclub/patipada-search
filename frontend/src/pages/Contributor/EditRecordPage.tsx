@@ -2,12 +2,10 @@ import { useParams } from "react-router-dom";
 import { search } from "../../service/search";
 import { getRequestByRecordIndex, insertRequest } from "../../service/data";
 import { useEffect, useState } from "react";
-import {
-  EditRecordHeader,
-  EditRecordForm,
-} from "../../components/contributor/edit-record";
-import { Grid } from "@chakra-ui/react";
-import { Footer, MessageToast } from "../../components";
+import { EditRecordForm } from "../../components/contributor/edit-record";
+import { Grid, GridItem } from "@chakra-ui/react";
+import { MessageToast } from "../../components";
+import { EditRecordHeader, Footer } from "../../components/layout";
 import {
   Request,
   mapDataItemToRequest,
@@ -88,10 +86,24 @@ function EditRecordPage() {
   };
 
   return (
-    <Grid templateRows="auto 1fr auto" gap={4} w="full" minH="100svh">
-      <EditRecordHeader />
-      {data && <EditRecordForm data={data} submit={submit} />}
-      <Footer />
+    <Grid
+      templateRows="0.2fr 2fr 0.2fr"
+      templateAreas={`" header"
+                        " main"
+                        " footer"`}
+      gap={4}
+      w="full"
+      h="100svh"
+    >
+      <GridItem pl="2" area={"header"}>
+        <EditRecordHeader />
+      </GridItem>
+      <GridItem pl="2" area={"main"}>
+        {data && <EditRecordForm data={data} submit={submit} />}
+      </GridItem>
+      <GridItem area={"footer"} h="8xs">
+        <Footer />
+      </GridItem>
     </Grid>
   );
 }
