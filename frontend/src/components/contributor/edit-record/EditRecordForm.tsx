@@ -6,13 +6,6 @@ import {
   Center,
   HStack,
   Box,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react";
 import { YoutubeVideo } from "../../search";
@@ -23,6 +16,8 @@ import { TimesAndTools } from "../../search";
 import CommentableTextField from "./CommentableTextField";
 import CommentableTimeField from "./CommentableTimeField";
 import { useNavigate } from "react-router-dom";
+import { extractStringFromHTML } from "../../../functions";
+import { ActionModal } from "../../modal";
 interface EditRecordFormProps {
   data: Request;
   submit: (data: Request) => void;
@@ -128,8 +123,8 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
           </Box>
           <TimesAndTools
             index={data.index}
-            startTime={data.startTime}
-            endTime={data.endTime}
+            startTime={extractStringFromHTML(data.startTime)}
+            endTime={extractStringFromHTML(data.endTime)}
             handleReplay={handleReplay}
             navigate={() => {}}
           />
@@ -157,23 +152,13 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
           </Button>
         </HStack>
       </Center>
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>{modalTitle}</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>{modalDescription}</ModalBody>
-
-          <ModalFooter>
-            <Button variant="cancel" mr={3} onClick={onClose}>
-              ยกเลิก
-            </Button>
-            <Button variant="success" onClick={confirm}>
-              ยืนยัน
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+      <ActionModal
+        openModal={isOpen}
+        closeModal={onClose}
+        confirm={confirm}
+        modalTitle={modalTitle}
+        modalBody={modalDescription}
+      />
     </Flex>
   );
 }

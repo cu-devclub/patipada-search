@@ -9,7 +9,10 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
-
+// TODO : Preparation Query function for multiple
+// e.g. 1 : Keyword search with remove stop word 
+// e.g. 2 : TF-IDF search with remove stop word
+// e.g. 3 : LDA 
 // AnalyzeQueryKeyword analyzes the given query keyword.
 //
 // query: the query keyword to be analyzed.
@@ -46,3 +49,7 @@ func buildAnalyzeQuery(index, query string) string {
         "text": "%s"
     }`, query)
 }
+
+
+// Query -> word tokenize -> remove stop word -> Bag of words -> LDA -> Topic -> Search
+// Query -> word tokenize -> remove stop word -> Bag of words -> TF-IDF -> Search

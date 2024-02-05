@@ -1,7 +1,9 @@
-export const  timeToSeconds = (time:string) => {
+import { format } from "date-fns/format";
+
+export const timeToSeconds = (time: string) => {
   const [hours, minutes, seconds] = time.split(":").map(Number);
   return hours * 3600 + minutes * 60 + seconds;
-}
+};
 
 export const setTimeout = (time: number, callback: TimerHandler) => {
   const milliseconds = time * 1000;
@@ -11,15 +13,24 @@ export const setTimeout = (time: number, callback: TimerHandler) => {
 };
 
 // create a function that receives time in this format: 00:00:00 and return 3 values: hours, minutes, seconds
-export const splitTime = (time:string) => {
+export const splitTime = (time: string) => {
   const [hours, minutes, seconds] = time.split(":").map(Number);
   return { hours, minutes, seconds };
 };
 
-export const generateTime = (hours:number, minutes:number, seconds:number): string => {
+export const generateTime = (
+  hours: number,
+  minutes: number,
+  seconds: number
+): string => {
   const paddedHour = hours.toString().padStart(2, "0");
   const paddedMinute = minutes.toString().padStart(2, "0");
   const paddedSecond = seconds.toString().padStart(2, "0");
   const fullTimeText = `${paddedHour}:${paddedMinute}:${paddedSecond}`;
   return fullTimeText;
-}
+};
+
+const dateTimeFormat = "dd.MM.yyyy HH:mm";
+
+export const formatDate = (d: string) =>
+  d ? format(new Date(d), dateTimeFormat) : null;

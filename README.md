@@ -101,9 +101,9 @@ To run this project, you will need to add the following environment variables to
 
 **Data management service:** Golang, Gin, MongoDB
 
-**Communication:** gRPC
+**Communication:** 
 
-**Containerization:** Docker, kubenetes
+**Containerization:** Docker
 
 ## Project structure
 

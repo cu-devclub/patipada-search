@@ -27,7 +27,7 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 
 	// retrieve amount
 	sAmount := c.Query("amount")
-	amount := 20 // default to 20 results
+	amount := 50 // default to 50 results
 	if sAmount != "" {
 		var err error
 		amount, err = strconv.Atoi(sAmount)

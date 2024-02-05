@@ -1,9 +1,9 @@
-name : Deploy new auth db (intial)
+name : Dev-Setup docker-compose file
 on:
   workflow_dispatch
 
 jobs:
-    deploy-auth-db: 
+    dev-deploy-docker-compose-file: 
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
@@ -16,8 +16,9 @@ jobs:
                 chmod 700 ~/.ssh
                 chmod 600 ~/.ssh/id_rsa
                 ssh-keyscan -t rsa ${{ secrets.LINUX_HOST }} >> ~/.ssh/known_hosts
-                        
-            - name: Copy auth-db directory to server
+            
+            - name: Copy Compose File to Server
               run: |
-                rm -rf auth-db
-                scp -i ~/.ssh/id_rsa ./auth-db ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+                rm -f docker-compose.prod.yml
+                scp -i ~/.ssh/id_rsa docker-compose.prod.yml ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+            

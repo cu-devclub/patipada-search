@@ -1,6 +1,2 @@
-import EditRecordHeader from "./EditRecordHeader";
 import EditRecordForm from "./EditRecordForm";
-export {
-    EditRecordHeader,
-    EditRecordForm
-}
+export {  EditRecordForm };

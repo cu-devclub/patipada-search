@@ -10,8 +10,8 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { SignInButton, UserAvatar } from "./user/index.ts";
-import Logo from "./Logo.tsx";
+import { SignInButton, UserAvatar } from "../../user/index.ts";
+import Logo from "../../logo/Logo.tsx";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { getCookie } from "typescript-cookie";
 
@@ -25,7 +25,7 @@ function BaseHeader({ children }: BaseHeaderProps) {
   const username = getCookie("username");
 
   return (
-    <VStack >
+    <VStack>
       <Flex
         px={4}
         pt={4}

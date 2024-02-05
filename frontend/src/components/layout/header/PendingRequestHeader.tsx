@@ -1,5 +1,5 @@
 import { Heading } from "@chakra-ui/react";
-import { BaseHeader } from "../..";
+import BaseHeader  from "./BaseHeader";
 function PendingRequestHeader() {
   return (
     <BaseHeader>

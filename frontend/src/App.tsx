@@ -8,7 +8,12 @@ import {
   ChangePasswordPage,
 } from "./pages/User";
 import NotFoundPage from "./pages/404";
-import { Dashboard as AdminDashboard, AdminChoosePage, AdminRequestPage, AdminEditRequestPage } from "./pages/Admin";
+import {
+  Dashboard as AdminDashboard,
+  AdminChoosePage,
+  AdminRequestPage,
+  AdminEditRequestPage,
+} from "./pages/Admin";
 import { PendingRequestPage, EditRecordPage } from "./pages/Contributor";
 export default function App() {
   return (
@@ -30,7 +35,10 @@ export default function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="choosePage" element={<AdminChoosePage />} />
           <Route path="request" element={<AdminRequestPage />} />
-          <Route path="edit-request/:requestID" element={<AdminEditRequestPage />} />
+          <Route
+            path="edit-request/:requestID"
+            element={<AdminEditRequestPage />}
+          />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
