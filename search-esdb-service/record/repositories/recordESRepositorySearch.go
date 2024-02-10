@@ -3,32 +3,88 @@ package repositories
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"log"
 	"net/url"
+	"search-esdb-service/errors"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
+	"search-esdb-service/record/repositories/elasticQuery"
 	"strings"
 )
 
-// Search searches for records in the specified Elasticsearch index based on the provided query.
-//
-// Parameters:
-// - indexName: The name of the Elasticsearch index to search in.
-// - query: The query string used to search for records.
-//
-// Returns:
-// - []*entities.Record: A slice of records found in the index that match the query.
-// - error: An error if any occurred during the search operation.
-func (r *RecordESRepository) Search(indexName, query string, amount int) ([]*entities.Record, error) {
+func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, *errors.RequestError) {
 	client := r.es
 
-	// Build the Elasticsearch query
-	queryJSON, err := buildElasticsearchQuery(query)
+	recordIndex = url.PathEscape(recordIndex)
+
+	// Perform the search request
+	res, err := client.Get(indexName, recordIndex)
 	if err != nil {
-		return nil, err
+		return nil, errors.CreateError(500, fmt.Sprintf("Error getting record: %s", err))
+	}
+	defer res.Body.Close()
+
+	// Check the response status
+	if res.IsError() && res.StatusCode != 405 {
+		return nil, errors.CreateError(res.StatusCode, fmt.Sprintf("Elasticsearch error: %s", res.Status()))
 	}
 
+	// Decode the response
+	var response map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, errors.CreateError(500, fmt.Sprintf("Error decoding response: %s", err))
+	}
+
+	doc := response["_source"]
+	docID := response["_id"].(string)
+
+	record := helper.UnescapeFieldsAndCreateRecord(doc, docID)
+
+	return record, nil
+}
+
+func (r *RecordESRepository) GetAllRecords(indexName string) ([]*entities.Record, *errors.RequestError) {
+	return r.performSearch(indexName, 0, elasticQuery.BuildMatchAllQuery, nil)
+}
+
+func (r *RecordESRepository) Search(indexName, query string, amount int) ([]*entities.Record, *errors.RequestError) {
+	return r.performSearch(indexName, amount, elasticQuery.BuildElasticsearchQuery, query)
+}
+
+func (r *RecordESRepository) SearchByTokens(indexName string, tokens []string, amount int) ([]*entities.Record, *errors.RequestError) {
+	query := strings.Join(tokens, " ")
+	return r.performSearch(indexName, amount, elasticQuery.BuildElasticsearchQueryByTokens, query)
+}
+
+func (r *RecordESRepository) performSearch(indexName string, amount int, buildQueryFunc interface{}, query interface{}) ([]*entities.Record, *errors.RequestError) {
+	client := r.es
+
+	var queryJSON string
+	var err error
+
+	switch q := query.(type) {
+	case string:
+		queryFunc, ok := buildQueryFunc.(func(string) (string, error))
+		if !ok {
+			return nil, errors.CreateError(500, "Invalid query builder function")
+		}
+		queryJSON, err = queryFunc(q)
+	case nil:
+		queryFunc, ok := buildQueryFunc.(func() (string, error))
+		if !ok {
+			return nil, errors.CreateError(500, "Invalid query builder function")
+		}
+		queryJSON, err = queryFunc()
+	default:
+		return nil, errors.CreateError(500, "Invalid query type")
+	}
+
+	if err != nil {
+		return nil, errors.CreateError(500, fmt.Sprintf("Error building query: %s", err))
+	}
+
+	log.Println("IndexName", indexName, amount, "Query:", queryJSON)
 	// Perform the search request
 	res, err := client.Search(
 		client.Search.WithContext(context.Background()),
@@ -37,142 +93,36 @@ func (r *RecordESRepository) Search(indexName, query string, amount int) ([]*ent
 		client.Search.WithSize(amount),
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.CreateError(500, fmt.Sprintf("Error getting response: %s", err))
 	}
 	defer res.Body.Close()
 
 	// Check the response status
 	if res.IsError() {
-		return nil, fmt.Errorf("Elasticsearch error: %s", res.Status())
+		return nil, errors.CreateError(res.StatusCode, fmt.Sprintf("Elasticsearch error: %s", res.Status()))
 	}
 
 	// Decode the response
 	var response map[string]interface{}
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return nil, err
+		return nil, errors.CreateError(500, fmt.Sprintf("Error decoding response: %s", err))
 	}
 
 	// Extract and iterate through the hits (documents) in the response
 	hits, found := response["hits"].(map[string]interface{})["hits"].([]interface{})
 	if !found {
-		return nil, errors.New("No hits found in the response")
+		return nil, errors.CreateError(500, "Invalid response format")
 	}
+
+	log.Println("Found", len(hits), "hits")
 
 	var records []*entities.Record
 	for _, hit := range hits {
-		doc := hit.(map[string]interface{})["_source"]
+		doc := hit.(map[string]interface{})["_source"].(map[string]interface{})
 		docID := hit.(map[string]interface{})["_id"].(string)
-		// Unescape fields (e.g., "question" and "answer") individually before appending them
-		unescapedDoc := make(map[string]interface{})
-		for key, value := range doc.(map[string]interface{}) {
-			if stringValue, isString := value.(string); isString {
-				// Unescape the string value
-				unescapedValue := helper.UnescapeDoubleQuotes(stringValue)
-				unescapedDoc[key] = unescapedValue
-			} else {
-				unescapedDoc[key] = value
-			}
-		}
-		unescapedDoc["id"] = docID
-
-		record := &entities.Record{
-			Index:      docID,
-			YoutubeURL: unescapedDoc["youtubeURL"].(string),
-			Question:   unescapedDoc["question"].(string),
-			Answer:     unescapedDoc["answer"].(string),
-			StartTime:  unescapedDoc["startTime"].(string),
-			EndTime:    unescapedDoc["endTime"].(string),
-		}
+		record := helper.UnescapeFieldsAndCreateRecord(doc, docID)
 		records = append(records, record)
 	}
 
 	return records, nil
-}
-
-func buildElasticsearchQuery(query string) (string, error) {
-	// Build the Elasticsearch query
-	queryString := map[string]interface{}{
-		"query": map[string]interface{}{
-			"bool": map[string]interface{}{
-				"should": []map[string]interface{}{
-					{
-						"multi_match": map[string]interface{}{
-							"query":  query,
-							"fields": []string{"question", "answer"},
-						},
-					},
-					{
-						"multi_match": map[string]interface{}{
-							"query":  query,
-							"type":   "phrase_prefix",
-							"fields": []string{"question", "answer"},
-						},
-					},
-					{
-						"term": map[string]interface{}{
-							"_id": query,
-						},
-					},
-				},
-			},
-		},
-	}
-
-	// Convert the query to JSON
-	queryJSON, err := json.Marshal(queryString)
-	if err != nil {
-		return "", err
-	}
-
-	return string(queryJSON), nil
-}
-
-func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, error) {
-	client := r.es
-
-	recordIndex = url.PathEscape(recordIndex)
-
-	// Perform the search request
-	res, err := client.Get(indexName, recordIndex)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	// Check the response status
-	if res.IsError() && res.StatusCode != 405 {
-		return nil, fmt.Errorf("Elasticsearch error: %s", res.Status())
-	}
-
-	// Decode the response
-	var response map[string]interface{}
-	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return nil, err
-	}
-
-	doc := response["_source"]
-	docID := response["_id"].(string)
-	// Unescape fields (e.g., "question" and "answer") individually before appending them
-	unescapedDoc := make(map[string]interface{})
-	for key, value := range doc.(map[string]interface{}) {
-		if stringValue, isString := value.(string); isString {
-			// Unescape the string value
-			unescapedValue := helper.UnescapeDoubleQuotes(stringValue)
-			unescapedDoc[key] = unescapedValue
-		} else {
-			unescapedDoc[key] = value
-		}
-	}
-	unescapedDoc["id"] = docID
-
-	record := &entities.Record{
-		Index:      docID,
-		YoutubeURL: unescapedDoc["youtubeURL"].(string),
-		Question:   unescapedDoc["question"].(string),
-		Answer:     unescapedDoc["answer"].(string),
-		StartTime:  unescapedDoc["startTime"].(string),
-		EndTime:    unescapedDoc["endTime"].(string),
-	}
-
-	return record, nil
 }

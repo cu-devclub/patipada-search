@@ -2,26 +2,19 @@ package repositories
 
 import (
 	"context"
-	"fmt"
 	"io"
+	"search-esdb-service/errors"
 	"search-esdb-service/record/helper"
+	"search-esdb-service/record/repositories/elasticQuery"
 	"strings"
 
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
-// TODO : Preparation Query function for multiple
-// e.g. 1 : Keyword search with remove stop word 
-// e.g. 2 : TF-IDF search with remove stop word
-// e.g. 3 : LDA 
-// AnalyzeQueryKeyword analyzes the given query keyword.
-//
-// query: the query keyword to be analyzed.
-// []string: a list of analyzed tokens.
-// error: an error if the analysis fails.
-func (r *RecordESRepository) AnalyzeQueryKeyword(query string) ([]string, error) {
+
+func (r *RecordESRepository) AnalyzeQueryKeyword(query string) ([]string, *errors.RequestError) {
 	client := r.es
 
-	analyzeQuery := buildAnalyzeQuery("record", query)
+	analyzeQuery := elasticQuery.BuildAnalyzeQuery("record", query)
 	request := esapi.IndicesAnalyzeRequest{
 		Index: "record",
 		Body:  strings.NewReader(analyzeQuery),
@@ -30,26 +23,18 @@ func (r *RecordESRepository) AnalyzeQueryKeyword(query string) ([]string, error)
 	// Perform the request
 	response, err := request.Do(context.Background(), client)
 	if err != nil {
-		return nil, err
+		return nil, errors.CreateError(500, err.Error())
 	}
 
 	responseBody, err := io.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return nil, errors.CreateError(500, err.Error())
 	}
 
 	result, err := helper.ExtractTokens(responseBody)
+	if err != nil {
+		return nil, errors.CreateError(500, err.Error())
+	}
 
-	return result, err
+	return result, nil
 }
-
-func buildAnalyzeQuery(index, query string) string {
-	return fmt.Sprintf(`{
-        "tokenizer": "icu_tokenizer",
-        "text": "%s"
-    }`, query)
-}
-
-
-// Query -> word tokenize -> remove stop word -> Bag of words -> LDA -> Topic -> Search
-// Query -> word tokenize -> remove stop word -> Bag of words -> TF-IDF -> Search

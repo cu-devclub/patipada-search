@@ -23,7 +23,7 @@ search-esdb-service
 !modules.txt
 
 volumes/
-.vscode/
+.vscode
 
 # Binary file
 searchApp

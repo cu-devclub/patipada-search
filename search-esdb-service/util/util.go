@@ -29,3 +29,12 @@ func DecreaseIndexForSearchByIndex(str string) (string, error) {
 	}
 	return str, errors.New("string is not in the format of `xxxxx-yy`")
 }
+
+func Contains(arr []string, str string) bool {
+	for _, a := range arr {
+		if a == str {
+			return true
+		}
+	}
+	return false
+}

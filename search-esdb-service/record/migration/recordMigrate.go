@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"search-esdb-service/config"
+	"search-esdb-service/data"
 	"search-esdb-service/database"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
@@ -32,7 +33,7 @@ const (
             "type": "shingle",
             "max_shingle_size": 3,
             "min_shingle_size": 2,
-            "output_unigrams": "true"
+			"output_unigrams": true
           }
         }
       }
@@ -98,7 +99,7 @@ func RecordMigrate(cfg *config.Config, es database.Database) {
 
 	// Convert csv file
 	log.Println("CONVERTING CSV-----------")
-	records, err := ConvertCSVFilesInDirectory(cfg.Static.DataPath)
+	records, err := ConvertCSVFilesInDirectory(cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -136,17 +137,11 @@ func indexExists(client *elasticsearch.Client, indexName string) (bool, error) {
 //
 // It takes a directory path as a parameter and returns a slice of
 // entities.Record structs and an error.
-func ConvertCSVFilesInDirectory(directoryPath string) ([]*entities.Record, error) {
-	// Find file
-	log.Println("FIND DATA IN DIRECTORY: ", directoryPath)
-	cwd, err := os.Getwd()
-	if err != nil {
-		return nil, err
-	}
-
-	dataDirPath := filepath.Join(cwd, directoryPath)
-
-	dir, err := os.ReadDir(dataDirPath)
+func ConvertCSVFilesInDirectory(cfg *config.Config) ([]*entities.Record, error) {
+	
+	dataDirPath := cfg.Static.DataPath + cfg.Static.RecordPath
+	
+	dir,err := data.GetRecordCSVFilesEntry(cfg)
 	if err != nil {
 		return nil, err
 	}

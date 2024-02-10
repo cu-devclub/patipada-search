@@ -6,6 +6,6 @@ WORKDIR /app
 
 COPY searchApp /app
 COPY app.env /app
-COPY /data /app/data
+COPY /datasource /app/datasource
 
 CMD ["/app/searchApp"]

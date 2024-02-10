@@ -61,3 +61,13 @@ func (s *SearchRecordStruct) TokensToString() string {
 	}
 	return "[" + tokens[:len(tokens)-1] + "]"
 }
+
+func (s *UpdateRecord) ToString() string {
+	return `{
+		"documentID": "` + s.DocumentID + `",
+		"startTime": "` + s.StartTime + `",
+		"endTime": "` + s.EndTime + `",
+		"question": "` + s.Question + `",
+		"answer": "` + s.Answer + `"
+	}`
+}
