@@ -74,8 +74,11 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
 
     .
     ├── config  
-    ├── data                    # csv data (raw)
-    ├── database                    
+    ├── data                    # data reader function
+    ├── datasource              # Data source (csv and stopwords)
+    ├── database 
+    ├── proto                   # gRPC   
+      |- search_proto           # gRPC protocol between data mngt & search                  
     ├── messages                # Response Message
     ├── server                     
     ├── record
