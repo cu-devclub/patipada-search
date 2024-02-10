@@ -70,7 +70,8 @@ func (g *ginServer) initializeRecordHttpHandler() {
 	//
 	// Query :
 	// - query (*required): The query string used to search for records.
-	// - amount : The number of results to return. default is 20
+	// - amount : The number of results to return. default is 50
+	// - searchType : The type of search to perform. one of "tf-idf" or "default"
 	//
 	// Response :
 	// - 200 & The search results.

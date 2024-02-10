@@ -3,10 +3,12 @@ package usecases
 import (
 	"search-esdb-service/constant"
 	"search-esdb-service/errors"
+	"search-esdb-service/messages"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
 	"search-esdb-service/record/models"
 	"search-esdb-service/util"
+	"strings"
 )
 
 func (r *recordUsecaseImpl) GetAllRecords(indexName string) ([]*models.Record, *errors.RequestError) {
@@ -17,14 +19,7 @@ func (r *recordUsecaseImpl) GetAllRecords(indexName string) ([]*models.Record, *
 
 	responseRecords := make([]*models.Record, 0)
 	for _, r := range records {
-		responseRecords = append(responseRecords, &models.Record{
-			Index:      r.Index,
-			YoutubeURL: r.YoutubeURL,
-			Question:   r.Question,
-			Answer:     r.Answer,
-			StartTime:  r.StartTime,
-			EndTime:    r.EndTime,
-		})
+		responseRecords = append(responseRecords, helper.RecordEntityToModels(r))
 	}
 
 	return responseRecords, nil
@@ -40,10 +35,11 @@ func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount i
 	}
 
 	switch searchType {
-	case constant.SEARCH_BY_TOKENS:
+	case constant.SEARCH_BY_TF_IDF:
 		stopWords := r.dataI.GetStopWord()
 		tokens = helper.RemoveStopWordsFromTokensArray(stopWords.PythaiNLP, tokens)
-		records, err = r.recordRepository.SearchByTokens(indexName, tokens, amount)
+		q := strings.Join(tokens, "")
+		records, err = r.recordRepository.Search(indexName, q, amount)
 	default:
 		records, err = r.recordRepository.Search(indexName, query, amount)
 	}
@@ -69,9 +65,9 @@ func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (
 	// search the record
 	records, err := r.recordRepository.SearchByRecordIndex(indexName, str)
 	if err != nil {
-		if err.Error() == "Elasticsearch error: 404 Not Found" {
+		if err.Error() == messages.ELASTIC_404_ERROR {
 			return nil, nil
-		} else if err.Error() != "Elasticsearch error: 405 Method Not Allowed" {
+		} else if err.Error() != messages.ELASTIC_405_ERROR {
 			// 405 is because gRPC we can ignore it
 			return nil, errors.CreateError(500, err.Error())
 		}
@@ -85,6 +81,6 @@ func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (
 // e.g. 2 : TF-IDF search with remove stop word
 // e.g. 3 : LDA
 
-// Query -> word tokenize -> remove stop word -> Bag of words -> Search : Done 
-// Query -> word tokenize -> remove stop word -> Bag of words -> TF-IDF -> Search
+// Query -> word tokenize -> remove stop word -> Bag of words -> Search : Duplicate
+// Query -> word tokenize -> remove stop word -> Bag of words -> TF-IDF -> Search : Done
 // Query -> word tokenize -> remove stop word -> Bag of words -> LDA -> Topic -> Search

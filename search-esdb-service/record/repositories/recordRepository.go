@@ -34,8 +34,6 @@ type RecordRepository interface {
 
 	SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, *errors.RequestError)
 
-	SearchByTokens(indexName string, tokens []string, amount int) ([]*entities.Record, *errors.RequestError)
-
 	// BulkInsert inserts multiple records into the Elasticsearch index.
 	//
 	// qars: A slice of pointers to Record entities representing the records to be inserted.

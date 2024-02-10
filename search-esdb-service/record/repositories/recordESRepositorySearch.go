@@ -52,11 +52,6 @@ func (r *RecordESRepository) Search(indexName, query string, amount int) ([]*ent
 	return r.performSearch(indexName, amount, elasticQuery.BuildElasticsearchQuery, query)
 }
 
-func (r *RecordESRepository) SearchByTokens(indexName string, tokens []string, amount int) ([]*entities.Record, *errors.RequestError) {
-	query := strings.Join(tokens, " ")
-	return r.performSearch(indexName, amount, elasticQuery.BuildElasticsearchQueryByTokens, query)
-}
-
 func (r *RecordESRepository) performSearch(indexName string, amount int, buildQueryFunc interface{}, query interface{}) ([]*entities.Record, *errors.RequestError) {
 	client := r.es
 
@@ -118,6 +113,8 @@ func (r *RecordESRepository) performSearch(indexName string, amount int, buildQu
 
 	var records []*entities.Record
 	for _, hit := range hits {
+		log.Println("Hit:", hit.(map[string]interface{}))
+		log.Println("--------------------")
 		doc := hit.(map[string]interface{})["_source"].(map[string]interface{})
 		docID := hit.(map[string]interface{})["_id"].(string)
 		record := helper.UnescapeFieldsAndCreateRecord(doc, docID)
