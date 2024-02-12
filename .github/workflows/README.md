@@ -43,3 +43,4 @@ This is done because not every service need to re-deploy when push to some branc
 18. DATA_MNGMNT_DB_USER
 19. DATA_MNGMNT_DB_PASSWORD
 20. LINUX_PRIVATE_KEY
+21. SUPER_ADMIN_USERNAME
