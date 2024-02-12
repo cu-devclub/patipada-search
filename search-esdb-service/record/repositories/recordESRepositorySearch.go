@@ -79,7 +79,6 @@ func (r *RecordESRepository) performSearch(indexName string, amount int, buildQu
 		return nil, errors.CreateError(500, fmt.Sprintf("Error building query: %s", err))
 	}
 
-	log.Println("IndexName", indexName, amount, "Query:", queryJSON)
 	// Perform the search request
 	res, err := client.Search(
 		client.Search.WithContext(context.Background()),

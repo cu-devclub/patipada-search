@@ -20,6 +20,7 @@ func BuildMatchAllQuery() (string, error) {
 }
 
 func BuildElasticsearchQuery(query string) (string, error) {
+	searchFields := []string{"question"}
 	// Build the Elasticsearch query
 	queryString := map[string]interface{}{
 		"query": map[string]interface{}{
@@ -28,14 +29,14 @@ func BuildElasticsearchQuery(query string) (string, error) {
 					{
 						"multi_match": map[string]interface{}{
 							"query":  query,
-							"fields": []string{"question", "answer"},
+							"fields": searchFields,
 						},
 					},
 					{
 						"multi_match": map[string]interface{}{
 							"query":  query,
 							"type":   "phrase_prefix",
-							"fields": []string{"question", "answer"},
+							"fields": searchFields,
 						},
 					},
 					{

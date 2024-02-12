@@ -81,6 +81,10 @@ func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (
 // e.g. 2 : TF-IDF search with remove stop word
 // e.g. 3 : LDA
 
-// Query -> word tokenize -> remove stop word -> Bag of words -> Search : Duplicate
-// Query -> word tokenize -> remove stop word -> Bag of words -> TF-IDF -> Search : Done
-// Query -> word tokenize -> remove stop word -> Bag of words -> LDA -> Topic -> Search
+// Query -> [ word tokenize -> remove stop word ] -> Bag of words -> Search : Duplicate
+// Query -> [ word tokenize -> remove stop word  ]-> Bag of words -> TF-IDF -> Search : Done
+// Query -> [ word tokenize -> remove stop word -> Bag of words -> LDA -> Topic ] -> Search
+// RAW data -> [ remove stop word -> Bag of word -> LDA -> [vector] ] -> PROCESSED CSV
+// Migrate start service
+// QUERY -> [ remove stop word -> Bag of word -> LDA -> [vector] ] -> cosine similarity -> ELASTIC 
+// [....] => external
