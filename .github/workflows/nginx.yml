@@ -35,4 +35,4 @@ jobs:
             cd dhammanava-search
             docker stop nginx || true
             docker rm  nginx || true
-            docker compose -f docker-compose.prod.yml up --build -d nginx
+            docker compose -f docker-compose.prod.yml up -d nginx

@@ -5,8 +5,8 @@ services:
     container_name: search-container
     environment:
       ESDB_URL: http://elastic-db:9200
-      ESDB_USERNAME: ${ESDB_USERNAME}
-      ESDB_PASSWORD: ${ESDB_PASSWORD}
+      ESDB_USERNAME: ${ELASTIC_USERNAME}
+      ESDB_PASSWORD: ${ELASTIC_PASSWORD}
       FRONTEND_URL: http://frontend:5173
     ports:
       - 8081:8081
