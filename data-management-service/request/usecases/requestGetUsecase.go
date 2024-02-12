@@ -112,11 +112,6 @@ func (r *requestUsecase) GetRequest(status, username, requestID, index, approved
 //			400 (Bad Request) and 
 //          500 (Internal Server Error).
 func (r *requestUsecase) GetLastestRequestOfRecord(index string) (*models.Request, *errors.RequestError) {
-	// validate record index
-	if index == "" {
-		return nil, errors.CreateError(400, messages.BAD_REQUEST)
-	}
-
 	result, err := r.requestRepositories.ValidateRecordIndex(index)
 	if err != nil || result == false {
 		log.Println("Error validate record index", index)

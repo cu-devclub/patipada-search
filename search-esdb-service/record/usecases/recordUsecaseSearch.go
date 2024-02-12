@@ -63,8 +63,8 @@ func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (
 		return nil, errors.CreateError(400, err.Error())
 	}
 	// search the record
-	records, err := r.recordRepository.SearchByRecordIndex(indexName, str)
-	if err != nil {
+	records, isFound, err := r.recordRepository.SearchByRecordIndex(indexName, str)
+	if isFound == false && err != nil {
 		if err.Error() == messages.ELASTIC_404_ERROR {
 			return nil, nil
 		} else if err.Error() != messages.ELASTIC_405_ERROR {
@@ -72,6 +72,7 @@ func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (
 			return nil, errors.CreateError(500, err.Error())
 		}
 	}
+
 	response := helper.RecordEntityToModels(records)
 	return response, nil
 }
@@ -86,5 +87,5 @@ func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (
 // Query -> [ word tokenize -> remove stop word -> Bag of words -> LDA -> Topic ] -> Search
 // RAW data -> [ remove stop word -> Bag of word -> LDA -> [vector] ] -> PROCESSED CSV
 // Migrate start service
-// QUERY -> [ remove stop word -> Bag of word -> LDA -> [vector] ] -> cosine similarity -> ELASTIC 
+// QUERY -> [ remove stop word -> Bag of word -> LDA -> [vector] ] -> cosine similarity -> ELASTIC
 // [....] => external

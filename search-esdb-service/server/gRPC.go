@@ -37,6 +37,7 @@ func GRPCListen(server Server, cfg *config.Config) {
 }
 
 func (a *GRPCServer) SearchRecord(ctx context.Context, req *search_proto.SearchRequest) (*search_proto.SearchResponse, error) {
+	log.Println("Receiving search request from gRPC client...")
 	recordESRepository := recordRepository.NewRecordESRepository(a.server.GetDB())
 
 	// ignoring dataI (use to store stopword)
@@ -44,7 +45,6 @@ func (a *GRPCServer) SearchRecord(ctx context.Context, req *search_proto.SearchR
 
 	result, err := recordUsecase.SearchByRecordIndex("record", req.Query)
 	if err != nil {
-		log.Println("RERERERERE", err)
 		return nil, err
 	}
 
@@ -52,7 +52,6 @@ func (a *GRPCServer) SearchRecord(ctx context.Context, req *search_proto.SearchR
 		log.Println("search result", result.ToString())
 	}
 
-	log.Println("Reteruwfuisduifgjsdiuof")
 	return &search_proto.SearchResponse{
 		IsFounded: result != nil,
 	}, nil

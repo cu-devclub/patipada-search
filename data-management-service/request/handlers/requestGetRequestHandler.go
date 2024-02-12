@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"data-management/messages"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -44,7 +45,13 @@ func (r *requestHandler) GetRequest(c *gin.Context) {
 //	400 (Bad Request) and
 //	500 (Internal Server Error).
 func (r *requestHandler) GetLastestRequestOfRecord(c *gin.Context) {
+	log.Println("GetLastestRequestOfRecord handler : starting handler .....")
 	index := c.Query("index")
+	if index == "" {
+		log.Println("Error validate index", index)
+		responseJSON(c, 400, messages.BAD_REQUEST, nil)
+		return
+	}
 	modelsRequest, err := r.requestUsecase.GetLastestRequestOfRecord(index)
 	if err != nil {
 		responseJSON(c, err.StatusCode, err.Error(), nil)

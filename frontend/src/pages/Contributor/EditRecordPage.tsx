@@ -29,7 +29,7 @@ function EditRecordPage() {
           if (res.requestID == "NOT FOUND") {
             try {
               // Perform search when status is 404
-              const searchResult = await search(recordID);
+              const searchResult = await search(recordID,"default");
               if (searchResult.data.length === 0) {
                 navigate("404");
               }

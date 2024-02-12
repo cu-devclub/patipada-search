@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, *errors.RequestError) {
+func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, bool, *errors.RequestError) {
 	client := r.es
 
 	recordIndex = url.PathEscape(recordIndex)
@@ -21,27 +21,26 @@ func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) 
 	// Perform the search request
 	res, err := client.Get(indexName, recordIndex)
 	if err != nil {
-		return nil, errors.CreateError(500, fmt.Sprintf("Error getting record: %s", err))
+		return nil, false, errors.CreateError(500, fmt.Sprintf("Error getting record: %s", err))
 	}
 	defer res.Body.Close()
 
 	// Check the response status
 	if res.IsError() && res.StatusCode != 405 {
-		return nil, errors.CreateError(res.StatusCode, fmt.Sprintf("Elasticsearch error: %s", res.Status()))
+		return nil, false, errors.CreateError(res.StatusCode, fmt.Sprintf("Elasticsearch error: %s", res.Status()))
 	}
 
 	// Decode the response
 	var response map[string]interface{}
 	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return nil, errors.CreateError(500, fmt.Sprintf("Error decoding response: %s", err))
+		return nil, false, errors.CreateError(500, fmt.Sprintf("Error decoding response: %s", err))
 	}
 
 	doc := response["_source"]
 	docID := response["_id"].(string)
 
 	record := helper.UnescapeFieldsAndCreateRecord(doc, docID)
-
-	return record, nil
+	return record, true, nil
 }
 
 func (r *RecordESRepository) GetAllRecords(indexName string) ([]*entities.Record, *errors.RequestError) {

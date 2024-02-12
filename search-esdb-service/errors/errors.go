@@ -1,22 +1,20 @@
 package errors
 
-import (
-	"errors"
-	"fmt"
-)
-
 type RequestError struct {
 	StatusCode int
-	Err        error
+	Message    string
 }
 
-func (r *RequestError) Error() string {
-	return fmt.Sprintf("%v",  r.Err)
+func (e *RequestError) Error() string {
+	return e.Message
 }
 
-func CreateError(statusCode int, errMessage string) *RequestError {
+func CreateError(statusCode int, message string) *RequestError {
+	if message == "" {
+		return nil
+	}
 	return &RequestError{
 		StatusCode: statusCode,
-		Err:        errors.New(errMessage),
+		Message:    message,
 	}
 }

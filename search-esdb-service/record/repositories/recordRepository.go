@@ -32,7 +32,7 @@ type RecordRepository interface {
 	// - error: An error if any occurred during the search operation.
 	Search(indexName, query string, amount int) ([]*entities.Record, *errors.RequestError)
 
-	SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, *errors.RequestError)
+	SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, bool, *errors.RequestError)
 
 	// BulkInsert inserts multiple records into the Elasticsearch index.
 	//
