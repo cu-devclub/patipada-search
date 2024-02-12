@@ -14,6 +14,7 @@ func main() {
 	log.Println("Initializing config")
 	config.InitializeViper("./")
 	cfg := config.GetConfig()
+	log.Println("Success initiliazed config",cfg)
 
 	db := database.NewPostgresDatabase(&cfg)
 	log.Println("Success connect to database")

@@ -16,7 +16,7 @@ func main() {
 	config.InitializeViper("./")
 
 	cfg := config.GetConfig()
-	log.Println("Config initialized:", cfg)
+	log.Println("Config initialized")
 
 	log.Println("Connecting to database...")
 	db := database.NewElasticDatabase(&cfg)
