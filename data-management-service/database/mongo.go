@@ -18,7 +18,6 @@ func NewMongoDatabase(cfg *config.Config) Database {
 	// create a connection to mongo db
 	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s@%s:%s",
 		cfg.DB.Username, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port))
-	log.Println("CLIENT OPTIONS",clientOptions)
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatal(err)

@@ -42,17 +42,6 @@ services:
     networks:
       - backbone
 
-  # kibana:
-  #   image: docker.elastic.co/kibana/kibana:8.10.4
-  #   ports:
-  #     - 5601:5601
-  #   environment:
-  #     - ELASTICSEARCH_URL=http://elastic-db:9200
-  #   depends_on:
-  #     - elastic-db
-  #   networks:
-  #     - backbone
-
   auth-service:
     container_name: auth-container
     image: ${DOCKERHUB_USERNAME}/dhammanava-auth-image:latest
@@ -106,7 +95,7 @@ services:
       FRONTEND_URL: http://frontend:5173
       MONGO_DB_HOST: data-db
       MONGO_DB_PORT: 27017
-      MONGO_DB_USER: ${DATA_MNGMNT_DB_USER}
+      MONGO_DB_USERNAME: ${DATA_MNGMNT_DB_USER}
       MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
       MONGO_DB_NAME: record
     ports:
@@ -137,7 +126,7 @@ services:
   #* Already run (set up ssl) don't need to run again
   nginx:
     image: nginx:latest
-    container_name: nginx_container
+    container_name: nginx-container
     restart: unless-stopped
     ports:
       - 80:80
