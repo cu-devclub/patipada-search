@@ -10,8 +10,10 @@ import { searchURL } from '../../constant/serviceURL';
  */
 export const search = async (query: string): Promise<SearchResultInterface> => {
   try {
-
-    const response = await axios.get(`${searchURL}/search?query=${query}`);
+    const searchType = "tf_idf";
+    const response = await axios.get(
+      `${searchURL}/search?query=${query}&searchType=${searchType}`
+    );
 
     const records: DataItem[] = response.data.results.map((item: DataItem) => {
       return {

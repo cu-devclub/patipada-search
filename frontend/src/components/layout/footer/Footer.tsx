@@ -22,15 +22,18 @@ function Footer() {
     <Flex
       w="100%"
       h="100%"
-      bg="brand_gray.500"
+      bg="brand_gray.400"
       direction="row"
-      justify={{ xl: "flex-end", md: "center", base: "center" }}
+      justify={{ xl: "space-between", md: "center", base: "center" }}
       align="center"
       px="4"
       gap={4}
     >
       <Text onClick={() => onOpenModal("about")} cursor={"pointer"}>
         เกี่ยวกับ
+      </Text>
+      <Text onClick={() => onOpenModal("develop")} cursor={"pointer"}>
+        ค้นธรรม ณ ธรรมนาวา (v0.2)
       </Text>
       <Text onClick={() => onOpenModal("develop")} cursor={"pointer"}>
         อยู่ระหว่างการพัฒนา
