@@ -72,7 +72,7 @@ services:
     networks:
       - backbone
 
-  #* Copy ./auth-db to server in `.github/workflows/set-up.yml` before run docker-compose up
+  #* Copy ./auth-db to server in `.github/workflows/auth-db.yml` before run docker-compose up
   auth-db:
     image: postgres:latest
     container_name: auth-postgres-container
