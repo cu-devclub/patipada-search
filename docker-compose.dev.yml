@@ -126,7 +126,7 @@ services:
       - backbone
 
   data-db: 
-    image: mongo:latest
+    image: mongo:4.4
     container_name: data-mongo-container
     ports:
       - 27017:27017

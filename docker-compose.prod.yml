@@ -10,6 +10,8 @@ services:
       FRONTEND_URL: http://frontend:5173
     ports:
       - 8081:8081
+    restart: 
+      always
     depends_on:
       - elastic-db
     networks:
@@ -25,6 +27,8 @@ services:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
     ports:
       - 9200:9200
+    restart: 
+      always
     networks:
       - backbone
 
@@ -33,6 +37,8 @@ services:
     container_name: frontend-container
     ports:
       - 5173:8080
+    restart: 
+      always
     networks:
       - backbone
 
@@ -68,6 +74,8 @@ services:
       - USER_EMAIL=${USER_EMAIL}
     ports:
       - 8082:8082
+    restart:
+      always
     depends_on:
       - auth-db
     networks:
@@ -83,6 +91,8 @@ services:
       POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
     ports:
       - 5432:5432
+    restart: 
+      always
     volumes:
       - ./auth-db:/docker-entrypoint-initdb.d
       - ./volumes/database/auth:/var/lib/postgresql/data
@@ -101,22 +111,28 @@ services:
       MONGO_DB_NAME: record
     ports:
       - 8083:8083
+    restart:
+      always
     depends_on:
       - data-db
     networks:
       - backbone
 
   data-db:
-    image: mongo:latest
+    image: mongo:4.4
     container_name: data-mongo-container
     ports:
       - 27017:27017
+    restart: 
+      always
     environment:
       MONGO_INITDB_DATABASE: record
       MONGO_INITDB_ROOT_USERNAME: ${DATA_MNGMNT_DB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
     volumes:
       - ./volumes/database/mongo-data:/data/db
+    networks:
+      - backbone
 
   #* Already run (set up ssl) don't need to run again
   nginx:
@@ -127,7 +143,7 @@ services:
       - 80:80
       - 443:443
     networks:
-      - backbone
+      - backbone    
     volumes:
       - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf
       - ./certbot/www/:/var/www/certbot
