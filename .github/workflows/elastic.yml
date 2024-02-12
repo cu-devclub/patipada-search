@@ -1,4 +1,4 @@
-name : Setup elastic search
+name : -DB- ElasticSearch Deployment
 on:
   workflow_dispatch
 
@@ -33,6 +33,6 @@ jobs:
           key: ${{ secrets.LINUX_PRIVATE_KEY }}
           script: |
             cd dhammanava-search
-            docker stop elastic-db || true
-            docker rm  elastic-db || true
+            docker stop elastic-container || true
+            docker rm  elastic-container || true
             docker compose -f docker-compose.prod.yml up --build -d elastic-db

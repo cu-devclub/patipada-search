@@ -1,4 +1,4 @@
-name : Deploy new auth db (intial)
+name : -DB- Auth DB
 on:
   workflow_dispatch
 
@@ -33,6 +33,6 @@ jobs:
                 key: ${{ secrets.LINUX_PRIVATE_KEY }}
                 script: |
                   cd dhammanava-search
-                  docker stop auth-db || true
-                  docker rm  auth-db || true
+                  docker stop auth-postgres-container || true
+                  docker rm  auth-postgres-container || true
                   docker compose -f docker-compose.prod.yml up --build -d auth-db

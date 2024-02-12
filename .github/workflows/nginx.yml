@@ -1,4 +1,4 @@
-name : Setup nginx
+name : -Service- nginx
 on:
   workflow_dispatch
 
@@ -33,6 +33,6 @@ jobs:
           key: ${{ secrets.LINUX_PRIVATE_KEY }}
           script: |
             cd dhammanava-search
-            docker stop nginx || true
-            docker rm  nginx || true
+            docker stop nginx-container || true
+            docker rm  nginx-container || true
             docker compose -f docker-compose.prod.yml up -d nginx
