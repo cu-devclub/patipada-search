@@ -1,7 +1,7 @@
-version: '3'
+version: "3"
 services:
   search-service:
-    image: dhammanava-search-image:latest
+    image: ${DOCKERHUB_USERNAME}/dhammanava-search-image:latest
     container_name: search-container
     environment:
       ESDB_URL: http://elastic-db:9200
@@ -16,10 +16,12 @@ services:
       - backbone
 
   elastic-db:
-    image: dhammanava-elastic-image
     container_name: elastic-container
+    build:
+      context: ./elastic
     environment:
       - discovery.type=single-node
+      - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
     ports:
       - 9200:9200
@@ -27,7 +29,7 @@ services:
       - backbone
 
   frontend:
-    image: dhammanava-frontend-image:latest
+    image: ${DOCKERHUB_USERNAME}/dhammanava-frontend-image:latest
     container_name: frontend-container
     ports:
       - 5173:8080
@@ -47,10 +49,10 @@ services:
 
   auth-service:
     container_name: auth-container
-    image: dhammanava-auth-image:latest
+    image: ${DOCKERHUB_USERNAME}/dhammanava-auth-image:latest
     environment:
       - FRONTEND_URL=http://frontend:5173
-      - JWT_KEY=${JWT_KEY} 
+      - JWT_KEY=${JWT_KEY}
       - DATABASE_HOST=auth-db
       - DATABASE_USER=${AUTH_DB_USER}
       - DATABASE_PASSWORD=${AUTH_DB_PASSWORD}
@@ -88,14 +90,14 @@ services:
 
   data-service:
     container_name: data-container
-    image: dhammanava-data-image:latest
+    image: ${DOCKERHUB_USERNAME}/dhammanava-data-image:latest
     environment:
-       FRONTEND_URL: http://frontend:5173
-       MONGO_DB_HOST: data-db
-       MONGO_DB_PORT: 27017
-       MONGO_DB_USER: ${DATA_MNGMNT_DB_USER}
-       MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
-       MONGO_DB_NAME: record
+      FRONTEND_URL: http://frontend:5173
+      MONGO_DB_HOST: data-db
+      MONGO_DB_PORT: 27017
+      MONGO_DB_USER: ${DATA_MNGMNT_DB_USER}
+      MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
+      MONGO_DB_NAME: record
     ports:
       - 8083:8083
     depends_on:
@@ -103,7 +105,7 @@ services:
     networks:
       - backbone
 
-  data-db: 
+  data-db:
     image: mongo:latest
     container_name: data-mongo-container
     ports:
@@ -115,7 +117,6 @@ services:
     volumes:
       - ./volumes/database/mongo-data:/data/db
 
-      
   #* Already run (set up ssl) don't need to run again
   nginx:
     image: nginx:latest
@@ -144,3 +145,4 @@ services:
 networks:
   backbone:
     driver: bridge
+# TODO: Add user name to the image name
