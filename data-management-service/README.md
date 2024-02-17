@@ -11,6 +11,13 @@ If you do not want to run using docker you can run using golang
 #### Prerequisite
 
 1. Install golang
+2. Start data management db
+``` bash
+cd <your-path>/<project-root(where docker compose is)>
+```
+``` bash
+docker compose -f docker-compose.dev.yml up -d data-db
+```
 
 #### Steps
 
@@ -53,13 +60,16 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
 ###
 
     .
-    ├── auth_proto              # gRPC with auth service
+    ├── communication           # gRPC client setup
+    ├── proto                   # GRPC
+        ├── auth_proto 
+        ├── search_proto 
     ├── config
     ├── database
     ├── errors                  # Custom errors
     ├── messages                # Response Message
     ├── server
-    ├── tests                   # integration testing
+    ├── tests                   # unit test & integration testing
     ├── structValidator         # validator
     ├── request
         ├── handlers

@@ -9,6 +9,13 @@ If you do not want to run using docker you can run using golang
 #### Prerequisite 
 
 1. Install golang 
+2. Start auth-db docker compose
+``` bash
+cd <your-path>/<project-root(where docker compose is)>
+```
+``` bash
+docker compose -f docker-compose.dev.yml up -d auth-db
+```
 
 #### Steps
 1. Open your terminal
@@ -42,14 +49,14 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
 ### 
 
     .
-    ├── auth_proto              # gRPC with auth service      
+    ├── auth_proto              # gRPC server      
     ├── config            
     ├── database                    
     ├── errors                  # Custom errors
     ├── jwt                     # JWT token related
     ├── messages                # Response Message
     ├── server                     
-    ├── tests                   # integration testing  
+    ├── tests                   # unit & integration testing  
     ├── users
         ├── handlers           
         ├── entities

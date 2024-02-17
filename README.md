@@ -11,6 +11,8 @@ This project is a part of the Waris Lakthong senior project, focusing on develop
 
 ## Data Source
 
+### Record
+
 All data is extracted from Dhammanva live question-answer video transcripts ([visit the youtube channel](https://www.youtube.com/@dhammanava7327)), which include:
 
 - Start time of the section
@@ -19,14 +21,18 @@ All data is extracted from Dhammanva live question-answer video transcripts ([vi
 - Answer
 - YouTube URL
 
-The data is stored in the [search-esdb-service/data](./search-esdb-service/data/) directory.
+The data is stored in the [data](./data/record/) directory.
+
+### Stop words
+The stop word dictionary use in this project is currently from pythainlp
+as store in [stopwords](./data/stopword/)
 
 ## Deployment
 
 In [.github/workflows](./.github/workflows/) directiory contians workflow for each container and each workflow will run on `workflow_dispatch`, means you need to press a `run` button in github actions page.
 for more information please visit [.github/workflows](./.github/workflows/)
 
-## Run Locally
+## Development Process (Run locally)
 
 ### Prerequisites
 
@@ -50,6 +56,15 @@ or
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
+- Or in case you want to run each service individually, you can navigate to each service and reading through README.md
+
+## Production 
+By default you should use github workflow and deploy to produciton by trigger each jobs you want. However if you want something more you can use docker-compose.prod.yml and Makefile to set the service as you want.
+| These 2 files already have ci action to savely deploy to server 
+
+- docker-compose.prod.yml ; manipulate through docker compose 
+
+- Makefile is the collection of commands I prebuilt which you can run using `make <command>` all the details for each command provided in the comment section in Makefile
 
 ## Environment Variables
 
@@ -73,6 +88,8 @@ To run this project, you will need to add the following environment variables to
 
 `LINK_URL` : url link to provide reset password token (local would be frontend, production would be host name)
 
+`SUPER_ADMIN_USERNAME` : Username for the super admin account
+
 `SUPER_ADMIN_PASSWORD` : Password for the super admin account
 
 `SUPER_ADMIN_EMAIL` : Email for the super admin account
@@ -89,19 +106,21 @@ To run this project, you will need to add the following environment variables to
 
 `DATA_MNGMNT_DB_PASSWORD` : password for default user in data management database
 
+`DOCKERHUB_USERNAME` : username for docker hub use only in production
+
 > _<u>Note</u>_ if you run each project without docker e.g. `go run main.go` you do not need to assign the .env variables each service has default env variables in app.env except `SENDER_PASSWORD`, which you are required to assign in `app.env`
 
 ## Tech Stack
 
 **Frontend:** React, Typescript, Vite, Chakra UI, Tiptap
 
-**Seasrch service:** Golang, Gin, ElasticSearch
+**Search service:** Golang, Gin, ElasticSearch
 
 **Authentication service:** Golang, Echo, PostgreSQL
 
 **Data management service:** Golang, Gin, MongoDB
 
-**Communication:** 
+**Communication:** GRPC
 
 **Containerization:** Docker
 
@@ -115,13 +134,17 @@ To run this project, you will need to add the following environment variables to
     ├── data-management-service
     ├── elastic                     # initialize elasticSearch
     ├── frontend
-    ├── .github/workflows           # Workflow files
-    ├── nginx                       # example of nginx used in production
+    ├── .github/workflows           # Workflow files (CI/CD)
+    ├── nginx                       # nginx file for both dev and prod
     ├── search-esdb-service
+    ├── data                        # Store data source 
+        ├── record                  # Records (Q&A , start & end time, URL, ...)
+        ├── stopword                # List of stopword 
     ├── .env.template               # template of .env
     ├── .secrets.template           # template of .secrets used in act (test workflow locally)
     ├── README.md
     ├── Makefile                    # Makefile used in development
+    ├── Makefile.prod               # Makefile used in production
     ├── docker-compose.dev.yml      # used to build image and test local
     ├── docker-compose.prod.yml     # used in production
 
