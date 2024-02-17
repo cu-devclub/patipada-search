@@ -11,6 +11,7 @@ To deploy / develop each service or each database please check README.md for eac
 2. [Search Service](./search-esdb-service/)
 3. [Authentication Service](./auth-service/)
 4. [Data Management Service](./data-management-service/)
+5. [Machine learning Service](./ml-service/)
 
 ## Data Source
 
@@ -123,6 +124,8 @@ To run this project, you will need to add the following environment variables to
 
 **Data management service:** Golang, Gin, MongoDB
 
+**Machine Learning service:** Python, Flask
+
 **Communication:** GRPC
 
 **Containerization:** Docker
@@ -140,6 +143,7 @@ To run this project, you will need to add the following environment variables to
     ├── .github/workflows           # Workflow files (CI/CD)
     ├── nginx                       # nginx file for both dev and prod
     ├── search-esdb-service
+    ├── ml-service
     ├── data                        # Store data source 
         ├── record                  # Records (Q&A , start & end time, URL, ...)
         ├── stopword                # List of stopword 
