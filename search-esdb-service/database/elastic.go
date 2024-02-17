@@ -58,7 +58,7 @@ func NewElasticDatabase(cfg *config.Config) Database {
 
 	//* Check plugins => icu analyzer to extract token
 	if err = es.checkPlugins(); err != nil {
-		panic("Error checking Plugins:")
+		panic("Error checking Plugins:" + err.Error())
 	}
 
 	return &elasticDatabase{

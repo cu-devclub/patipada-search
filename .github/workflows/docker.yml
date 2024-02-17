@@ -1,4 +1,4 @@
-name : Setup docker-compose file
+name : -File- Docker compose
 on:
   workflow_dispatch
 

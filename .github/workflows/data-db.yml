@@ -1,0 +1,22 @@
+name : -DB- Data DB 
+on:
+  workflow_dispatch
+
+jobs:
+    deploy-auth-db: 
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Deploy to Ubuntu server
+              uses: appleboy/ssh-action@master
+              with:
+                host: ${{secrets.LINUX_HOST}}
+                username: ${{secrets.LINUX_USERNAME}}
+                key: ${{ secrets.LINUX_PRIVATE_KEY }}
+                script: |
+                  cd dhammanava-search
+                  docker stop data-mongo-container || true
+                  docker rm  data-mongo-container || true
+                  docker compose -f docker-compose.prod.yml up -d data-db

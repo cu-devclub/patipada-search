@@ -96,7 +96,9 @@ function SearchResultPage() {
             />
             <Flex
               w={{ base: "100%", md: "80%", xl: "70%" }}
-              justifyItems={"center"}
+              justifyContent={"center"}
+              alignItems={"center"}
+              pt={4}
             >
               <Pagination
                 current={currentPage}

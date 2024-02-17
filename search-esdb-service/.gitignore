@@ -23,7 +23,10 @@ search-esdb-service
 !modules.txt
 
 volumes/
-.vscode/
+.vscode
 
 # Binary file
 searchApp
+
+# DataSource folder (use for run the app in develop)
+datasource

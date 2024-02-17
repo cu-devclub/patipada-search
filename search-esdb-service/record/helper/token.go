@@ -2,7 +2,9 @@ package helper
 
 import (
 	"encoding/json"
+	"log"
 	"search-esdb-service/record/entities"
+	"search-esdb-service/util"
 )
 
 // ExtractTokens extracts tokens from the analyze response JSON
@@ -24,4 +26,22 @@ func ExtractTokens(responseJSON []byte) ([]string, error) {
 	}
 
 	return tokens, nil
+}
+
+func RemoveStopWordsFromTokensArray(stopWords []string, tokens []string) []string {
+	var result []string
+	for _, token := range tokens {
+		if !util.Contains(stopWords, token) {
+			result = append(result, token)
+		} else {
+			log.Println("Stop word removed: ", token)
+		}
+	}
+
+	// if the tokens contain only stop words, do not remove any token
+	if len(result) == 0 {
+		return tokens
+	}
+
+	return result
 }

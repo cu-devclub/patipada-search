@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"search-esdb-service/errors"
 	"search-esdb-service/record/entities"
 	"strconv"
 	"strings"
@@ -16,11 +17,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/esutil"
 )
 
-// BulkInsert inserts multiple records into the Elasticsearch index.
-//
-// qars: A slice of pointers to Record entities representing the records to be inserted.
-// Returns an error if there was an issue inserting the records.
-func (r *RecordESRepository) BulkInsert(qars []*entities.Record) error {
+func (r *RecordESRepository) BulkInsert(qars []*entities.Record) *errors.RequestError {
 	es := r.es
 	var countSuccessful uint64
 	bi, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
@@ -28,7 +25,7 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) error {
 		Client: es, // The Elasticsearch client
 	})
 	if err != nil {
-		return fmt.Errorf("Error creating the indexer: %s", err)
+		return errors.CreateError(500, fmt.Sprintf("Error creating the indexer: %s", err))
 	}
 
 	start := time.Now().UTC()
@@ -38,7 +35,7 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) error {
 		data, err := json.Marshal(a)
 
 		if err != nil {
-			return fmt.Errorf("Cannot encode data %v: %s", a.Question, err)
+			return errors.CreateError(500, fmt.Sprintf("Cannot encode data %v: %s", a.Question, err))
 		}
 
 		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -73,7 +70,7 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) error {
 			},
 		)
 		if err != nil {
-			return fmt.Errorf("Unexpected error: %s", err)
+			return errors.CreateError(500, fmt.Sprintf("Unexpected error: %s", err))
 		}
 		// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	}
@@ -82,7 +79,7 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) error {
 	// Close the indexer
 	//
 	if err := bi.Close(context.Background()); err != nil {
-		return fmt.Errorf("Unexpected error: %s", err)
+		return errors.CreateError(500, fmt.Sprintf("Unexpected error: %s", err))
 	}
 	// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -95,13 +92,13 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) error {
 	dur := time.Since(start)
 
 	if biStats.NumFailed > 0 {
-		return fmt.Errorf(
+		return errors.CreateError(500, fmt.Sprintf(
 			"Indexed [%s] documents with [%s] errors in %s (%s docs/sec)",
 			humanize.Comma(int64(biStats.NumFlushed)),
 			humanize.Comma(int64(biStats.NumFailed)),
 			dur.Truncate(time.Millisecond),
 			humanize.Comma(int64(1000.0/float64(dur/time.Millisecond)*float64(biStats.NumFlushed))),
-		)
+		))
 	} else {
 		log.Printf(
 			"Sucessfuly indexed [%s] documents in %s (%s docs/sec)",

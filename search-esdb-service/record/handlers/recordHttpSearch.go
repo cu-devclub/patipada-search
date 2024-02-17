@@ -1,27 +1,20 @@
 package handlers
 
 import (
+	"log"
+	"search-esdb-service/constant"
 	"search-esdb-service/messages"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-// Search searches for records based on the provided query.
-//
-// Query :
-// - query (*required): The query string used to search for records.
-// - amount : The number of results to return. default is 20
-//
-// Response :
-// - 200: The search results.
-// - 400: Bad request. (query not attached) or invalid amount
-// - 500: An internal server error occurred.
 func (r *recordHttpHandler) Search(c *gin.Context) {
+	log.Println("Search Handler ...")
 	// retrieve query
 	query := c.Query("query")
 	if query == "" {
-		baseResponse(c, 400, messages.BAD_REQUEST)
+		errorResponse(c, 400, messages.BAD_REQUEST, messages.QUERY_PARAMETER_EMPTY)
 		return
 	}
 
@@ -32,37 +25,63 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		var err error
 		amount, err = strconv.Atoi(sAmount)
 		if err != nil {
-			baseResponse(c, 400, messages.BAD_REQUEST)
+			errorResponse(c, 400, messages.BAD_REQUEST, messages.AMOUNT_INSUFFICENT)
 			return
 		}
 	}
 
-	records, err := r.recordUsecase.Search("record", query, amount)
+	// retreive search type
+	searchType := c.Query("searchType")
+	if searchType == "" {
+		searchType = constant.SEARCH_BY_DEFAULT
+	}
+
+	log.Println("With query:", query, "amount:", amount, "searchType:", searchType)
+
+	// search for records
+	records, err := r.recordUsecase.Search("record", query, searchType, amount)
 	if err != nil {
-		baseResponse(c, 500, messages.INTERNAL_SERVER_ERROR)
+		errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
 		return
 	}
-	baseResponse(c, 200, records)
+	successResponse(c, 200, records)
 
 }
 
-
 func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
+	log.Println("SearchByRecordIndex Handler ...")
 	// retrieve query
 	recordIndex := c.Param("recordIndex")
 	if recordIndex == "" {
-		baseResponse(c, 400, messages.BAD_REQUEST)
+		errorResponse(c, 400, messages.BAD_REQUEST, messages.QUERY_PARAMETER_EMPTY)
 		return
 	}
 
+	log.Println("With recordIndex:", recordIndex)
+
 	record, err := r.recordUsecase.SearchByRecordIndex("record", recordIndex)
 	if err != nil {
-		baseResponse(c, 500, messages.INTERNAL_SERVER_ERROR)
+		errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
 		return
 	}
 	if record == nil {
-		baseResponse(c, 404, messages.NOT_FOUND)
+		errorResponse(c, 404, messages.NOT_FOUND, messages.RECORD_INDEX_NOT_FOUND)
 		return
 	}
-	baseResponse(c, 200, record)
+	successResponse(c, 200, record)
+}
+
+// GetAllRecords retrieves all records from the elastic database
+// and sends a response back to the client.
+//
+// Response:
+// - 200 & A list of all records retrieved from the database.
+// - 500: An internal server error occurred.
+func (r *recordHttpHandler) GetAllRecords(c *gin.Context) {
+	records, err := r.recordUsecase.GetAllRecords("record")
+	if err != nil {
+		errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
+		return
+	}
+	successResponse(c, 200, records)
 }

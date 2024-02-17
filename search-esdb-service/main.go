@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"search-esdb-service/config"
+	"search-esdb-service/data"
 	"search-esdb-service/database"
 	recordMigrator "search-esdb-service/record/migration"
 	"search-esdb-service/server"
@@ -15,7 +16,7 @@ func main() {
 	config.InitializeViper("./")
 
 	cfg := config.GetConfig()
-	log.Println("Config initialized:", cfg)
+	log.Println("Config initialized")
 
 	log.Println("Connecting to database...")
 	db := database.NewElasticDatabase(&cfg)
@@ -25,7 +26,10 @@ func main() {
 	recordMigrator.RecordMigrate(&cfg, db)
 	log.Println("Migration finished")
 
-	s := server.NewGinServer(&cfg, db.GetDB())
+	log.Println("Initalizing data.....")
+	d := data.NewData(&cfg)
+
+	s := server.NewGinServer(&cfg, db.GetDB(), &d)
 
 	log.Println("Starting gRPC server...")
 	go server.GRPCListen(s, &cfg)

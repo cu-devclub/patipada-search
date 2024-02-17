@@ -1,4 +1,4 @@
-name: Frontend CI/CD with Docker
+name: -Service- Frontend
 
 on:
   workflow_dispatch
@@ -34,12 +34,9 @@ jobs:
           username: ${{secrets.LINUX_USERNAME}}
           key: ${{ secrets.LINUX_PRIVATE_KEY }}
           script: |
-            docker stop frontend || true
-            docker rm frontend || true
+            docker stop frontend-container || true
+            docker rm frontend-container || true
             docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-frontend-image:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-frontend-image:latest
             cd dhammanava-search 
             docker compose -f docker-compose.prod.yml up -d frontend
-
-#TODO : Versioning for docker image
-

@@ -37,13 +37,14 @@ func GRPCListen(server Server, cfg *config.Config) {
 }
 
 func (a *GRPCServer) SearchRecord(ctx context.Context, req *search_proto.SearchRequest) (*search_proto.SearchResponse, error) {
+	log.Println("Receiving search request from gRPC client...")
 	recordESRepository := recordRepository.NewRecordESRepository(a.server.GetDB())
 
-	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository)
+	// ignoring dataI (use to store stopword)
+	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository,nil)
 
 	result, err := recordUsecase.SearchByRecordIndex("record", req.Query)
 	if err != nil {
-		log.Println("RERERERERE", err)
 		return nil, err
 	}
 
@@ -51,7 +52,6 @@ func (a *GRPCServer) SearchRecord(ctx context.Context, req *search_proto.SearchR
 		log.Println("search result", result.ToString())
 	}
 
-	log.Println("Reteruwfuisduifgjsdiuof")
 	return &search_proto.SearchResponse{
 		IsFounded: result != nil,
 	}, nil
@@ -61,7 +61,8 @@ func (a *GRPCServer) UpdateRecord(ctx context.Context, req *search_proto.UpdateR
 	log.Println("Receiving update record request from gRPC client...")
 	recordESRepository := recordRepository.NewRecordESRepository(a.server.GetDB())
 
-	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository)
+	// ignore dataI (use to store stopword)
+	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository,nil)
 
 	record := &models.UpdateRecord{
 		DocumentID: req.Index,

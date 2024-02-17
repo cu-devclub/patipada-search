@@ -91,7 +91,7 @@ up_dev_search:
 ## up_build_data: stops docker compose (if running), builds projects and starts docker compose
 up_build_data: build_data
 	@echo "Stopping docker images (if running...)"
-	docker compose -f docker-compose.dev.yml down data-service data-db
+	docker compose -f docker-compose.dev.yml down data-service
 	@echo "Building (when required) and starting docker images..."
 	docker compose -f docker-compose.dev.yml up --build -d data-service
 	@echo "Docker images built and started!"

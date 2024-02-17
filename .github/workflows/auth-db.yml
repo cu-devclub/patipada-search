@@ -1,4 +1,4 @@
-name : Deploy new auth db (intial)
+name : -DB- Auth DB
 on:
   workflow_dispatch
 
@@ -24,3 +24,15 @@ jobs:
             - name: Copy auth-db directory to server
               run: |
                 scp -r -i ~/.ssh/id_rsa ./auth-db ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+
+            - name: Deploy to Ubuntu server
+              uses: appleboy/ssh-action@master
+              with:
+                host: ${{secrets.LINUX_HOST}}
+                username: ${{secrets.LINUX_USERNAME}}
+                key: ${{ secrets.LINUX_PRIVATE_KEY }}
+                script: |
+                  cd dhammanava-search
+                  docker stop auth-postgres-container || true
+                  docker rm  auth-postgres-container || true
+                  docker compose -f docker-compose.prod.yml up --build -d auth-db

@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"search-esdb-service/config"
+	"search-esdb-service/data"
 	recordHandlers "search-esdb-service/record/handlers"
 	recordRepository "search-esdb-service/record/repositories"
 	recordUsecases "search-esdb-service/record/usecases"
@@ -13,16 +14,18 @@ import (
 )
 
 type ginServer struct {
-	app *gin.Engine
-	db  *elasticsearch.Client
-	cfg *config.Config
+	app   *gin.Engine
+	db    *elasticsearch.Client
+	cfg   *config.Config
+	dataI *data.Data
 }
 
-func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
+func NewGinServer(cfg *config.Config, db *elasticsearch.Client, dataI *data.Data) Server {
 	return &ginServer{
-		app: gin.Default(),
-		db:  db,
-		cfg: cfg,
+		app:   gin.Default(),
+		db:    db,
+		cfg:   cfg,
+		dataI: dataI,
 	}
 }
 
@@ -34,7 +37,7 @@ func (g *ginServer) Start() {
 
 	// Allow CORS from frontend
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{g.cfg.App.FrontendURL,"http://localhost:5173"}
+	config.AllowOrigins = []string{g.cfg.App.FrontendURL, "http://localhost:5173"}
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	g.app.Use(cors.New(config))
 
@@ -51,11 +54,11 @@ func (g *ginServer) Start() {
 func (g *ginServer) initializeRecordHttpHandler() {
 	recordESRepository := recordRepository.NewRecordESRepository(g.db)
 
-	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository)
+	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, *g.dataI)
 
 	recordHttpHandler := recordHandlers.NewRecordHttpHandler(recordUsecase)
 
-	// GetAllRecords retrieves all records from the elastic database 
+	// GetAllRecords retrieves all records from the elastic database
 	// and sends a response back to the client.
 	//
 	// Response:
@@ -67,7 +70,8 @@ func (g *ginServer) initializeRecordHttpHandler() {
 	//
 	// Query :
 	// - query (*required): The query string used to search for records.
-	// - amount : The number of results to return. default is 20
+	// - amount : The number of results to return. default is 50
+	// - searchType : The type of search to perform. one of "tf-idf" or "default"
 	//
 	// Response :
 	// - 200 & The search results.

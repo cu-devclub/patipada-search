@@ -1,6 +1,9 @@
 package usecases
 
-import "search-esdb-service/record/models"
+import (
+	"search-esdb-service/errors"
+	"search-esdb-service/record/models"
+)
 
 type RecordUsecase interface {
 	// GetAllRecords retrieves all records from the specified index.
@@ -11,7 +14,7 @@ type RecordUsecase interface {
 	// Returns:
 	// - []*models.Record: An array of record objects.
 	// - error: Any error that occurred during the retrieval process.
-	GetAllRecords(indexName string) ([]*models.Record, error)
+	GetAllRecords(indexName string) ([]*models.Record, *errors.RequestError)
 
 	// Search searches for records in the specified index using the given query.
 	//
@@ -22,9 +25,9 @@ type RecordUsecase interface {
 	// Returns:
 	// - *models.SearchRecordStruct: The search results containing the matching records.
 	// - error: An error if the search operation fails.
-	Search(indexName, query string, amount int) (*models.SearchRecordStruct, error)
+	Search(indexName, query, searchType string, amount int) (*models.SearchRecordStruct, *errors.RequestError)
 
-	SearchByRecordIndex(indexName, recordIndex string) (*models.Record, error)
+	SearchByRecordIndex(indexName, recordIndex string) (*models.Record, *errors.RequestError)
 
-	UpdateRecord(record *models.UpdateRecord) error
+	UpdateRecord(record *models.UpdateRecord) *errors.RequestError
 }

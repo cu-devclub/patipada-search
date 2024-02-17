@@ -1,4 +1,4 @@
-name: Auth Service CI/CD with Docker
+name: -Service- Auth
 on: workflow_dispatch
 jobs:
   build-and-deploy-auth-service:
@@ -42,12 +42,9 @@ jobs:
           username: ${{secrets.LINUX_USERNAME}}
           key: ${{ secrets.LINUX_PRIVATE_KEY }}
           script: |
-            docker stop auth-service || true
-            docker rm  auth-service || true
+            docker stop auth-container || true
+            docker rm  auth-container || true
             docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-auth-image:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-auth-image:latest
             cd dhammanava-search
             docker compose -f docker-compose.prod.yml up -d auth-service
-        # Automatically start auth-db service along with auth-service as declare in docker-compose.prod.yml
-
-#TODO : Versioning for docker image

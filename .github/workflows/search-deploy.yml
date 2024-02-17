@@ -1,4 +1,4 @@
-name: Search Service CI/CD with Docker 
+name: -Service- Search 
 on:
   workflow_dispatch
 
@@ -44,10 +44,9 @@ jobs:
           username: ${{secrets.LINUX_USERNAME}}
           key: ${{ secrets.LINUX_PRIVATE_KEY }}
           script: |
-            docker stop search-service || true
-            docker rm  search-service || true
+            docker stop search-container || true
+            docker rm  search-container || true
             docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-search-image:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-search-image:latest
             cd dhammanava-search
             docker compose -f docker-compose.prod.yml up -d search-service
-#TODO : Versioning for docker image

@@ -3,14 +3,14 @@ package repositories
 import (
 	"context"
 	"fmt"
-	"log"
+	"search-esdb-service/errors"
 	"search-esdb-service/record/entities"
 	"strings"
 
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
 
-func (r *RecordESRepository) UpdateRecord(record *entities.UpdateRecord) error {
+func (r *RecordESRepository) UpdateRecord(record *entities.UpdateRecord) *errors.RequestError {
 	// The partial document to update.
 	doc := fmt.Sprintf(`{
 		"doc": {
@@ -32,15 +32,14 @@ func (r *RecordESRepository) UpdateRecord(record *entities.UpdateRecord) error {
 	// Execute the request.
 	res, err := req.Do(context.Background(), r.es)
 	if err != nil {
-		return err
+		return errors.CreateError(500, fmt.Sprintf("Error getting record: %s", err))
 	}
 	defer res.Body.Close()
 
 	if res.IsError() {
-		return err
+		return errors.CreateError(res.StatusCode, fmt.Sprintf("Elasticsearch error: %s", res.Status()))
 	}
-	
-	log.Println("Update record success...")
+
 	return nil
 
 }

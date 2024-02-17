@@ -11,6 +11,14 @@ If you do not want to run using docker you can run using golang
 #### Prerequisite 
 
 1. Install golang 
+2. Copy data directory from the root of the project, paste in this project, renamed to datasource
+3. Start elastic search db 
+``` bash
+cd <your-path>/<project-root(where docker compose is)>
+```
+``` bash
+docker compose -f docker-compose.dev.yml up -d elastic-db
+```
 
 #### Steps
 1. Open your terminal
@@ -48,13 +56,15 @@ go run main.go
 #### Search
 
 ```http
-  GET /search?query=&amount=
+  GET /search?query=&amount=&searchType
 ```
 ###### Query  String
 | Name         | Type   | Description           |Restrict           |
 |--------------|--------|-----------------------|-----------------------|
-| query | string  | คำค้นหา (id/คำถาม/คำตอบ) | required |
-| amount | number  | จำนวนคำตอบที่ต้องการให้แสดง (default 20) | optional |
+| query | string  | search string (id/question/answer) | required |
+| amount | number  | the amount of responed answer (default 50) | optional |
+| searchType | string  | type of search (tf-idf,...) (default tf-idf) | optional |
+
 
 ###### Response 
 | Code         | Message   | Description           |
@@ -73,9 +83,15 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
 ### 
 
     .
-    ├── config  
-    ├── data                    # csv data (raw)
-    ├── database                    
+    ├── config
+    ├── constant 
+    ├── errors                  # Custom error   
+    ├── util      
+    ├── data                    # data reader function
+    ├── database 
+    ├── datasource              # will be ignore from git (folked, used in dev) 
+    ├── proto                   # gRPC   
+      |- search_proto           # gRPC protocol between data mngt&search                  
     ├── messages                # Response Message
     ├── server                     
     ├── record
@@ -84,7 +100,7 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
         ├── usecases
         ├── repositories
         ├── models
-        ├── migration           # migrate default user
+        ├── migration           # migrate default record
         ├── helper              # helper function  
     ├── app.env                 # default env file
     ├── go.mod               

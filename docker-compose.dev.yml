@@ -12,6 +12,8 @@ services:
       FRONTEND_URL: http://frontend:5173
     restart:
       always
+    volumes:
+      - ./data:/app/datasource
     ports:
       - 8081:8081
     depends_on:
@@ -28,22 +30,12 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    volumes:
+      - ./volumes/database/elastic:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     networks:
       - backbone
-
-  #! Kibana still not working : need to config elastic TSL/SSL cert
-  # kibana:
-  #   image: docker.elastic.co/kibana/kibana:8.10.4
-  #   ports:
-  #     - 5601:5601
-  #   environment:
-  #     - ELASTICSEARCH_URL=http://elastic-db:9200
-  #   depends_on:
-  #     - elastic-db
-  #   networks:
-  #     - backbone
 
   frontend:
     image: dhammanava-frontend-image
@@ -73,6 +65,7 @@ services:
       - LINK_URL=${LINK_URL}
       - SUPER_ADMIN_PASSWORD=${SUPER_ADMIN_PASSWORD}
       - SUPER_ADMIN_EMAIL=${SUPER_ADMIN_EMAIL}
+      - SUPER_ADMIN_USERNAME=${SUPER_ADMIN_USERNAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - USER_PASSWORD=${USER_PASSWORD}
@@ -112,7 +105,7 @@ services:
        FRONTEND_URL: http://frontend:5173
        MONGO_DB_HOST: data-db
        MONGO_DB_PORT: 27017
-       MONGO_DB_USER: ${DATA_MNGMNT_DB_USER}
+       MONGO_DB_USERNAME: ${DATA_MNGMNT_DB_USER}
        MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
        MONGO_DB_NAME: record
     ports:
@@ -125,7 +118,7 @@ services:
       - backbone
 
   data-db: 
-    image: mongo:latest
+    image: mongo:4.4
     container_name: data-mongo-container
     ports:
       - 27017:27017

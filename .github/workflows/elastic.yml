@@ -1,30 +1,29 @@
-name: Elastic DB CI/CD with Docker 
+name : -DB- ElasticSearch Deployment
 on:
   workflow_dispatch
 
 jobs:
-  build-and-deploy-elastic-db:
+  deploy-elasticSearch: 
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LINUX_PRIVATE_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
+          chmod 700 ~/.ssh
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa ${{ secrets.LINUX_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
+      - name : Delete Existing elastic directory 
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }} "rm -rf ~/dhammanava-search/elastic"
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push docker image
-        uses: docker/build-push-action@v2
-        with: 
-          context: ./elastic
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-elastic-image:latest
+      - name: Copy elastic directory to server
+        run: |
+          scp -r -i ~/.ssh/id_rsa elastic ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
 
       - name: Deploy to Ubuntu server
         uses: appleboy/ssh-action@master
@@ -33,13 +32,7 @@ jobs:
           username: ${{secrets.LINUX_USERNAME}}
           key: ${{ secrets.LINUX_PRIVATE_KEY }}
           script: |
-            docker stop elastic-db || true
-            docker rm  elastic-db || true
-            docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-elastic-image:latest
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-elastic-image:latest
             cd dhammanava-search
-            docker compose -f docker-compose.prod.yml up -d elastic-db
-
-#TODO : Versioning for docker image
-
-
+            docker stop elastic-container || true
+            docker rm  elastic-container || true
+            docker compose -f docker-compose.prod.yml up --build -d elastic-db
