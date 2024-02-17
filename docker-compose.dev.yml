@@ -30,6 +30,8 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    volumes:
+      - ./volumes/database/elastic:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     networks:

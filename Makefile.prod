@@ -1,0 +1,194 @@
+## up: starts all containers in the background without forcing build
+up:
+	@echo "Starting Docker containers..."
+	docker compose -f docker-compose.prod.yml up -d
+	@echo "Docker containers started!"
+
+## up_containers: stops docker compose (if running), rebuild all the containers starts docker compose
+up_containers:
+	@echo "Stopping docker containers (if running...)"
+	docker compose -f docker-compose.prod.yml down
+	@echo "Starting docker container..."
+	docker compose -f docker-compose.prod.yml up --build -d auth-service search-service data-service frontend nginx
+	@echo "Docker container built and started!"
+
+## up_backend: starts backend containers ; auth, search and data
+up_backend: 
+	@echo "Starting docker containers..."
+	docker compose -f docker-compose.prod.yml up -d auth-service search-service data-service
+	@echo "Docker container built and started!"
+
+####### AUTH SERVICE #######
+## up_auth: stops auth docker compose (if running), starts auth docker compose
+up_auth: 
+	@echo "Stopping Auth-service (if running...)"
+	docker compose -f docker-compose.prod.yml down auth-service
+	@echo "Building (when required) and starting docker containers..."
+	docker compose -f docker-compose.prod.yml up -d auth-service
+	@echo "Auth service started!"
+
+## down_auth: stops the auth service
+down_auth:
+	@echo "Stopping auth service..."
+	docker compose -f docker-compose.prod.yml down auth-service
+	@echo "Auth service stopped!"
+
+## up_atuh_db: stops auth-db (if running) and starts auth-db
+up_auth_db:
+	@echo "Stopping auth-db (if running...)"
+	docker compose -f docker-compose.prod.yml down auth-db
+	@echo "starting auth-db containers..."
+	docker compose -f docker-compose.prod.yml up -d auth-db
+	@echo "Auth-db started!"
+
+## empty_auth_db: stops auth-db (if running), removes volumes and starts auth-db
+## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!! 
+empty_auth_db:
+	@echo "Stopping auth-db (if running...)"
+	docker compose -f docker-compose.prod.yml down auth-db
+	@echo "Remove volumes..."
+	rm -rf ./volumes/database/auth
+	@echo "starting auth-db containers..."
+	docker compose -f docker-compose.prod.yml up --build -d auth-db
+	@echo "Auth-db started!"
+
+## fresh_auth_db: stops auth-db (if running), removes volumes and starts auth-db
+## and restart auth service to re-migrate data
+## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
+fresh_auth_db:
+	@echo "Stopping auth-db (if running...)"
+	docker compose -f docker-compose.prod.yml down auth-db
+	@echo "Remove volumes..."
+	rm -rf ./volumes/database/auth
+	@echo "starting auth-db containers..."
+	docker compose -f docker-compose.prod.yml up --build -d auth-db
+	@echo "Auth-db started!"
+	@echo "Restarting auth service..."
+	docker compose -f docker-compose.prod.yml restart auth-service
+	@echo "Auth service restarted!"
+
+#################################
+
+###### Search Service ######
+## up_search: stops search container, starts search docker compose
+up_search:
+	@echo "Stopping search containers (if running...)"
+	docker compose -f docker-compose.prod.yml down search-service
+	@echo "Starting search service..."
+	docker compose -f docker-compose.prod.yml up -d search-service
+	@echo "Search service started!"
+
+## down_search: stops the search service
+down_search:
+	@echo "Stopping search service..."
+	docker compose -f docker-compose.prod.yml down search-service
+	@echo "Search service stopped!"
+
+## up_elastic (restart): stops elastic (if running) and starts elastic
+up_elastic:
+	@echo "Stopping elastic-db (if running...)"
+	docker compose -f docker-compose.prod.yml down elastic-db
+	@echo "starting elastic-db containers..."
+	docker compose -f docker-compose.prod.yml up -d elastic-db
+	@echo "elastic-db started!"
+
+## empty_elastic: stops elastic-db (if running), remove volumes, starts elastic-db
+## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
+empty_elastic:
+	@echo "Stopping elastic-db (if running...)"
+	docker compose -f docker-compose.prod.yml down elastic-db
+	@echo "Remove volumes..."
+	rm -rf ./volumes/database/elastic
+	@echo "starting elastic-db containers..."
+	docker compose -f docker-compose.prod.yml up --build -d elastic-db
+	@echo "elastic-db started!"
+
+## fresh_elastic: stops elastic-db (if running), remove volumes, starts elastic-db
+## and restart search service to re-migrate data
+## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
+fresh_elastic:
+	@echo "Stopping elastic-db (if running...)"
+	docker compose -f docker-compose.prod.yml down elastic-db
+	@echo "Remove volumes..."
+	rm -rf ./volumes/database/elastic
+	@echo "starting elastic-db containers..."
+	docker compose -f docker-compose.prod.yml up --build -d elastic-db
+	@echo "elastic-db started!"
+	@echo "Restarting search service..."
+	docker compose -f docker-compose.prod.yml restart search-service
+	@echo "Search service restarted!"
+
+#################################
+
+###### Data Management Service ######
+## up_data: stops data container, starts data docker compose
+up_data: 
+	@echo "Stopping data containers (if running...)"
+	docker compose -f docker-compose.prod.yml down data-service
+	@echo "Starting data service..."
+	docker compose -f docker-compose.prod.yml up -d data-service
+	@echo "Data service started!"
+
+## down_data: stops the data service
+down_data:
+	@echo "Stopping data service..."
+	docker compose -f docker-compose.prod.yml down data-service
+	@echo "Data service stopped!"
+
+## up_data_db: stops data-db (if running) and starts data-db
+up_data_db:
+	@echo "Stopping data-db (if running...)"
+	docker compose -f docker-compose.prod.yml down data-db
+	@echo "starting data-db containers..."
+	docker compose -f docker-compose.prod.yml up -d data-db
+	@echo "Data-db started!"
+
+## empty_data_db: stops data-db (if running), removes volumes and starts data-db
+## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
+empty_data_db:
+	@echo "Stopping data-db (if running...)"
+	docker compose -f docker-compose.prod.yml down data-db
+	@echo "Remove volumes..."
+	rm -rf ./volumes/database/mongo-data
+	@echo "starting data-db containers..."
+	docker compose -f docker-compose.prod.yml up --build -d data-db
+	@echo "Data-db started!"
+
+#################################
+
+##### Frontend Service #####
+## up_frontend: stops frontend container, starts frontend docker compose
+up_frontend: build_frontend
+	@echo "Stopping frontend containers (if running...)"
+	docker compose -f docker-compose.prod.yml down frontend
+	@echo "Starting frontend service..."
+	docker compose -f docker-compose.prod.yml up -d frontend
+	@echo "Frontend service started!"
+
+## down_frontend: stops the frontend service
+down_frontend:
+	@echo "Stopping frontend service..."
+	docker compose -f docker-compose.prod.yml down frontend
+	@echo "Frontend service stopped!"
+#################################
+
+###### Nginx Service ######
+## up_nginx: stops nginx container, starts nginx docker compose
+up_nginx:
+	@echo "Stopping nginx containers (if running...)"
+	docker compose -f docker-compose.prod.yml down nginx
+	@echo "Starting nginx service..."
+	docker compose -f docker-compose.prod.yml up -d nginx
+	@echo "Nginx service started!"
+
+## down_nginx : stops the nginx service
+down_nginx:
+	@echo "Stopping nginx service..."
+	docker compose -f docker-compose.prod.yml down nginx
+	@echo "Nginx service stopped!"
+
+## down: stops all containers
+down:
+	@echo "Stopping Docker containers..."
+	docker compose -f docker-compose.prod.yml down
+	@echo "Docker containers stopped!"
