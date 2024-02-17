@@ -27,3 +27,6 @@ volumes/
 
 # Binary file
 searchApp
+
+# DataSource folder (use for run the app in develop)
+datasource

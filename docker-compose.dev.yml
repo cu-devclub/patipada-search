@@ -12,6 +12,8 @@ services:
       FRONTEND_URL: http://frontend:5173
     restart:
       always
+    volumes:
+      - ./data:/app/datasource
     ports:
       - 8081:8081
     depends_on:
