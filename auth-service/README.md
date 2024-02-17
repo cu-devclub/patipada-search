@@ -3,6 +3,10 @@
 
 This service use to authenticate and authorize user.
 
+#### CI/CD : 
+[deploy auth service](../.github/workflows/auth-deploy.yml)
+[deploy auth db](../.github/workflows/auth-db.yml)
+
 ## Run locally 
 If you do not want to run using docker you can run using golang
 

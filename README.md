@@ -2,6 +2,9 @@
 
 This project is a part of the Waris Lakthong senior project, focusing on developing a hybrid search system for Dhammanva question-answer videos. The system is designed using a microservices architecture, with each backend service adhering to clean architecture principles.
 
+## !! Important Note
+To deploy / develop each service or each database please check README.md for each one. This README.md provided only overall of the project.
+
 ## Services Overview
 
 1. [Frontend Service](./frontend/)

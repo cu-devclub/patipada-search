@@ -4,6 +4,10 @@
 
 This service use to store managed data
 
+#### CI/CD : 
+[deploy data service](../.github/workflows/data-deploy.yml)
+[deploy data db](../.github/workflows/data-db.yml)
+
 ## Run locally
 
 If you do not want to run using docker you can run using golang
