@@ -2,7 +2,7 @@ version: '3'
 services:
   search-service:
     container_name: search-container
-    image: dhammanava-search-image
+    image: ${DOCKERHUB_USERNAME}/dhammanava-search-image
     build:
       context: ./search-esdb-service
     environment:
@@ -20,10 +20,27 @@ services:
       - elastic-db
     networks:
       - backbone
+  
+  ml-service:
+    container_name: ml-container
+    image: ${DOCKERHUB_USERNAME}/dhammanava-ml-image
+    build:
+      context: ./ml-service
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV=development
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=8084
+    restart: 
+      always
+    ports:
+      - 8084:8084
+    networks:
+      - backbone
+    command: ["python", "-m", "flask", "run"]
 
   elastic-db: 
     container_name: elastic-container
-    image: dhammanava-elastic-image
     build:
       context: ./elastic
     environment: 
@@ -38,7 +55,7 @@ services:
       - backbone
 
   frontend:
-    image: dhammanava-frontend-image
+    image: ${DOCKERHUB_USERNAME}/dhammanava-frontend-image
     container_name: frontend-container
     build:
       context: ./frontend
@@ -51,7 +68,7 @@ services:
 
   auth-service:
     container_name: auth-container
-    image: dhammanava-auth-image:latest
+    image: ${DOCKERHUB_USERNAME}/dhammanava-auth-image:latest
     build:
       context: ./auth-service
     environment:
@@ -98,7 +115,7 @@ services:
     
   data-service:
     container_name: data-container
-    image: dhammanava-data-image
+    image: ${DOCKERHUB_USERNAME}/dhammanava-data-image
     build:
       context: ./data-management-service
     environment:

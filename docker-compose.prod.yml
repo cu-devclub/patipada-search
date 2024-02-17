@@ -18,7 +18,23 @@ services:
       - elastic-db
     networks:
       - backbone
-
+  
+  ml-service:
+    container_name: ml-container
+    image: ${DOCKERHUB_USERNAME}/dhammanava-ml-image
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV=production
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=8084
+    restart: 
+      always
+    ports:
+      - 8084:8084
+    command: ["gunicorn", "-b", "0.0.0.0:8084", "run:app"]
+    networks:
+      - backbone
+  
   elastic-db:
     container_name: elastic-container
     build:
