@@ -1,6 +1,10 @@
 import { ReactNode } from "react";
-import {  Grid, GridItem } from "@chakra-ui/react";
-import { AdminSidebar, EditRequestHeader,Footer } from "../../components/layout";
+import { Grid, GridItem } from "@chakra-ui/react";
+import {
+  AdminSidebar,
+  EditRequestHeader,
+  Footer,
+} from "../../components/layout";
 
 interface AdminBasePageProps {
   children: ReactNode;
@@ -13,7 +17,6 @@ export const AdminBasePage: React.FC<AdminBasePageProps> = ({
   activePage,
   requestID,
 }) => {
-
   return (
     <Grid
       templateAreas={`"nav header"
@@ -29,13 +32,13 @@ export const AdminBasePage: React.FC<AdminBasePageProps> = ({
       <GridItem pl="2" area={"header"}>
         <EditRequestHeader activePage={activePage} requestID={requestID} />
       </GridItem>
-      <GridItem  area={"nav"}>
+      <GridItem area={"nav"}>
         <AdminSidebar activePage={activePage} />
       </GridItem>
       <GridItem pl="2" area={"main"}>
         {children}
       </GridItem>
-      <GridItem area={"footer"} h="8xs">
+      <GridItem area={"footer"}>
         <Footer />
       </GridItem>
     </Grid>
