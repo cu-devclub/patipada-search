@@ -19,11 +19,11 @@ import (
 // - 400 Bad request ; missing token
 // - 401 Unauthorize ; invalid token
 // - 500 internal server error
-func (u *UsersUsecaseImpl) Authorize(c echo.Context, requireRole string) (bool, *errors.RequestError) {
+func (u *UsersUsecaseImpl) Authorize(c echo.Context, requireRole string) (bool, error) {
 	cfg := config.GetConfig()
 	role, err := jwt.GetRole(c)
 	if err != nil {
-		return false, errors.CreateError(err.StatusCode, err.Error())
+		return false, err
 	}
 	// check if requireRole one of admin, super-admin, user
 	if requireRole != cfg.User.Admins.Role && requireRole != cfg.User.Users.Role && requireRole != cfg.User.SuperAdmin.Role {
@@ -31,9 +31,6 @@ func (u *UsersUsecaseImpl) Authorize(c echo.Context, requireRole string) (bool, 
 	}
 
 	ch := jwt.HasAuthorizeRole(role, requireRole, true)
-	if err != nil {
-		return false, errors.CreateError(err.StatusCode, err.Error())
-	}
 
 	return ch, nil
 }

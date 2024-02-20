@@ -31,14 +31,14 @@ import (
 //
 // - 409 conflict ; no permission when requester is not super-admin/admin
 // - 500 internal server error
-func (h *usersHttpHandler) RegisterUser(c echo.Context) error  {
+func (h *usersHttpHandler) RegisterUser(c echo.Context) error {
 	log.Println("RegisterUser : Starting handler")
 	reqBody := new(models.RegisterDto)
 
 	if err := c.Bind(reqBody); err != nil {
 		log.Println("RegisterUser : Error while binding request body: ", err)
 		return baseResponse(c, http.StatusBadRequest, messages.BAD_REQUEST)
-		
+
 	}
 
 	requesterRole := "user"
@@ -46,9 +46,13 @@ func (h *usersHttpHandler) RegisterUser(c echo.Context) error  {
 	if reqBody.Role == "admin" || reqBody.Role == "super-admin" {
 		requesterRole, err = jwt.GetRole(c)
 		if err != nil {
-			log.Println("RegisterUser : Error while validating token: ", err)
-			return baseResponse(c, http.StatusUnauthorized, messages.UNAUTHORIZED)
-			
+			if er, ok := err.(*errors.RequestError); ok {
+				log.Println("RegisterUser : Error while validating token: ", er.Error())
+				return baseResponse(c, er.StatusCode, er.Error())
+			} else {
+				log.Println("RegisterUser : Error while validating token: ", err)
+				return baseResponse(c, http.StatusUnauthorized, messages.UNAUTHORIZED)
+			}
 		}
 	}
 
