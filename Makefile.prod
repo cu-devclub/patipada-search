@@ -9,13 +9,13 @@ up_containers:
 	@echo "Stopping docker containers (if running...)"
 	docker compose -f docker-compose.prod.yml down
 	@echo "Starting docker container..."
-	docker compose -f docker-compose.prod.yml up --build -d auth-service search-service data-service frontend nginx
+	docker compose -f docker-compose.prod.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq
 	@echo "Docker container built and started!"
 
 ## up_backend: starts backend containers ; auth, search and data
 up_backend: 
 	@echo "Starting docker containers..."
-	docker compose -f docker-compose.prod.yml up -d auth-service search-service data-service
+	docker compose -f docker-compose.prod.yml up -d auth-service search-service data-service rabbitmq
 	@echo "Docker container built and started!"
 
 ####### AUTH SERVICE #######

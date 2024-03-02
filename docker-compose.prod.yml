@@ -8,6 +8,9 @@ services:
       ESDB_USERNAME: ${ELASTIC_USERNAME}
       ESDB_PASSWORD: ${ELASTIC_PASSWORD}
       FRONTEND_URL: http://frontend:5173
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_URL: rabbitmq
     ports:
       - 8081:8081
     volumes:
@@ -102,6 +105,9 @@ services:
       MONGO_DB_USERNAME: ${DATA_MNGMNT_DB_USER}
       MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
       MONGO_DB_NAME: record
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_URL: rabbitmq
     ports:
       - 8083:8083
     restart:
@@ -124,6 +130,18 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
     volumes:
       - ./volumes/database/mongo-data:/data/db
+    networks:
+      - backbone
+
+  rabbitmq:
+    image: "rabbitmq:3-alpine"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+    volumes:
+      - ./volumes/rabbitmq:/var/lib/rabbitmq
     networks:
       - backbone
 
