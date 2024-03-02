@@ -1,3 +1,3 @@
-import { search } from "./search";
+import { search, searchRecordIndex } from "./search";
 
-export { search };
+export { search, searchRecordIndex };
