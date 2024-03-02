@@ -14,6 +14,12 @@ type mongoDatabase struct {
 	Db *mongo.Client
 }
 
+func NewMockMongoDatabase() Database {
+	return &mongoDatabase{
+		Db: &mongo.Client{},
+	}
+}
+
 func NewMongoDatabase(cfg *config.Config) Database {
 	// create a connection to mongo db
 	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s@%s:%s",
