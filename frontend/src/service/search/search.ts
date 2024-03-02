@@ -41,3 +41,25 @@ export const search = async (
     throw returnErr;
   }
 };
+
+export const searchRecordIndex = async (
+  recordIndex: string
+): Promise<DataItem> => {
+  try {
+    const response = await axios.get(
+      `${searchURL}/search/${recordIndex}`
+    );
+    const item: DataItem = {
+      index: response.data.index,
+      youtubeURL: response.data.youtubeURL,
+      question: response.data.question,
+      answer: response.data.answer,
+      startTime: response.data.startTime,
+      endTime: response.data.endTime,
+    };
+    return item;
+  } catch (error: unknown) {
+    const returnErr = CreateCustomError(error);
+    throw returnErr;
+  }
+};

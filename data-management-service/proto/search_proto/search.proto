@@ -6,7 +6,6 @@ option go_package = "/search_proto";
 
 service SearchService {
     rpc SearchRecord(SearchRequest) returns (SearchResponse);
-    rpc UpdateRecord(UpdateRecordRequest) returns (UpdateRecordResponse);
 }
 
 message SearchRequest {
@@ -15,18 +14,6 @@ message SearchRequest {
 
 message SearchResponse {
     bool isFounded = 1;
-}
-
-message UpdateRecordRequest {
-    string index = 1;
-    string startTime = 2;
-    string endTime = 3;
-    string question = 4;
-    string answer = 5;
-}
-
-message UpdateRecordResponse {
-    bool isUpdated = 1;
 }
 
 // protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative search.proto

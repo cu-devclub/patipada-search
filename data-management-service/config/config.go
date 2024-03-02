@@ -8,8 +8,9 @@ import (
 
 type (
 	Config struct {
-		App App
-		DB  Database
+		App      App
+		RabbitMQ RabbitMQ
+		DB       Database
 	}
 	App struct {
 		Port          int
@@ -17,6 +18,11 @@ type (
 		FrontendURL   string
 		AuthService   string
 		SearchService string
+	}
+	RabbitMQ struct {
+		URL            string
+		Username       string
+		Password       string
 	}
 	Database struct {
 		Host     string
@@ -46,6 +52,11 @@ func GetConfig() Config {
 			FrontendURL:   viper.GetString("FRONTEND_URL"),
 			AuthService:   viper.GetString("AUTH_SERVICE"),
 			SearchService: viper.GetString("SEARCH_SERVICE"),
+		},
+		RabbitMQ: RabbitMQ{
+			URL:            viper.GetString("RABBITMQ_URL"),
+			Username:       viper.GetString("RABBITMQ_USERNAME"),
+			Password:       viper.GetString("RABBITMQ_PASSWORD"),
 		},
 		DB: Database{
 			Host:     viper.GetString("MONGO_DB_HOST"),

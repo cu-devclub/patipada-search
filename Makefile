@@ -12,14 +12,14 @@ up_build:  build_auth build_search build_data build_frontend
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq
 	@echo "Docker images built and started!"
 
 up_build_backend: build_auth build_search build_data
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service rabbitmq
 	@echo "Docker images built and started!"
 
 ####### AUTH SERVICE #######

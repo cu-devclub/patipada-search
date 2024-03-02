@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   search-service:
     container_name: search-container
@@ -10,8 +10,10 @@ services:
       ESDB_USERNAME: ${ELASTIC_USERNAME}
       ESDB_PASSWORD: ${ELASTIC_PASSWORD}
       FRONTEND_URL: http://frontend:5173
-    restart:
-      always
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_URL: rabbitmq
+    restart: always
     volumes:
       - ./data:/app/datasource
     ports:
@@ -21,12 +23,12 @@ services:
     networks:
       - backbone
 
-  elastic-db: 
+  elastic-db:
     container_name: elastic-container
     image: dhammanava-elastic-image
     build:
       context: ./elastic
-    environment: 
+    environment:
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
@@ -44,8 +46,7 @@ services:
       context: ./frontend
     ports:
       - 5173:8080
-    restart:
-      always
+    restart: always
     networks:
       - backbone
 
@@ -56,7 +57,7 @@ services:
       context: ./auth-service
     environment:
       - FRONTEND_URL=http://frontend:5173
-      - JWT_KEY=${JWT_KEY} 
+      - JWT_KEY=${JWT_KEY}
       - DATABASE_HOST=auth-db
       - DATABASE_USER=${AUTH_DB_USER}
       - DATABASE_PASSWORD=${AUTH_DB_PASSWORD}
@@ -72,8 +73,7 @@ services:
       - USER_EMAIL=${USER_EMAIL}
     ports:
       - 8082:8082
-    restart:
-      always
+    restart: always
     depends_on:
       - auth-db
     networks:
@@ -88,36 +88,37 @@ services:
       POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
     ports:
       - 5432:5432
-    restart:
-      always
+    restart: always
     volumes:
       - ./auth-db:/docker-entrypoint-initdb.d
       - ./volumes/database/auth:/var/lib/postgresql/data
     networks:
       - backbone
-    
+
   data-service:
     container_name: data-container
     image: dhammanava-data-image
     build:
       context: ./data-management-service
     environment:
-       FRONTEND_URL: http://frontend:5173
-       MONGO_DB_HOST: data-db
-       MONGO_DB_PORT: 27017
-       MONGO_DB_USERNAME: ${DATA_MNGMNT_DB_USER}
-       MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
-       MONGO_DB_NAME: record
+      FRONTEND_URL: http://frontend:5173
+      MONGO_DB_HOST: data-db
+      MONGO_DB_PORT: 27017
+      MONGO_DB_USERNAME: ${DATA_MNGMNT_DB_USER}
+      MONGO_DB_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
+      MONGO_DB_NAME: record
+      RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_URL: rabbitmq
     ports:
       - 8083:8083
-    restart:
-      always
+    restart: always
     depends_on:
       - data-db
     networks:
       - backbone
 
-  data-db: 
+  data-db:
     image: mongo:4.4
     container_name: data-mongo-container
     ports:
@@ -126,14 +127,23 @@ services:
       MONGO_INITDB_DATABASE: record
       MONGO_INITDB_ROOT_USERNAME: ${DATA_MNGMNT_DB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
-    restart:
-      always
+    restart: always
     volumes:
       - ./volumes/database/mongo-data:/data/db
     networks:
       - backbone
 
-  nginx : 
+  rabbitmq:
+    image: "rabbitmq:3.12-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./volumes/rabbitmq:/var/lib/rabbitmq
+    networks:
+      - backbone
+
+  nginx:
     image: nginx:latest
     container_name: nginx-container
     ports:
@@ -147,7 +157,7 @@ services:
       - frontend
     networks:
       - backbone
-      
+
 networks:
   backbone:
     driver: bridge

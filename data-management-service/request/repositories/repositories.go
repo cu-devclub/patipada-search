@@ -95,5 +95,5 @@ type Repositories interface {
 	//   error: An error that occurred during the operation, if any.
 	ValidateUsername(username string) (bool, error)
 
-	UpdateRecord(record *entities.Record) (bool,error)
+	UpdateRecord(record *entities.Record) error
 }
