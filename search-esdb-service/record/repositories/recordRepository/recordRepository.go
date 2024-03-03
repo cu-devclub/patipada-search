@@ -12,14 +12,9 @@ type RecordRepository interface {
 	// indexName: The name of the Elasticsearch index.
 	// []*entities.Record: An array of Record objects representing the retrieved documents.
 	// error: An error object if there was an issue retrieving the records.
-	GetAllRecords(indexName string) ([]*entities.Record, *errors.RequestError)
+	GetAllRecords(indexName string) ([]*entities.Record, error)
 
-	// AnalyzeQueryKeyword analyzes the given query keyword.
-	//
-	// query: the query keyword to be analyzed.
-	// []string: a list of analyzed tokens.
-	// error: an error if the analysis fails.
-	AnalyzeQueryKeyword(query string) ([]string, *errors.RequestError)
+	// TODO : Tokenize service connection with ML service
 
 	// Search searches for records in the specified Elasticsearch index based on the provided query.
 	//
@@ -30,9 +25,11 @@ type RecordRepository interface {
 	// Returns:
 	// - []*entities.Record: A slice of records found in the index that match the query.
 	// - error: An error if any occurred during the search operation.
-	Search(indexName, query string, amount int) ([]*entities.Record, *errors.RequestError)
+	Search(indexName string, query interface{}, amount int) ([]*entities.Record, error)
 
-	SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, bool, *errors.RequestError)
+	VectorSearch(indexName string, query interface{}, amount int) ([]*entities.Record, error)
+
+	SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, bool, error)
 
 	// BulkInsert inserts multiple records into the Elasticsearch index.
 	//

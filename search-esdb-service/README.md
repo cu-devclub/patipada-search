@@ -5,6 +5,11 @@ This service use to search the data. The mechanism to search is combining both k
 
 > Currently vector search is under development
 
+#### CI/CD : 
+[deploy search service](../.github/workflows/search-deploy.yml)
+[deploy elastic db](../.github/workflows/elastic.yml)
+
+
 ## Run locally 
 If you do not want to run using docker you can run using golang
 

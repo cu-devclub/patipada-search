@@ -8,7 +8,6 @@ import (
 	"log"
 	"search-esdb-service/errors"
 	"search-esdb-service/record/entities"
-	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -31,9 +30,8 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) *errors.Request
 	start := time.Now().UTC()
 
 	// Loop over the collection
-	for order, a := range qars {
+	for _, a := range qars {
 		data, err := json.Marshal(a)
-
 		if err != nil {
 			return errors.CreateError(500, fmt.Sprintf("Cannot encode data %v: %s", a.Question, err))
 		}
@@ -49,7 +47,7 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) *errors.Request
 				Action: "index",
 
 				// DocumentID is the (optional) document ID
-				DocumentID: a.YoutubeURL + "-" + strconv.Itoa(order),
+				DocumentID: a.Index,
 
 				// Body is an `io.Reader` with the payload
 				Body: bytes.NewReader(data),

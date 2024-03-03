@@ -11,7 +11,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	recordESRepositories "search-esdb-service/record/repositories"
+	recordESRepositories "search-esdb-service/record/repositories/recordRepository"
 	recordUsecases "search-esdb-service/record/usecases"
 )
 

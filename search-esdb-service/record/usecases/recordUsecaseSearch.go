@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func (r *recordUsecaseImpl) GetAllRecords(indexName string) ([]*models.Record, *errors.RequestError) {
+func (r *recordUsecaseImpl) GetAllRecords(indexName string) ([]*models.Record, error) {
 	records, err := r.recordRepository.GetAllRecords(indexName)
 	if err != nil {
 		return nil, err
@@ -24,23 +24,45 @@ func (r *recordUsecaseImpl) GetAllRecords(indexName string) ([]*models.Record, *
 	return responseRecords, nil
 }
 
-func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount int) (*models.SearchRecordStruct, *errors.RequestError) {
+func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount int) (*models.SearchRecordStruct, error) {
 	var records []*entities.Record
 
+	var searchQuery interface{}
 	// extract tokens from query
-	tokens, err := r.recordRepository.AnalyzeQueryKeyword(query)
+	tokens, err := r.mlRepository.TokenizeQuery(query)
+	if err != nil {
+		return nil, err
+	}
+
+	pureQuery, err := r.mlRepository.RemoveStopWordFromTokensArrays(tokens)
 	if err != nil {
 		return nil, err
 	}
 
 	switch searchType {
 	case constant.SEARCH_BY_TF_IDF:
-		stopWords := r.dataI.GetStopWord()
-		tokens = helper.RemoveStopWordsFromTokensArray(stopWords.PythaiNLP, tokens)
-		q := strings.Join(tokens, "")
-		records, err = r.recordRepository.Search(indexName, q, amount)
+		q := strings.Join(pureQuery, "")
+		searchQuery = q
+		records, err = r.recordRepository.Search(indexName, searchQuery, amount)
+		if err != nil {
+			return nil, err
+		}
+	case constant.SEARCH_BY_LDA:
+		searchQuery, err = r.mlRepository.PerformLDATopicModelling(tokens)
+		if err != nil {
+			return nil, err
+		}
+		records, err = r.recordRepository.VectorSearch(indexName, searchQuery, amount)
+		if err != nil {
+			return nil, err
+		}
 	default:
-		records, err = r.recordRepository.Search(indexName, query, amount)
+		// DO nothing
+		searchQuery = query
+		records, err = r.recordRepository.Search(indexName, searchQuery, amount)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	responseRecords := make([]*models.Record, 0)
@@ -56,7 +78,7 @@ func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount i
 	return response, nil
 }
 
-func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (*models.Record, *errors.RequestError) {
+func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (*models.Record, error) {
 	// search the record
 	records, isFound, err := r.recordRepository.SearchByRecordIndex(indexName, recordIndex)
 	if isFound == false && err != nil {

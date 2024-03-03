@@ -8,7 +8,7 @@ import (
 	validator "data-management/structValidator"
 	"log"
 )
-
+// TODO : make service can run even other service not there (gRPC connection)
 func main() {
 	/// ----------------- Initialize Config----------------- ///
 	log.Println("Initializing config...")

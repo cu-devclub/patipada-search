@@ -5,7 +5,6 @@ import (
 	"search-esdb-service/communication"
 	"search-esdb-service/config"
 	"search-esdb-service/constant"
-	"search-esdb-service/data"
 	"search-esdb-service/database"
 	recordMigrator "search-esdb-service/record/migration"
 	"search-esdb-service/server"
@@ -29,15 +28,9 @@ func main() {
 
 	/// ----------------- Migrate record ----------------- ///
 	log.Println("Starting migration...")
-	recordMigrator.RecordMigrate(&cfg, db)
+	recordMigrator.MigrateRecords(&cfg, db)
 	log.Println("Migration finished")
 	/// ----------------- Migrated record ----------------- ///
-
-	/// ----------------- Initialize data ----------------- ///
-	log.Println("Initalizing data.....")
-	d := data.NewData(&cfg)
-	log.Println("Data initialized")
-	/// ----------------- Initialized data ----------------- ///
 
 	/// ----------------- Initialize communication ----------------- ///
 	log.Println("Connecting to RabbitMQ...")
@@ -58,7 +51,7 @@ func main() {
 	/// ----------------- Initialized communication ----------------- ///
 
 	/// ----------------- Start server ----------------- ///
-	s := server.NewGinServer(&cfg, db.GetDB(), &d)
+	s := server.NewGinServer(&cfg, db.GetDB())
 	log.Println("Starting gRPC server...")
 	go server.GRPCListen(s, &cfg)
 
