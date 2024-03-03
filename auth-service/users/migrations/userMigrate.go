@@ -15,6 +15,7 @@ import (
 // It takes a database instance as the parameter.
 // It returns an error if there was an issue during the migration process.
 func UsersMigrate(db database.Database) error {
+	log.Println("Migrating users....")
 	// 1. Get super admin username and password from env
 	cfg := config.GetConfig()
 	// 2. Check if super admin already exists
@@ -38,13 +39,14 @@ func UsersMigrate(db database.Database) error {
 		return err
 	}
 
+	log.Println("Migrated users successfully!")
 	return nil
 }
 
 func migrateUserEntities(user *config.UserCredential, users []*entities.Users, db database.Database) error {
 	log.Println("Migrating user entities role", user.Role)
 	if foundUser := helper.GetUserFromUserLists(users, user.Username); foundUser != nil {
-		log.Println(user.Role,"already exists")
+		log.Println(user.Role, "already exists")
 		return nil
 	}
 

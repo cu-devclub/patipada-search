@@ -15,7 +15,6 @@ type Payload struct {
 func (consumer *Consumer) handlePayload(payload Payload) {
 	switch payload.Name {
 	case constant.UPDATE_RECORD_PAYLOAD_NAME:
-		log.Println("payload Name :", payload.Name, "payload Data :", payload.Data)
 		var model models.UpdateRecord
 
 		// Convert the map to JSON
@@ -40,6 +39,7 @@ func (consumer *Consumer) handlePayload(payload Payload) {
 }
 
 func (consumer *Consumer) updateRecordEvent(model models.UpdateRecord) {
+	log.Println("Receive update record event queue....")
 	err := consumer.recordUsecase.UpdateRecord(&model)
 	if err != nil {
 		log.Println("Failed to update record:", err)

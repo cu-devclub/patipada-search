@@ -1,13 +1,12 @@
 package handlers
 
-import "github.com/gin-gonic/gin"
+import (
+	"log"
 
-type jsonResponse struct {
-	Error   bool   `json:"error"`
-	Message string `json:"message"`
-	Data    any    `json:"data,omitempty"`
-}
+	"github.com/gin-gonic/gin"
+)
 
-func responseJSON(c *gin.Context, status int,message string, data any) {
+func responseJSON(c *gin.Context, status int, message string, data interface{}) {
+	log.Println("response with status: ", status, " message: ", message, " data: ", data)
 	c.JSON(status, gin.H{"message": message, "data": data})
 }

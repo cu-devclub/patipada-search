@@ -81,7 +81,7 @@ func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount i
 func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (*models.Record, error) {
 	// search the record
 	records, isFound, err := r.recordRepository.SearchByRecordIndex(indexName, recordIndex)
-	if isFound == false && err != nil {
+	if !isFound && err != nil {
 		if err.Error() == messages.ELASTIC_404_ERROR {
 			return nil, nil
 		} else if err.Error() != messages.ELASTIC_405_ERROR {

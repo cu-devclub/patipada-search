@@ -20,6 +20,7 @@ type RabbitMQStruct struct {
 }
 
 func ConnectToRabbitMQ(cfg *config.Config) (*RabbitMQStruct, error) {
+	log.Println("Connecting to Rabbit MQ....")
 	var counts int64
 	var backOff = 1 * time.Second
 	var connection *amqp.Connection
@@ -28,7 +29,7 @@ func ConnectToRabbitMQ(cfg *config.Config) (*RabbitMQStruct, error) {
 		cfg.RabbitMQ.Password,
 		cfg.RabbitMQ.URL,
 	)
-	log.Println("Rabbit MQ connection URL:", connectionURL)
+	log.Println("Connecting to Rabbit MQ with connection URL:", connectionURL)
 	// don't continue until we have a connection
 	for {
 		c, err := amqp.Dial(connectionURL)
@@ -49,12 +50,15 @@ func ConnectToRabbitMQ(cfg *config.Config) (*RabbitMQStruct, error) {
 		time.Sleep(backOff)
 	}
 
+	log.Println("Connected to Rabbit MQ!")
+
 	// Get the emitter
 	emitter, err := event.NewEmitter(connection, cfg)
 	if err != nil {
 		return nil, err
 	}
 
+	log.Println("Successfully initialized RabbitMQ connection & emitter!")
 	return &RabbitMQStruct{
 		Conn:         connection,
 		Emitter:      emitter,
@@ -68,7 +72,7 @@ type RabbitMQPayload struct {
 }
 
 func (c *CommunicationImpl) PublishUpdateRecordsToRabbitMQ(payloadName string, message interface{}) error {
-	log.Println("Emitting to RabbitMQ with message", message)
+	log.Println("Publish update records to RabbitMQ with message", message)
 	// convert message to payload json string
 	payload := RabbitMQPayload{
 		Name: payloadName,
@@ -79,6 +83,6 @@ func (c *CommunicationImpl) PublishUpdateRecordsToRabbitMQ(payloadName string, m
 	if err != nil {
 		return err
 	}
-	log.Println("Emitted to RabbitMQ!!!!")
+	log.Println("Published to RabbitMQ!!!!")
 	return nil
 }

@@ -21,6 +21,7 @@ type RabbitMQStruct struct {
 }
 
 func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client) (*RabbitMQStruct, error) {
+	log.Println("Connecting to RabbitMQ...")
 	var counts int64
 	var backOff = 1 * time.Second
 	var connection *amqp.Connection
@@ -51,6 +52,8 @@ func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client) (*RabbitMQS
 		time.Sleep(backOff)
 	}
 
+	log.Println("Connected to RabbitMQ!")
+
 	recordRepository := recordESRepositories.NewRecordESRepository(db)
 	recordUsecases := recordUsecases.NewRecordUsecase(recordRepository, nil)
 
@@ -66,5 +69,6 @@ func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client) (*RabbitMQS
 }
 
 func (c *CommunicationImpl) Listen(topics []string) error {
+	log.Println("Listening to topics...", topics)
 	return c.RabbitMQ.Consumer.Listen(topics)
 }

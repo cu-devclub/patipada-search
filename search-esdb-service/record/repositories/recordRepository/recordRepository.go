@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"search-esdb-service/errors"
 	"search-esdb-service/record/entities"
 )
 
@@ -35,7 +34,7 @@ type RecordRepository interface {
 	//
 	// qars: A slice of pointers to Record entities representing the records to be inserted.
 	// Returns an error if there was an issue inserting the records.
-	BulkInsert(qars []*entities.Record) *errors.RequestError
+	BulkInsert(qars []*entities.Record) error
 
-	UpdateRecord(record *entities.UpdateRecord) *errors.RequestError
+	UpdateRecord(record *entities.UpdateRecord) error
 }

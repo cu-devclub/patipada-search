@@ -17,6 +17,7 @@ type Consumer struct {
 }
 
 func NewConsumer(conn *amqp.Connection, cfg *config.Config, recordUsecase recordUsecases.RecordUsecase) (Consumer, error) {
+	log.Println("Creating new consumer...")
 	consumer := Consumer{
 		conn:          conn,
 		recordUsecase: recordUsecase,
@@ -27,6 +28,7 @@ func NewConsumer(conn *amqp.Connection, cfg *config.Config, recordUsecase record
 		return Consumer{}, err
 	}
 
+	log.Println("Consumer created successfully!")
 	return consumer, nil
 }
 

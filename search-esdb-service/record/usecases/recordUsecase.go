@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"search-esdb-service/errors"
 	"search-esdb-service/record/models"
 )
 
@@ -29,5 +28,5 @@ type RecordUsecase interface {
 
 	SearchByRecordIndex(indexName, recordIndex string) (*models.Record, error)
 
-	UpdateRecord(record *models.UpdateRecord) *errors.RequestError
+	UpdateRecord(record *models.UpdateRecord) error
 }

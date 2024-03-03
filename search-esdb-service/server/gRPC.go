@@ -20,6 +20,7 @@ type GRPCServer struct {
 }
 
 func GRPCListen(server Server, cfg *config.Config) {
+	log.Println("Starting gRPC server...")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.App.GRPCPort))
 	if err != nil {
 		log.Fatalf("failed to listen for gRPC: %v", err)

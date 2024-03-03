@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"search-esdb-service/constant"
+	"search-esdb-service/errors"
 	"search-esdb-service/messages"
 	"strconv"
 
@@ -41,8 +42,13 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 	// search for records
 	records, err := r.recordUsecase.Search("record", query, searchType, amount)
 	if err != nil {
-		errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
-		return
+		if er, ok := err.(*errors.RequestError); ok {
+			errorResponse(c, er.StatusCode, er.Message, er.Error())
+			return
+		} else {
+			errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
+			return
+		}
 	}
 	successResponse(c, 200, records)
 
@@ -61,8 +67,13 @@ func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
 
 	record, err := r.recordUsecase.SearchByRecordIndex("record", recordIndex)
 	if err != nil {
-		errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
-		return
+		if er, ok := err.(*errors.RequestError); ok {
+			errorResponse(c, er.StatusCode, er.Message, er.Error())
+			return
+		} else {
+			errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
+			return
+		}
 	}
 	if record == nil {
 		errorResponse(c, 404, messages.NOT_FOUND, messages.RECORD_INDEX_NOT_FOUND)
@@ -78,10 +89,16 @@ func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
 // - 200 & A list of all records retrieved from the database.
 // - 500: An internal server error occurred.
 func (r *recordHttpHandler) GetAllRecords(c *gin.Context) {
+	log.Println("GetAllRecords Handler ...")
 	records, err := r.recordUsecase.GetAllRecords("record")
 	if err != nil {
-		errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
-		return
+		if er, ok := err.(*errors.RequestError); ok {
+			errorResponse(c, er.StatusCode, er.Message, er.Error())
+			return
+		} else {
+			errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
+			return
+		}
 	}
 	successResponse(c, 200, records)
 }

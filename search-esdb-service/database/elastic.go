@@ -1,6 +1,7 @@
 package database
 
 import (
+	"log"
 	"search-esdb-service/config"
 	"time"
 
@@ -20,6 +21,7 @@ type elasticDatabase struct {
 // It also checks the plugins and returns an error if there is any.
 // Finally, it returns a pointer to an elasticDatabase struct which contains the Elasticsearch client.
 func NewElasticDatabase(cfg *config.Config) Database {
+	log.Println("Creating Elasticsearch client...")
 	retryBackoff := backoff.NewExponentialBackOff()
 	esCfg := elasticsearch.Config{
 		Addresses: []string{cfg.ESDB.URL}, // Elasticsearch cluster URL
@@ -60,6 +62,8 @@ func NewElasticDatabase(cfg *config.Config) Database {
 	if err = es.checkPlugins(); err != nil {
 		panic("Error checking Plugins:" + err.Error())
 	}
+
+	log.Println("Elasticsearch client created!")
 
 	return &elasticDatabase{
 		Db: client,

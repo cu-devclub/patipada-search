@@ -20,6 +20,7 @@ type GRPCServer struct {
 }
 
 func GRPCListen(server Server, cfg *config.Config) {
+	log.Println("Starting gRPC server....")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.App.GRPCPort))
 	if err != nil {
 		log.Fatalf("failed to listen for gRPC: %v", err)
@@ -29,11 +30,12 @@ func GRPCListen(server Server, cfg *config.Config) {
 
 	auth_proto.RegisterAuthServiceServer(grpcServer, &GRPCServer{server: server})
 
-	log.Println("gRPC server listening on port:",cfg.App.GRPCPort)
-
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve gRPC: %v", err)
 	}
+
+	log.Println("gRPC server listening on port:", cfg.App.GRPCPort)
+
 }
 
 func (a *GRPCServer) Authorization(ctx context.Context, req *auth_proto.AuthorizationRequest) (*auth_proto.AuthorizationResponse, error) {
@@ -53,13 +55,12 @@ func (a *GRPCServer) Authorization(ctx context.Context, req *auth_proto.Authoriz
 
 	role := tokenClaim.Role
 	result := jwt.HasAuthorizeRole(role, requiredRole, true)
-	
-	log.Println("Authorization result: ", result)
-	// Return the response
+
 	return &auth_proto.AuthorizationResponse{IsAuthorized: result}, nil
 }
 
 func (a *GRPCServer) VerifyUsername(ctx context.Context, req *auth_proto.VerifyUsernameRequest) (*auth_proto.VerifyUsernameResponse, error) {
+	log.Println("Recieving gRPC connection for username verification....")
 	username := req.GetUsername()
 	usersPostgresRepository := usersRepositories.NewUsersPostgresRepository(a.server.GetDB())
 	usersUsecase := usersUsecases.NewUsersUsecaseImpl(
@@ -69,6 +70,7 @@ func (a *GRPCServer) VerifyUsername(ctx context.Context, req *auth_proto.VerifyU
 
 	result, err := usersUsecase.VerifyUsername(username)
 	if err != nil {
+		log.Println("Error while verifying username: ", err)
 		return nil, err
 	}
 

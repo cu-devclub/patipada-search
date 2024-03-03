@@ -11,35 +11,27 @@ import (
 )
 
 func main() {
-	log.Println("Starting server...")
 
 	/// ----------------- Initialize config ----------------- ///
-	log.Println("Initializing config...")
 	config.InitializeViper("./")
 	cfg := config.GetConfig()
-	log.Println("Config initialized")
+	log.Println("Config initialized!")
 	/// ----------------- Initialized config ----------------- ///
 
 	/// ----------------- Initialize database ----------------- ///
-	log.Println("Connecting to database...")
 	db := database.NewElasticDatabase(&cfg)
-	log.Println("Success connect to database:")
 	/// ----------------- Initialized database ----------------- ///
 
 	/// ----------------- Migrate record ----------------- ///
-	log.Println("Starting migration...")
 	recordMigrator.MigrateRecords(&cfg, db)
-	log.Println("Migration finished")
 	/// ----------------- Migrated record ----------------- ///
 
 	/// ----------------- Initialize communication ----------------- ///
-	log.Println("Connecting to RabbitMQ...")
 	rabbitMQ, err := communication.ConnectToRabbitMQ(&cfg, db.GetDB())
 	if err != nil {
 		log.Println("Failed to connect to RabbitMQ:", err)
 		return
 	}
-	log.Println("Success connect to RabbitMQ")
 
 	comm := communication.NewCommunicationImpl(*rabbitMQ)
 	go func() {
@@ -52,7 +44,6 @@ func main() {
 
 	/// ----------------- Start server ----------------- ///
 	s := server.NewGinServer(&cfg, db.GetDB())
-	log.Println("Starting gRPC server...")
 	go server.GRPCListen(s, &cfg)
 
 	log.Println("Starting HTTP server on Port", cfg.App.Port, "...")

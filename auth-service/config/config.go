@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/viper"
 )
@@ -17,7 +18,7 @@ type (
 
 	App struct {
 		Port        int
-		GRPCPort	int
+		GRPCPort    int
 		FrontendURL string
 		JWTKey      string
 		RolesMap    map[string]int
@@ -60,6 +61,7 @@ type (
 )
 
 func InitializeViper(path string) {
+	log.Println("Initializing Viper...")
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
@@ -68,9 +70,11 @@ func InitializeViper(path string) {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %v", err))
 	}
+	log.Println("Viper initialized successfully")
 }
 
 func GetConfig() Config {
+	log.Println("Getting config....")
 	// Load roles map from config
 	rolesMap := make(map[string]int)
 	superAdmin := viper.GetInt("ROLES_MAP_SUPER_ADMIN")

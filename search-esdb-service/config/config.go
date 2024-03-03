@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/spf13/viper"
 )
@@ -25,9 +26,9 @@ type (
 		Password string
 	}
 	RabbitMQ struct {
-		URL            string
-		Username       string
-		Password       string
+		URL      string
+		Username string
+		Password string
 	}
 	Static struct {
 		DataPath   string
@@ -37,6 +38,7 @@ type (
 )
 
 func InitializeViper(path string) {
+	log.Println("Initializing viper...")
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
@@ -45,9 +47,11 @@ func InitializeViper(path string) {
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %v", err))
 	}
+	log.Println("Viper initialized")
 }
 
 func GetConfig() Config {
+	log.Println("Getting config...")
 	return Config{
 		App: App{
 			Port:        viper.GetInt("SERVER_PORT"),
@@ -60,9 +64,9 @@ func GetConfig() Config {
 			Password: viper.GetString("ESDB_PASSWORD"),
 		},
 		RabbitMQ: RabbitMQ{
-			URL:            viper.GetString("RABBITMQ_URL"),
-			Username:       viper.GetString("RABBITMQ_USERNAME"),
-			Password:       viper.GetString("RABBITMQ_PASSWORD"),
+			URL:      viper.GetString("RABBITMQ_URL"),
+			Username: viper.GetString("RABBITMQ_USERNAME"),
+			Password: viper.GetString("RABBITMQ_PASSWORD"),
 		},
 		Static: Static{
 			DataPath:   viper.GetString("STATIC_DATA"),

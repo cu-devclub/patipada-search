@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"data-management/errors"
 	"data-management/request/models"
 )
 
@@ -29,7 +28,7 @@ type UseCase interface {
 	// If the insertion fails, it returns an error.
 	//
 	// Finally, it populates the original models.Request struct with the requestID, CreatedAt, UpdatedAt, and Status fields from the entities.Request struct.
-	InsertRequest(request *models.Request) *errors.RequestError
+	InsertRequest(request *models.Request) error
 
 	// UpdateRequest updates a request in the MongoDB collection.
 	//	The function takes a pointer to a models.Request object as input. The Request object is first validated
@@ -40,7 +39,7 @@ type UseCase interface {
 	// - Success : no error (nil)
 	// - 400 : Bad request (validation error)
 	// - 500 : internal server error
-	UpdateRequest(request *models.Request) *errors.RequestError
+	UpdateRequest(request *models.Request) error
 
 	// GetRequest retrieves requests based on the provided parameters.
 	// It validates the parameters, creates a filter from them, and then retrieves the requests from the repository.
@@ -57,9 +56,9 @@ type UseCase interface {
 	//
 	// Returns:
 	//   - []*models.Request: A slice of pointers to the matching requests. If no requests match the filter, the slice will be empty.
-	//   - *errors.RequestError: An error that occurred during the operation, if any.
+	//   - error: An error that occurred during the operation, if any.
 	//       - status of 400 or 500
-	GetRequest(status, username, requestID, index, approvedBy string) ([]*models.Request, *errors.RequestError)
+	GetRequest(status, username, requestID, index, approvedBy string) ([]*models.Request, error)
 
 	// GetLastestRequestOfRecord retrieves the latest request of a record based on the provided index.
 	// It validates the index, creates a filter from it, and then retrieves the requests from the repository.
@@ -72,9 +71,9 @@ type UseCase interface {
 	//
 	// Returns:
 	//   - *models.Request: A pointer to the latest request. If no requests match the filter, the pointer will be nil.
-	//   - *errors.RequestError: An error that occurred during the operation, if any.
+	//   - error: An error that occurred during the operation, if any.
 	//          Possible status codes are
 	//			400 (Bad Request) and
 	//          500 (Internal Server Error).
-	GetLastestRequestOfRecord(index string) (*models.Request, *errors.RequestError)
+	GetLastestRequestOfRecord(index string) (*models.Request, error)
 }

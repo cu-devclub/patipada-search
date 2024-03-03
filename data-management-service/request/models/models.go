@@ -23,6 +23,10 @@ type (
 	}
 )
 
+func (r *Request) ToString() string {
+	return r.Index + " " + r.YoutubeURL + " " + r.Question + " " + r.Answer + " " + r.StartTime + " " + r.EndTime + " " + r.By
+}
+
 func (r *Request) MockData() {
 	r.Index = "61oREuQ5JU8-1"
 	r.YoutubeURL = "https://www.youtube.com/watch?v=JGwWNGJdvx8"

@@ -21,9 +21,17 @@ func NewMockMongoDatabase() Database {
 }
 
 func NewMongoDatabase(cfg *config.Config) Database {
+	log.Println("Connecting to MongoDB...")
 	// create a connection to mongo db
-	clientOptions := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%s@%s:%s",
-		cfg.DB.Username, cfg.DB.Password, cfg.DB.Host, cfg.DB.Port))
+	clientOptions := options.Client().ApplyURI(
+		fmt.Sprintf("mongodb://%s:%s@%s:%s",
+			cfg.DB.Username, 
+			cfg.DB.Password, 
+			cfg.DB.Host, 
+			cfg.DB.Port,
+		),
+	)
+	
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -34,11 +42,10 @@ func NewMongoDatabase(cfg *config.Config) Database {
 		log.Fatal(err)
 	}
 
+	log.Println("Connected to MongoDB!")
 	return &mongoDatabase{
 		Db: client,
 	}
-
-
 }
 
 func (m *mongoDatabase) GetDb() *mongo.Client {

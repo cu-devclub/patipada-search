@@ -20,9 +20,9 @@ type (
 		SearchService string
 	}
 	RabbitMQ struct {
-		URL            string
-		Username       string
-		Password       string
+		URL      string
+		Username string
+		Password string
 	}
 	Database struct {
 		Host     string
@@ -34,6 +34,7 @@ type (
 )
 
 func InitializeViper(path string) {
+	log.Println("Initializing viper...")
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
@@ -45,6 +46,7 @@ func InitializeViper(path string) {
 }
 
 func GetConfig() Config {
+	log.Println("Getting config...")
 	return Config{
 		App: App{
 			Port:          viper.GetInt("APP_PORT"),
@@ -54,9 +56,9 @@ func GetConfig() Config {
 			SearchService: viper.GetString("SEARCH_SERVICE"),
 		},
 		RabbitMQ: RabbitMQ{
-			URL:            viper.GetString("RABBITMQ_URL"),
-			Username:       viper.GetString("RABBITMQ_USERNAME"),
-			Password:       viper.GetString("RABBITMQ_PASSWORD"),
+			URL:      viper.GetString("RABBITMQ_URL"),
+			Username: viper.GetString("RABBITMQ_USERNAME"),
+			Password: viper.GetString("RABBITMQ_PASSWORD"),
 		},
 		DB: Database{
 			Host:     viper.GetString("MONGO_DB_HOST"),
