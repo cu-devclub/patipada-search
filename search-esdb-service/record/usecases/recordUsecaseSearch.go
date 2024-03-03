@@ -2,67 +2,31 @@ package usecases
 
 import (
 	"search-esdb-service/constant"
-	"search-esdb-service/errors"
-	"search-esdb-service/messages"
+	"search-esdb-service/data"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
 	"search-esdb-service/record/models"
+	"search-esdb-service/util"
 	"strings"
 )
 
-func (r *recordUsecaseImpl) GetAllRecords(indexName string) ([]*models.Record, error) {
-	records, err := r.recordRepository.GetAllRecords(indexName)
-	if err != nil {
-		return nil, err
-	}
-
-	responseRecords := make([]*models.Record, 0)
-	for _, r := range records {
-		responseRecords = append(responseRecords, helper.RecordEntityToModels(r))
-	}
-
-	return responseRecords, nil
-}
-
 func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount int) (*models.SearchRecordStruct, error) {
+
 	var records []*entities.Record
-
-	var searchQuery interface{}
-	// extract tokens from query
-	tokens, err := r.mlRepository.TokenizeQuery(query)
-	if err != nil {
-		return nil, err
-	}
-
-	pureQuery, err := r.mlRepository.RemoveStopWordFromTokensArrays(tokens)
-	if err != nil {
-		return nil, err
-	}
+	var tokens []string
+	var err error
 
 	switch searchType {
 	case constant.SEARCH_BY_TF_IDF:
-		q := strings.Join(pureQuery, "")
-		searchQuery = q
-		records, err = r.recordRepository.Search(indexName, searchQuery, amount)
-		if err != nil {
-			return nil, err
-		}
+		records, tokens, err = r.internalSearch(indexName, query, amount)
 	case constant.SEARCH_BY_LDA:
-		searchQuery, err = r.mlRepository.PerformLDATopicModelling(tokens)
-		if err != nil {
-			return nil, err
-		}
-		records, err = r.recordRepository.VectorSearch(indexName, searchQuery, amount)
-		if err != nil {
-			return nil, err
-		}
+		records, tokens, err = r.externalSearch(indexName, query, amount)
 	default:
-		// DO nothing
-		searchQuery = query
-		records, err = r.recordRepository.Search(indexName, searchQuery, amount)
-		if err != nil {
-			return nil, err
-		}
+		records, tokens, err = r.internalSearch(indexName, query, amount)
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	responseRecords := make([]*models.Record, 0)
@@ -78,31 +42,43 @@ func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount i
 	return response, nil
 }
 
-func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (*models.Record, error) {
-	// search the record
-	records, isFound, err := r.recordRepository.SearchByRecordIndex(indexName, recordIndex)
-	if !isFound && err != nil {
-		if err.Error() == messages.ELASTIC_404_ERROR {
-			return nil, nil
-		} else if err.Error() != messages.ELASTIC_405_ERROR {
-			// 405 is because gRPC we can ignore it
-			return nil, errors.CreateError(500, err.Error())
-		}
+func (r *recordUsecaseImpl) internalSearch(indexName, query string, amount int) ([]*entities.Record, []string, error) {
+	// working (tokenize, tf-idf) with only elastic
+	tokens, err := r.recordRepository.Tokenize(query)
+	if err != nil {
+		return nil, nil, err
 	}
 
-	response := helper.RecordEntityToModels(records)
-	return response, nil
+	pureTokens := util.RemoveSliceFromArrays(tokens, data.GetStopWord())
+	searchQuery := strings.Join(pureTokens, "")
+
+	records, err := r.recordRepository.Search(indexName, searchQuery, amount)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return records, pureTokens, nil
 }
 
-// TODO : Preparation Query function for multiple
-// e.g. 1 : Keyword search with remove stop word
-// e.g. 2 : TF-IDF search with remove stop word
-// e.g. 3 : LDA
+func (r *recordUsecaseImpl) externalSearch(indexName, query string, amount int) ([]*entities.Record, []string, error) {
+	// working (tokenize, lda,...) with external service
+	// TODO : make 1 service call for all tokenize, remove keyword and lda
+	tokens, err := r.mlRepository.TokenizeQuery(query)
+	if err != nil {
+		return nil, nil, err
+	}
 
-// Query -> [ word tokenize -> remove stop word ] -> Bag of words -> Search : Duplicate
-// Query -> [ word tokenize -> remove stop word  ]-> Bag of words -> TF-IDF -> Search : Done
-// Query -> [ word tokenize -> remove stop word -> Bag of words -> LDA -> Topic ] -> Search
-// RAW data -> [ remove stop word -> Bag of word -> LDA -> [vector] ] -> PROCESSED CSV
-// Migrate start service
-// QUERY -> [ remove stop word -> Bag of word -> LDA -> [vector] ] -> cosine similarity -> ELASTIC
-// [....] => external
+	pureTokens := util.RemoveSliceFromArrays(tokens, data.GetStopWord())
+	
+	searchQuery, err := r.mlRepository.PerformLDATopicModelling(pureTokens)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	records, err := r.recordRepository.VectorSearch(indexName, searchQuery, amount)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return records, pureTokens, nil
+}

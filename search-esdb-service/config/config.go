@@ -31,9 +31,10 @@ type (
 		Password string
 	}
 	Static struct {
-		DataPath   string
-		RecordPath string
-		LDAPath    string
+		DataPath     string
+		RecordPath   string
+		LDAPath      string
+		StopwordPath string
 	}
 )
 
@@ -69,9 +70,10 @@ func GetConfig() Config {
 			Password: viper.GetString("RABBITMQ_PASSWORD"),
 		},
 		Static: Static{
-			DataPath:   viper.GetString("STATIC_DATA"),
-			RecordPath: viper.GetString("RECORD_DATA_PATH"),
-			LDAPath:    viper.GetString("LDA_DATA_PATH"),
+			DataPath:     viper.GetString("STATIC_DATA"),
+			RecordPath:   viper.GetString("RECORD_DATA_PATH"),
+			LDAPath:      viper.GetString("LDA_DATA_PATH"),
+			StopwordPath: viper.GetString("STOPWORD_PATH"),
 		},
 	}
 }

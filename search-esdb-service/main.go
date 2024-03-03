@@ -5,6 +5,7 @@ import (
 	"search-esdb-service/communication"
 	"search-esdb-service/config"
 	"search-esdb-service/constant"
+	"search-esdb-service/data"
 	"search-esdb-service/database"
 	recordMigrator "search-esdb-service/record/migration"
 	"search-esdb-service/server"
@@ -19,6 +20,8 @@ func main() {
 	/// ----------------- Initialized config ----------------- ///
 
 	/// ----------------- Initialize database ----------------- ///
+	data.ReadStopWord(&cfg)
+
 	db := database.NewElasticDatabase(&cfg)
 	/// ----------------- Initialized database ----------------- ///
 
