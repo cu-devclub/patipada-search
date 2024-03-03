@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"search-esdb-service/config"
-	"search-esdb-service/data"
 	"search-esdb-service/database"
 	recordMigrator "search-esdb-service/record/migration"
 	"search-esdb-service/server"
@@ -23,13 +22,11 @@ func main() {
 	log.Println("Success connect to database:")
 
 	log.Println("Starting migration...")
-	recordMigrator.RecordMigrate(&cfg, db)
+	recordMigrator.MigrateRecords(&cfg, db)
 	log.Println("Migration finished")
 
-	log.Println("Initalizing data.....")
-	d := data.NewData(&cfg)
 
-	s := server.NewGinServer(&cfg, db.GetDB(), &d)
+	s := server.NewGinServer(&cfg, db.GetDB())
 
 	log.Println("Starting gRPC server...")
 	go server.GRPCListen(s, &cfg)

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/url"
 	"search-esdb-service/errors"
 	"search-esdb-service/record/entities"
@@ -13,7 +12,7 @@ import (
 	"strings"
 )
 
-func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, bool, *errors.RequestError) {
+func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, bool, error) {
 	client := r.es
 
 	recordIndex = url.PathEscape(recordIndex)
@@ -43,15 +42,19 @@ func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) 
 	return record, true, nil
 }
 
-func (r *RecordESRepository) GetAllRecords(indexName string) ([]*entities.Record, *errors.RequestError) {
+func (r *RecordESRepository) GetAllRecords(indexName string) ([]*entities.Record, error) {
 	return r.performSearch(indexName, 0, elasticQuery.BuildMatchAllQuery, nil)
 }
 
-func (r *RecordESRepository) Search(indexName, query string, amount int) ([]*entities.Record, *errors.RequestError) {
+func (r *RecordESRepository) Search(indexName string, query interface{}, amount int) ([]*entities.Record, error) {
 	return r.performSearch(indexName, amount, elasticQuery.BuildElasticsearchQuery, query)
 }
 
-func (r *RecordESRepository) performSearch(indexName string, amount int, buildQueryFunc interface{}, query interface{}) ([]*entities.Record, *errors.RequestError) {
+func (r *RecordESRepository) VectorSearch(indexName string, query interface{}, amount int) ([]*entities.Record, error) {
+	return r.performSearch(indexName, amount, elasticQuery.BuildKNNQuery, query)
+}
+
+func (r *RecordESRepository) performSearch(indexName string, amount int, buildQueryFunc interface{}, query interface{}) ([]*entities.Record, error) {
 	client := r.es
 
 	var queryJSON string
@@ -64,6 +67,12 @@ func (r *RecordESRepository) performSearch(indexName string, amount int, buildQu
 			return nil, errors.CreateError(500, "Invalid query builder function")
 		}
 		queryJSON, err = queryFunc(q)
+	case []float64:
+		queryFunc, ok := buildQueryFunc.(func([]float64, string) (string, error))
+		if !ok {
+			return nil, errors.CreateError(500, "Invalid query builder function")
+		}
+		queryJSON, err = queryFunc(q, "question_lda")
 	case nil:
 		queryFunc, ok := buildQueryFunc.(func() (string, error))
 		if !ok {
@@ -107,12 +116,8 @@ func (r *RecordESRepository) performSearch(indexName string, amount int, buildQu
 		return nil, errors.CreateError(500, "Invalid response format")
 	}
 
-	log.Println("Found", len(hits), "hits")
-
 	var records []*entities.Record
 	for _, hit := range hits {
-		log.Println("Hit:", hit.(map[string]interface{}))
-		log.Println("--------------------")
 		doc := hit.(map[string]interface{})["_source"].(map[string]interface{})
 		docID := hit.(map[string]interface{})["_id"].(string)
 		record := helper.UnescapeFieldsAndCreateRecord(doc, docID)

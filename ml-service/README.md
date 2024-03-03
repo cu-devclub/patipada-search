@@ -7,6 +7,26 @@ This service use to perform a vector search (LDA) as the support service for sea
 [deploy search service](../.github/workflows/search-deploy.yml)
 [deploy elastic db](../.github/workflows/elastic.yml)
 
+## BULK LDA
+The [script](/bulkLDA.py) is used for perform lda to exisiting datas in csv files
+it will read all the csv files inside [../data/record](../data/record/)
+then it will return the csv file in this format
+```
+index, question, answer
+yyyy,xxxx,zzzz
+```
+- the index is `youtubeURL` + `-` + `index` which will be match with the document we will insert to ElasticSearch
+- the question and answer is the lda vector 
+
+The script will save the csv file to [../data/lda](../data/lda/)
+
+this csv will be used in migration stage of search service. 
+
+To run the script
+
+```bash
+python bulkLDA.py
+```
 
 ## Run locally 
 If you do not want to run using docker you can run using python
@@ -42,30 +62,6 @@ python run.py
 
 ## API Reference
 
-#### Bulk LDA (return csv vector)
-
-```http
-  POST /bulk_lda
-```
-
-###### Response
-| Code         | Message   | Description           |
-|--------------|--------|-----------------------|
-| 200 |  |  |
-| 500 |  |  |
-
-#### Search
-
-```http
-  POST /lda
-```
-
-###### Response 
-| Code         | Message   | Description           |
-|--------------|--------|-----------------------|
-| 200 |  |  |
-| 400 | bad request  | not attach query or amount invalid |
-| 500 | Internal server error  | something went wrong in server |
 
 ## Tech stack 
 **Language** : Python
@@ -82,6 +78,7 @@ python run.py
     ├── app.env                 # default env file
     ├── config.py               # get config (app.env and overrided)
     ├── run.py                  # entry point of service
+    ├── bulkLDA.py              # run bulk lda for existing data
     ├── requirements.txt        # list of requirement packages             
     ├── Dockerfile              # Docker file use to build docker image
     └── README.md

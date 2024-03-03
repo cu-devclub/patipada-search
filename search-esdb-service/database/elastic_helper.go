@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
@@ -21,21 +22,21 @@ func (es *elasticDatabase) CheckClusterHealth() {
 	// Perform the request
 	res, err := req.Do(context.Background(), es.GetDB())
 	if err != nil {
-		fmt.Printf("Error checking cluster health: %s", err)
+		log.Printf("Error checking cluster health: %s", err)
 		return
 	}
 	defer res.Body.Close()
 
 	// Check the response status
 	if res.IsError() {
-		fmt.Printf("Error: %s", res.Status())
+		log.Printf("Error: %s", res.Status())
 		return
 	}
 
 	// Print the cluster health information
-	fmt.Println("Elastic Cluster Health:")
-	fmt.Println("---------------")
-	fmt.Printf("Status: %s\n", res.Status())
+	log.Println("Elastic Cluster Health:")
+	log.Println("---------------")
+	log.Printf("Status: %s\n", res.Status())
 
 }
 
@@ -61,7 +62,7 @@ func (es *elasticDatabase) checkPlugins() error {
 
 	// Check the response status
 	if res.IsError() {
-		return fmt.Errorf("Elasticsearch error: %s", res.Status())
+		return fmt.Errorf("elasticsearch error: %s", res.Status())
 	}
 
 	// Decode the JSON response
@@ -71,7 +72,7 @@ func (es *elasticDatabase) checkPlugins() error {
 	}
 
 	if len(plugins) == 0 {
-		return fmt.Errorf("No plugins installed")
+		return fmt.Errorf("no plugins installed")
 	}
 	// Print the list of installed plugins
 	for _, plugin := range plugins {

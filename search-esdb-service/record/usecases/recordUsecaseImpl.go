@@ -1,18 +1,18 @@
 package usecases
 
 import (
-	"search-esdb-service/data"
-	"search-esdb-service/record/repositories"
+	recordRepository "search-esdb-service/record/repositories/recordRepository"
+	mlRepository "search-esdb-service/record/repositories/mlRepository"
 )
 
 type recordUsecaseImpl struct {
-	recordRepository repositories.RecordRepository
-	dataI            data.Data
+	recordRepository recordRepository.RecordRepository
+	mlRepository     mlRepository.MLRepository
 }
 
-func NewRecordUsecase(recordRepository repositories.RecordRepository, dataI data.Data) RecordUsecase {
+func NewRecordUsecase(recordRepository recordRepository.RecordRepository, mlRepository mlRepository.MLRepository) RecordUsecase {
 	return &recordUsecaseImpl{
 		recordRepository: recordRepository,
-		dataI:            dataI,
+		mlRepository:     mlRepository,
 	}
 }

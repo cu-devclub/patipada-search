@@ -4,14 +4,18 @@
 
 package entities
 
+import "fmt"
+
 type (
 	Record struct {
-		Index      string `json:"index"`
-		YoutubeURL string `json:"youtubeURL"`
-		Question   string `json:"question"`
-		Answer     string `json:"answer"`
-		StartTime  string `json:"startTime"`
-		EndTime    string `json:"endTime"`
+		Index       string    `json:"index"`
+		YoutubeURL  string    `json:"youtubeURL"`
+		Question    string    `json:"question"`
+		Answer      string    `json:"answer"`
+		StartTime   string    `json:"startTime"`
+		EndTime     string    `json:"endTime"`
+		QuestionLDA []float64 `json:"question_lda,omitempty"`
+		AnswerLDA   []float64 `json:"answer_lda,omitempty"`
 	}
 
 	UpdateRecord struct {
@@ -30,3 +34,7 @@ type (
 		Position    int    `json:"position"`
 	}
 )
+
+func (r *Record) ToString() string {
+	return fmt.Sprintf("Index: %s, YoutubeURL: %s, Question: %s, Answer: %s, StartTime: %s, EndTime: %s, QuestionLDA: %v, AnswerLDA: %v", r.Index, r.YoutubeURL, r.Question, r.Answer, r.StartTime, r.EndTime, r.QuestionLDA, r.AnswerLDA)
+}

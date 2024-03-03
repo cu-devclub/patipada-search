@@ -10,161 +10,140 @@ import (
 	"search-esdb-service/database"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
-	"search-esdb-service/record/repositories"
+	recordRepository "search-esdb-service/record/repositories/recordRepository"
+	"search-esdb-service/util"
 	"strings"
 
 	"github.com/elastic/go-elasticsearch/v8"
 )
 
 const (
-	CREATE_INDEX_ICU_TOKENIZER = `
+	IndexCreationBody = `
 {
   "settings": {
-    "index": {
-      "analysis": {
-        "analyzer": {
-          "analyzer_shingle": {
-            "tokenizer": "icu_tokenizer",
-            "filter": ["filter_shingle"]
-          }
-        },
-        "filter": {
-          "filter_shingle": {
-            "type": "shingle",
-            "max_shingle_size": 3,
-            "min_shingle_size": 2,
+	"index": {
+	  "analysis": {
+		"analyzer": {
+		  "analyzer_shingle": {
+			"tokenizer": "icu_tokenizer",
+			"filter": ["filter_shingle"]
+		  }
+		},
+		"filter": {
+		  "filter_shingle": {
+			"type": "shingle",
+			"max_shingle_size": 3,
+			"min_shingle_size": 2,
 			"output_unigrams": true
-          }
-        }
-      }
-    }
+		  }
+		}
+	  }
+	}
   },
-    "mappings": {
-    "properties": {
-      "youtubeURL": {
-        "type": "text"
-      },
-      "question": {
-        "type": "text",
-        "analyzer": "analyzer_shingle"
-      },
-      "answer": {
-        "type": "text",
-        "analyzer": "analyzer_shingle"
-      },
-      "startTime": {
-        "type": "text"
-      },
-      "endTime": {
-        "type": "text"
-      }
-    }
+	"mappings": {
+	"properties": {
+	  "youtubeURL": {
+		"type": "text"
+	  },
+	  "question": {
+		"type": "text",
+		"analyzer": "analyzer_shingle"
+	  },
+	  "question_lda":{
+		"type": "dense_vector",
+		"dims": 5
+	  },
+	  "answer": {
+		"type": "text",
+		"analyzer": "analyzer_shingle"
+	  },
+	  "answer_lda":{
+		"type": "dense_vector",
+		"dims": 5
+	  },
+	  "startTime": {
+		"type": "text"
+	  },
+	  "endTime": {
+		"type": "text"
+	  }
+	}
   }
 }
 `
 )
 
-// Migration steps
-// Create index named `record`; if not exists else return
-// Convert file in csv format to json format from data folder
-// insert json to es
-// ------------------------------
-
-// RecordMigrate migrates records to Elasticsearch.
-//
-// Takes a *config.Config and a database.Database as parameters.
-// Does not return anything.
-func RecordMigrate(cfg *config.Config, es database.Database) {
+func MigrateRecords(cfg *config.Config, es database.Database) {
+	log.Println("Starting migration...")
 	client := es.GetDB()
 	indexName := "record"
-	exists, err := indexExists(client, indexName)
+	exists, err := doesIndexExist(client, indexName)
 	if err != nil {
 		panic(err)
 	}
 	if exists {
-		log.Println("---------DATA ALREADY EXISTS---------")
-		return // index already exists
+		log.Println("-----Index already exists, no need to migrate ------")
+		return
 	}
 
-	// Create the index
-	log.Println("INDEX DOES NOT EXIST, CREATING INDEX")
+	log.Println("Creating index record ....")
 	res, err := client.Indices.Create(
 		indexName,
-		client.Indices.Create.WithBody(strings.NewReader(CREATE_INDEX_ICU_TOKENIZER)),
+		client.Indices.Create.WithBody(strings.NewReader(IndexCreationBody)),
 	)
 	if err != nil {
 		panic(err)
 	}
-	log.Print("CREATING INDEX RESPONSE: ", res)
+	log.Println("Creating index record response:", res)
 
-	// Convert csv file
-	log.Println("CONVERTING CSV-----------")
-	records, err := ConvertCSVFilesInDirectory(cfg)
+	log.Println("Converting CSV to records and updating with LDA...")
+	records, err := ConvertCSVToRecords(cfg)
 	if err != nil {
 		panic(err)
 	}
 
-	log.Println("CHECKING CLUSTER HEALTH")
+	records, err = UpdateRecordsWithLDA(cfg, records)
+	if err != nil {
+		panic(err)
+	}
+
 	es.CheckClusterHealth()
-	
-	log.Println("INSERTING DATA TO ES-----------")
-	// bulk insert records to es
-	recordESRepository := repositories.NewRecordESRepository(es.GetDB())
+
+	log.Println("Bulk inserting records...")
+	recordESRepository := recordRepository.NewRecordESRepository(es.GetDB())
 	if err := recordESRepository.BulkInsert(records); err != nil {
 		panic(err)
 	}
-
-	log.Printf("Successfully migrated %d records\n", len(records))
+	log.Println("Migration finished !!!!")
 }
 
-// indexExists checks if the index exists using the Indices.Exists API.
-//
-// It takes a client *elasticsearch.Client and an indexName string as parameters.
-// It returns a bool indicating whether the index exists and an error if any.
-func indexExists(client *elasticsearch.Client, indexName string) (bool, error) {
-	// Check if the index exists using the Indices.Exists API
+func doesIndexExist(client *elasticsearch.Client, indexName string) (bool, error) {
 	res, err := client.Indices.Exists([]string{indexName})
 	if err != nil {
-		log.Println("Error checking if the index exists:", err)
 		return false, err
 	}
-	log.Println("INDEX EXISTS : " ,res.StatusCode != 404)
 	return res.StatusCode != 404, nil
 }
 
-// ConvertCSVFilesInDirectory converts CSV files in the specified
-// directory into a slice of entities.Record structs.
-//
-// It takes a directory path as a parameter and returns a slice of
-// entities.Record structs and an error.
-func ConvertCSVFilesInDirectory(cfg *config.Config) ([]*entities.Record, error) {
-	
+func ConvertCSVToRecords(cfg *config.Config) ([]*entities.Record, error) {
 	dataDirPath := cfg.Static.DataPath + cfg.Static.RecordPath
-	
-	dir,err := data.GetRecordCSVFilesEntry(cfg)
+	dir, err := data.GetRecordCSVFilesEntry(cfg)
 	if err != nil {
 		return nil, err
 	}
 
 	var records []*entities.Record
-
-	log.Println("CONVERTING CSV TO JSON")
-	// Read Files in directory (in case more than 1 file)
 	for _, entry := range dir {
-		// Check if the entry is a regular file and has a .csv extension
 		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".csv") {
 			continue
 		}
 
-		// Build the full path to the CSV file
 		csvFilePath := filepath.Join(dataDirPath, entry.Name())
 		fileName := strings.TrimSuffix(entry.Name(), ".csv")
 
-		// Insert data from the CSV file
-		r, err := generateDataFromCSV(csvFilePath, fileName)
+		r, err := generateRecordsFromCSV(csvFilePath, fileName)
 		if err != nil {
-			log.Printf("Error inserting data from CSV file %s: %s\n", csvFilePath, err)
-			continue // Continue to the next file if there's an error
+			continue
 		}
 		records = append(records, r...)
 	}
@@ -172,41 +151,25 @@ func ConvertCSVFilesInDirectory(cfg *config.Config) ([]*entities.Record, error) 
 	return records, nil
 }
 
-// generateDataFromCSV generates a slice of entities.Record structs from a CSV file.
-//
-// Parameters:
-// - filePath: the path to the CSV file.
-// - fileName: the name of the CSV file.
-//
-// Returns:
-// - []*entities.Record: a slice of entities.Record structs representing the CSV records.
-// - error: an error if there was a problem reading the CSV file.
-func generateDataFromCSV(filePath string, fileName string) ([]*entities.Record, error) {
-	// Open the CSV file
+func generateRecordsFromCSV(filePath string, fileName string) ([]*entities.Record, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	// Create a CSV reader
 	reader := csv.NewReader(file)
-
-	// Read and discard the header line
 	if _, err := reader.Read(); err != nil {
 		return nil, err
 	}
 
-	// FOR BULKING
 	var qaRecords []*entities.Record
-	// Read CSV records and insert them into Elasticsearch
 	for {
 		record, err := reader.Read()
 		if err != nil {
-			// End of file
 			break
 		}
-		//Empty Record
+
 		ch := false
 		for i := range record {
 			if record[i] == "" {
@@ -218,18 +181,15 @@ func generateDataFromCSV(filePath string, fileName string) ([]*entities.Record, 
 			continue
 		}
 
-		// Remove newline characters from the fields
 		for i := range record {
 			record[i] = helper.EscapeText(record[i])
 		}
 
-		// Escape . to : in record[2] and record[3] (starttime and endtime)
 		record[2] = strings.ReplaceAll(record[2], ".", ":")
 		record[3] = strings.ReplaceAll(record[3], ".", ":")
 
-		// Assuming your CSV columns are in the order: Question, Answe``r, StartTime, EndTime
 		qar := &entities.Record{
-			Index:      record[4],
+			Index:      record[5] + "-" + record[4],
 			YoutubeURL: record[5],
 			Question:   record[0],
 			Answer:     record[1],
@@ -237,8 +197,64 @@ func generateDataFromCSV(filePath string, fileName string) ([]*entities.Record, 
 			EndTime:    record[3],
 		}
 
-		qaRecords = append(qaRecords, qar) // FOR BULKING
+		qaRecords = append(qaRecords, qar)
 	}
 
 	return qaRecords, nil
 }
+
+func UpdateRecordsWithLDA(cfg *config.Config, records []*entities.Record) ([]*entities.Record, error) {
+	ldaDirPath := cfg.Static.DataPath + cfg.Static.LDAPath
+	dir, err := os.ReadDir(ldaDirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	recordMap := make(map[string]*entities.Record)
+	for _, record := range records {
+		recordMap[record.Index] = record
+	}
+
+	for _, entry := range dir {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".csv") {
+			continue
+		}
+
+		csvFilePath := filepath.Join(ldaDirPath, entry.Name())
+		file, err := os.Open(csvFilePath)
+		if err != nil {
+			continue
+		}
+		defer file.Close()
+
+		reader := csv.NewReader(file)
+		for {
+			record, err := reader.Read()
+			if err != nil {
+				break
+			}
+
+			if recordEntity, ok := recordMap[record[0]]; ok {
+				questionLDA, err := util.ConvertStringToFloat64Arrays(record[1])
+				if err != nil {
+					return nil, err
+				}
+				if questionLDA != nil {
+					recordEntity.QuestionLDA = questionLDA
+				}
+
+				answerLDA, err := util.ConvertStringToFloat64Arrays(record[2])
+				if err != nil {
+					return nil, err
+				}
+				if answerLDA != nil {
+					recordEntity.AnswerLDA = answerLDA
+				}
+
+			}
+		}
+	}
+
+	return records, nil
+}
+

@@ -3,9 +3,9 @@ package server
 import (
 	"fmt"
 	"search-esdb-service/config"
-	"search-esdb-service/data"
 	recordHandlers "search-esdb-service/record/handlers"
-	recordRepository "search-esdb-service/record/repositories"
+	mlRepository "search-esdb-service/record/repositories/mlRepository"
+	recordRepository "search-esdb-service/record/repositories/recordRepository"
 	recordUsecases "search-esdb-service/record/usecases"
 
 	"github.com/elastic/go-elasticsearch/v8"
@@ -14,18 +14,16 @@ import (
 )
 
 type ginServer struct {
-	app   *gin.Engine
-	db    *elasticsearch.Client
-	cfg   *config.Config
-	dataI *data.Data
+	app *gin.Engine
+	db  *elasticsearch.Client
+	cfg *config.Config
 }
 
-func NewGinServer(cfg *config.Config, db *elasticsearch.Client, dataI *data.Data) Server {
+func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
 	return &ginServer{
-		app:   gin.Default(),
-		db:    db,
-		cfg:   cfg,
-		dataI: dataI,
+		app: gin.Default(),
+		db:  db,
+		cfg: cfg,
 	}
 }
 
@@ -53,8 +51,8 @@ func (g *ginServer) Start() {
 // endpoints of the record API, such as "/displayAllRecords" and "/search".
 func (g *ginServer) initializeRecordHttpHandler() {
 	recordESRepository := recordRepository.NewRecordESRepository(g.db)
-
-	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, *g.dataI)
+	mlRepository := mlRepository.NewMLServiceRepository()
+	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository)
 
 	recordHttpHandler := recordHandlers.NewRecordHttpHandler(recordUsecase)
 

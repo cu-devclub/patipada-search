@@ -57,3 +57,22 @@ func BuildElasticsearchQuery(query string) (string, error) {
 
 	return string(queryJSON), nil
 }
+
+func BuildKNNQuery(queryVector []float64, field string) (string, error) {
+	knnQuery := map[string]interface{}{
+		"query_vector":   queryVector, // The vector to find neighbors for
+		"k":              10,          // Number of nearest neighbors to retrieve
+		"field":          field,       // The field to compare with
+		"num_candidates": 50,
+	}
+	query := map[string]interface{}{
+		"knn": knnQuery,
+	}
+
+	queryJSON, err := json.Marshal(query)
+	if err != nil {
+		return "", err
+	}
+
+	return string(queryJSON), nil
+}

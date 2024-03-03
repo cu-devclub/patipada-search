@@ -24,9 +24,9 @@ type (
 		Password string
 	}
 	Static struct {
-		DataPath     string
-		RecordPath   string
-		StopWordPath string
+		DataPath   string
+		RecordPath string
+		LDAPath    string
 	}
 )
 
@@ -54,9 +54,9 @@ func GetConfig() Config {
 			Password: viper.GetString("ESDB_PASSWORD"),
 		},
 		Static: Static{
-			DataPath:     viper.GetString("STATIC_DATA"),
-			RecordPath:   viper.GetString("RECORD_DATA_PATH"),
-			StopWordPath: viper.GetString("STOPWORD_PATH"),
+			DataPath:   viper.GetString("STATIC_DATA"),
+			RecordPath: viper.GetString("RECORD_DATA_PATH"),
+			LDAPath:    viper.GetString("LDA_DATA_PATH"),
 		},
 	}
 }

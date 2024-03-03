@@ -8,7 +8,8 @@ import (
 	"search-esdb-service/config"
 	search_proto "search-esdb-service/proto/search_proto"
 	"search-esdb-service/record/models"
-	recordRepository "search-esdb-service/record/repositories"
+	mlRepository "search-esdb-service/record/repositories/mlRepository"
+	recordRepository "search-esdb-service/record/repositories/recordRepository"
 	recordUsecases "search-esdb-service/record/usecases"
 
 	"google.golang.org/grpc"
@@ -39,9 +40,9 @@ func GRPCListen(server Server, cfg *config.Config) {
 func (a *GRPCServer) SearchRecord(ctx context.Context, req *search_proto.SearchRequest) (*search_proto.SearchResponse, error) {
 	log.Println("Receiving search request from gRPC client...")
 	recordESRepository := recordRepository.NewRecordESRepository(a.server.GetDB())
-
+	mlRepository := mlRepository.NewMLServiceRepository()
 	// ignoring dataI (use to store stopword)
-	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository,nil)
+	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository)
 
 	result, err := recordUsecase.SearchByRecordIndex("record", req.Query)
 	if err != nil {
@@ -60,9 +61,9 @@ func (a *GRPCServer) SearchRecord(ctx context.Context, req *search_proto.SearchR
 func (a *GRPCServer) UpdateRecord(ctx context.Context, req *search_proto.UpdateRecordRequest) (*search_proto.UpdateRecordResponse, error) {
 	log.Println("Receiving update record request from gRPC client...")
 	recordESRepository := recordRepository.NewRecordESRepository(a.server.GetDB())
-
+	mlRepository := mlRepository.NewMLServiceRepository()
 	// ignore dataI (use to store stopword)
-	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository,nil)
+	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository)
 
 	record := &models.UpdateRecord{
 		DocumentID: req.Index,

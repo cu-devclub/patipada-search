@@ -13,3 +13,7 @@ app = create_app(env)
 if __name__ == "__main__":
     # Run the Flask app with the specified port
     app.run(port=app.config['PORT'],debug=app.config['DEBUG'])
+
+# TODO : tokenized the text apis => Done
+# TODO : remove stop words from text apis => Done
+# TODO : LDA => Done
