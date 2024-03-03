@@ -8,9 +8,10 @@ import (
 
 type (
 	Config struct {
-		App    App
-		ESDB   ESDB
-		Static Static
+		App      App
+		ESDB     ESDB
+		RabbitMQ RabbitMQ
+		Static   Static
 	}
 
 	App struct {
@@ -22,6 +23,11 @@ type (
 		URL      string
 		Username string
 		Password string
+	}
+	RabbitMQ struct {
+		URL            string
+		Username       string
+		Password       string
 	}
 	Static struct {
 		DataPath   string
@@ -52,6 +58,11 @@ func GetConfig() Config {
 			URL:      viper.GetString("ESDB_URL"),
 			Username: viper.GetString("ESDB_USERNAME"),
 			Password: viper.GetString("ESDB_PASSWORD"),
+		},
+		RabbitMQ: RabbitMQ{
+			URL:            viper.GetString("RABBITMQ_URL"),
+			Username:       viper.GetString("RABBITMQ_USERNAME"),
+			Password:       viper.GetString("RABBITMQ_PASSWORD"),
 		},
 		Static: Static{
 			DataPath:   viper.GetString("STATIC_DATA"),

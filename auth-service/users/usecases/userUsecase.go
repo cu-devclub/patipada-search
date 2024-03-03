@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"auth-service/errors"
 	"auth-service/users/models"
 
 	"github.com/labstack/echo/v4"
@@ -110,7 +109,7 @@ type UsersUsecase interface {
 	// - 400 Bad request ; missing token
 	// - 401 Unauthorize ; invalid token
 	// - 500 internal server error
-	VerifyToken(c echo.Context) (bool, *errors.RequestError)
+	VerifyToken(c echo.Context) (bool, error)
 
 	VerifyUsername(username string) (bool, error)
 
@@ -125,5 +124,5 @@ type UsersUsecase interface {
 	// - 400 Bad request ; missing token
 	// - 401 Unauthorize ; invalid token
 	// - 500 internal server error
-	Authorize(c echo.Context, requireRole string) (bool, *errors.RequestError)
+	Authorize(c echo.Context, requireRole string) (bool, error)
 }

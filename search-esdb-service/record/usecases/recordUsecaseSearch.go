@@ -7,7 +7,6 @@ import (
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
 	"search-esdb-service/record/models"
-	"search-esdb-service/util"
 	"strings"
 )
 
@@ -80,13 +79,9 @@ func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount i
 }
 
 func (r *recordUsecaseImpl) SearchByRecordIndex(indexName, recordIndex string) (*models.Record, error) {
-	str, err := util.DecreaseIndexForSearchByIndex(recordIndex)
-	if err != nil {
-		return nil, errors.CreateError(400, err.Error())
-	}
 	// search the record
-	records, isFound, err := r.recordRepository.SearchByRecordIndex(indexName, str)
-	if !isFound {
+	records, isFound, err := r.recordRepository.SearchByRecordIndex(indexName, recordIndex)
+	if isFound == false && err != nil {
 		if err.Error() == messages.ELASTIC_404_ERROR {
 			return nil, nil
 		} else if err.Error() != messages.ELASTIC_405_ERROR {

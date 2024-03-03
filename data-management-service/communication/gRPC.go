@@ -5,7 +5,6 @@ import (
 	"data-management/config"
 	"data-management/proto/auth_proto"
 	"data-management/proto/search_proto"
-	"data-management/request/entities"
 	"fmt"
 	"log"
 	"time"
@@ -14,18 +13,19 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type gRPC struct {
-	authClient   auth_proto.AuthServiceClient
-	searchClient search_proto.SearchServiceClient
+type GRPCStruct struct {
+	AuthClient   auth_proto.AuthServiceClient
+	SearchClient search_proto.SearchServiceClient
 }
 
-// As a test for other feature that doesn't require gRPC,
-// we can create a temporary gRPC client that does nothing.
-func NewTempgRPC() Communication {
-	return &gRPC{}
+func NewMockgRPC() *GRPCStruct {
+	return &GRPCStruct{
+		AuthClient:   nil,
+		SearchClient: nil,
+	}
 }
 
-func NewgRPC(cfg *config.Config) Communication {
+func NewgRPC(cfg *config.Config) *GRPCStruct {
 	log.Println("Connecting to auth service via gRPC...")
 	authConn, err := grpc.Dial(fmt.Sprintf("%s:%d", cfg.App.AuthService, cfg.App.GRPCPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
@@ -45,24 +45,24 @@ func NewgRPC(cfg *config.Config) Communication {
 	authClient := auth_proto.NewAuthServiceClient(authConn)
 	searchClient := search_proto.NewSearchServiceClient(searchConn)
 
-	return &gRPC{
-		authClient:   authClient,
-		searchClient: searchClient,
+	return &GRPCStruct{
+		AuthClient:   authClient,
+		SearchClient: searchClient,
 	}
 }
 
-func (g *gRPC) Authorization(token string, requiredRole string) (bool, error) {
+func (g *CommunicationImpl) Authorization(token string, requiredRole string) (bool, error) {
 	log.Println("Authorization ....")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	result, err := g.authClient.Authorization(ctx, &auth_proto.AuthorizationRequest{Token: token, RequiredRole: requiredRole})
+	result, err := g.GRPC.AuthClient.Authorization(ctx, &auth_proto.AuthorizationRequest{Token: token, RequiredRole: requiredRole})
 	if err != nil {
 		log.Println("Error calling auth service via gRPC", err)
 		return false, err
 	}
 
-	if result.IsAuthorized != true {
+	if !result.IsAuthorized {
 		log.Println("User is not authorized")
 		return false, err
 	}
@@ -71,18 +71,18 @@ func (g *gRPC) Authorization(token string, requiredRole string) (bool, error) {
 	return true, nil
 }
 
-func (g *gRPC) VerifyUsername(username string) (bool, error) {
+func (g *CommunicationImpl) VerifyUsername(username string) (bool, error) {
 	log.Println("Verify Username : ", username, " ....")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	result, err := g.authClient.VerifyUsername(ctx, &auth_proto.VerifyUsernameRequest{Username: username})
+	result, err := g.GRPC.AuthClient.VerifyUsername(ctx, &auth_proto.VerifyUsernameRequest{Username: username})
 	if err != nil {
 		log.Println("Error calling auth service via gRPC", err)
 		return false, err
 	}
 
-	if result.IsVerified != true {
+	if !result.IsVerified {
 		log.Println("Username is not valid")
 		return false, err
 	}
@@ -91,14 +91,14 @@ func (g *gRPC) VerifyUsername(username string) (bool, error) {
 	return true, nil
 }
 
-func (g *gRPC) SearchRecord(recordID string) (bool, error) {
+func (g *CommunicationImpl) SearchRecord(recordID string) (bool, error) {
 	log.Println("Search Record : ", recordID, " ....")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	result, err := g.searchClient.SearchRecord(ctx, &search_proto.SearchRequest{Query: recordID})
-	log.Println("SearchRecord Result", result,"ERror",err)
-	if err != nil  {
+	result, err := g.GRPC.SearchClient.SearchRecord(ctx, &search_proto.SearchRequest{Query: recordID})
+	log.Println("SearchRecord Result", result, "ERror", err)
+	if err != nil {
 		if err.Error() != "rpc error: code = Unknown desc = Elasticsearch error: 405 Method Not Allowed" {
 			// grpc error with elastic which can be ignored
 			log.Println("Error calling search service via gRPC", err)
@@ -106,37 +106,11 @@ func (g *gRPC) SearchRecord(recordID string) (bool, error) {
 		}
 	}
 
-	if result.IsFounded != true {
+	if !result.IsFounded {
 		log.Println("Record is not found")
 		return false, err
 	}
 
 	log.Println("Record is found")
-	return true, nil
-}
-
-func (g *gRPC) UpdateRecord(record *entities.Record) (bool, error) {
-	log.Println("Update Record : ", record, " ....")
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-
-	result, err := g.searchClient.UpdateRecord(ctx, &search_proto.UpdateRecordRequest{
-		Index:     record.Index,
-		Question:  record.Question,
-		Answer:    record.Answer,
-		StartTime: record.StartTime,
-		EndTime:   record.EndTime,
-	})
-	if err != nil {
-		log.Println("Error calling search service via gRPC", err)
-		return false, err
-	}
-
-	if result.IsUpdated != true {
-		log.Println("Record is not updated")
-		return false, nil
-	}
-
-	log.Println("Record is updated")
 	return true, nil
 }

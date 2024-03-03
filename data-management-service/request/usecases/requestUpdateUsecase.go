@@ -120,8 +120,8 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) *errors.RequestE
 
 	// --- Update the record by sending plain text of `startTime`,`endTime`,`question`,`answer` to the record (search) service
 	log.Println("Update request usecase; Updating record ....")
-	result, err = r.requestRepositories.UpdateRecord(recordEntity)
-	if err != nil || result == false {
+	err = r.requestRepositories.UpdateRecord(recordEntity)
+	if err != nil {
 		log.Println("Error update record; Request: ", request, "Error: ", err)
 		return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
 	}

@@ -118,6 +118,8 @@ func (r *RecordESRepository) performSearch(indexName string, amount int, buildQu
 
 	var records []*entities.Record
 	for _, hit := range hits {
+		// log.Println("Hit:", hit.(map[string]interface{}))
+		// log.Println("--------------------")
 		doc := hit.(map[string]interface{})["_source"].(map[string]interface{})
 		docID := hit.(map[string]interface{})["_id"].(string)
 		record := helper.UnescapeFieldsAndCreateRecord(doc, docID)

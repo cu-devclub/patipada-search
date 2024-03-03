@@ -50,7 +50,7 @@ func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, *errors.RequestErr
 		return nil, errors.CreateError(http.StatusBadRequest, messages.MISSING_AUTHORIZATION)
 	}
 
-	claims,err := ValidateAndExtractToken(tokenString)
+	claims, err := ValidateAndExtractToken(tokenString)
 	if err != nil {
 		return nil, err
 	}

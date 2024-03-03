@@ -39,7 +39,7 @@ func (r *requestUsecase) GetRequest(status, username, requestID, index, approved
 	// validate username
 	if username != "" {
 		result, err := r.requestRepositories.ValidateUsername(username)
-		if err != nil || result == false {
+		if err != nil || !result {
 			log.Println("Error validate username", username)
 			return nil, errors.CreateError(400, messages.BAD_REQUEST)
 		}
@@ -48,7 +48,7 @@ func (r *requestUsecase) GetRequest(status, username, requestID, index, approved
 	// validate record ID
 	if index != "" {
 		result, err := r.requestRepositories.ValidateRecordIndex(index)
-		if err != nil || result == false  {
+		if err != nil || !result  {
 			log.Println("Error validate record index", index)
 			return nil, errors.CreateError(400, messages.BAD_REQUEST)
 		}
@@ -57,7 +57,7 @@ func (r *requestUsecase) GetRequest(status, username, requestID, index, approved
 	// validate approved by
 	if approvedBy != "" {
 		result, err := r.requestRepositories.ValidateUsername(approvedBy)
-		if err != nil || result == false {
+		if err != nil || !result {
 			log.Println("Error validate approved by", approvedBy)
 			return nil, errors.CreateError(400, messages.BAD_REQUEST)
 		}
@@ -84,6 +84,11 @@ func (r *requestUsecase) GetRequest(status, username, requestID, index, approved
 	if err != nil {
 		log.Println("Error get request from repository", err)
 		return nil, errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
+	}
+
+	if len(entitiesRequests) == 0 {
+		log.Println("Empty Result")
+		return []*models.Request{}, nil
 	}
 
 	var modelsRequests []*models.Request
@@ -136,7 +141,7 @@ func (r *requestUsecase) GetLastestRequestOfRecord(index string) (*models.Reques
 	}
 
 	if len(entitiesRequest) == 0 {
-		return nil, nil
+		return &models.Request{}, nil
 	}
 
 	// get the lastest request from `updated_at` field

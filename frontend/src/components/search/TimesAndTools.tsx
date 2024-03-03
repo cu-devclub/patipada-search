@@ -1,7 +1,7 @@
 import { RepeatIcon, EditIcon } from "@chakra-ui/icons";
 import { HStack, Tooltip, IconButton, Text } from "@chakra-ui/react";
 interface TimesAndToolsProps {
-  index: string
+  index: string;
   startTime: string;
   endTime: string;
   token?: string;
@@ -46,7 +46,9 @@ function TimesAndTools({
           <IconButton
             aria-label="Edit"
             icon={<EditIcon />}
-            onClick={() => navigate(`/contributor/edit-record/${index}`)}
+            onClick={() =>
+              navigate(`/contributor/edit-record/${index}`)
+            }
           />
         </Tooltip>
       )}

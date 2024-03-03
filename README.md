@@ -112,6 +112,10 @@ To run this project, you will need to add the following environment variables to
 
 `DOCKERHUB_USERNAME` : username for docker hub use only in production
 
+`RABBITMQ_USERNAME` : username for rabbit mq service; this value will be set as default user and needed services will used this value as credential
+
+`RABBITMQ_PASSWORD` : password for rabbit mq service; this value will be set as default user and needed services will used this value as credential
+
 > _<u>Note</u>_ if you run each project without docker e.g. `go run main.go` you do not need to assign the .env variables each service has default env variables in app.env except `SENDER_PASSWORD`, which you are required to assign in `app.env`
 
 ## Tech Stack
@@ -126,7 +130,7 @@ To run this project, you will need to add the following environment variables to
 
 **Machine Learning service:** Python, Flask
 
-**Communication:** GRPC
+**Communication:** GRPC, RabbitMQ
 
 **Containerization:** Docker
 

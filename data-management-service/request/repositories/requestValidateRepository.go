@@ -25,7 +25,7 @@ func (r *requestRepositories) ValidateRecordIndex(recordID string) (bool, error)
 	if err != nil {
 		return false, err
 	}
-	if result == false {
+	if !result {
 		return false, nil
 	}
 
@@ -49,7 +49,7 @@ func (r *requestRepositories) ValidateUsername(username string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if result == false {
+	if !result {
 		return false, nil
 	}
 
