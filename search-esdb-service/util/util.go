@@ -14,6 +14,20 @@ func Contains(arr []string, str string) bool {
 	return false
 }
 
+// Remove stopwords from token array
+// arr => tokens
+// slice => stopwords
+func RemoveSliceFromArrays(arr []string, slice []string) []string {
+	var result []string
+	for _, a := range arr {
+		if Contains(slice, a) {
+			continue
+		}
+		result = append(result, a)
+	}
+	return result
+}
+
 func ConvertStringToFloat64Arrays(arr string) ([]float64, error) {
 	if arr == "[]" {
 		// Empty array case

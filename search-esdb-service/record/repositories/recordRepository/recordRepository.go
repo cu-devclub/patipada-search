@@ -28,6 +28,8 @@ type RecordRepository interface {
 
 	VectorSearch(indexName string, query interface{}, amount int) ([]*entities.Record, error)
 
+	Tokenize(query string) ([]string, error)
+
 	SearchByRecordIndex(indexName, recordIndex string) (*entities.Record, bool, error)
 
 	// BulkInsert inserts multiple records into the Elasticsearch index.
