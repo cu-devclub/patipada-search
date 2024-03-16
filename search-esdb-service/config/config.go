@@ -1,16 +1,17 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/spf13/viper"
 )
 
+var cfg *Config
+
 type (
 	Config struct {
-		App    App
-		ESDB   ESDB
-		Static Static
+		App      App
+		ESDB     ESDB
+		RabbitMQ RabbitMQ
+		Static   Static
 	}
 
 	App struct {
@@ -23,26 +24,33 @@ type (
 		Username string
 		Password string
 	}
+	RabbitMQ struct {
+		URL      string
+		Username string
+		Password string
+	}
 	Static struct {
 		DataPath     string
 		RecordPath   string
-		StopWordPath string
+		LDAPath      string
+		StopwordPath string
 	}
 )
 
-func InitializeViper(path string) {
+func InitializeViper(path string) error {
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %v", err))
+		return err
 	}
+	return nil
 }
 
-func GetConfig() Config {
-	return Config{
+func ReadConfig() {
+	cfg = &Config{
 		App: App{
 			Port:        viper.GetInt("SERVER_PORT"),
 			FrontendURL: viper.GetString("FRONTEND_URL"),
@@ -53,10 +61,20 @@ func GetConfig() Config {
 			Username: viper.GetString("ESDB_USERNAME"),
 			Password: viper.GetString("ESDB_PASSWORD"),
 		},
+		RabbitMQ: RabbitMQ{
+			URL:      viper.GetString("RABBITMQ_URL"),
+			Username: viper.GetString("RABBITMQ_USERNAME"),
+			Password: viper.GetString("RABBITMQ_PASSWORD"),
+		},
 		Static: Static{
 			DataPath:     viper.GetString("STATIC_DATA"),
 			RecordPath:   viper.GetString("RECORD_DATA_PATH"),
-			StopWordPath: viper.GetString("STOPWORD_PATH"),
+			LDAPath:      viper.GetString("LDA_DATA_PATH"),
+			StopwordPath: viper.GetString("STOPWORD_PATH"),
 		},
 	}
+}
+
+func GetConfig() Config {
+	return *cfg
 }

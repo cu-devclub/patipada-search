@@ -1,9 +1,27 @@
 package handlers
 
-import "github.com/gin-gonic/gin"
+import (
+	"log/slog"
+
+	"github.com/gin-gonic/gin"
+)
+
+type HandlerOpts struct {
+	Name   string `json:"name"`
+	Method string `json:"method"`
+	Params any    `json:"params"`
+}
+
+func (h HandlerOpts) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("name", h.Name),
+		slog.String("method", h.Method),
+		slog.Any("params", h.Params),
+	)
+}
 
 type RecordHandler interface {
-	// GetAllRecords retrieves all records from the elastic database 
+	// GetAllRecords retrieves all records from the elastic database
 	// and sends a response back to the client.
 	//
 	// Response:

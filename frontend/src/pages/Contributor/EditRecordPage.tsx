@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { search } from "../../service/search";
+import { searchRecordIndex } from "../../service/search";
 import { getRequestByRecordIndex, insertRequest } from "../../service/data";
 import { useEffect, useState } from "react";
 import { EditRecordForm } from "../../components/contributor/edit-record";
@@ -26,14 +26,14 @@ function EditRecordPage() {
     const getRecord = async (recordID: string) => {
       await getRequestByRecordIndex(recordID)
         .then(async (res) => {
-          if (res.requestID == "NOT FOUND") {
+          if (res.requestID == "") {
             try {
               // Perform search when status is 404
-              const searchResult = await search(recordID,"default");
-              if (searchResult.data.length === 0) {
+              const searchResult = await searchRecordIndex(recordID);
+              if (searchResult.index == "") {
                 navigate("404");
               }
-              const request = mapDataItemToRequest(searchResult.data[0]);
+              const request = mapDataItemToRequest(searchResult);
               setData(request);
               addToast({
                 description: "ดึงข้อมูลสำเร็จ",

@@ -2,12 +2,16 @@
 
 This project is a part of the Waris Lakthong senior project, focusing on developing a hybrid search system for Dhammanva question-answer videos. The system is designed using a microservices architecture, with each backend service adhering to clean architecture principles.
 
+## !! Important Note
+To deploy / develop each service or each database please check README.md for each one. This README.md provided only overall of the project.
+
 ## Services Overview
 
 1. [Frontend Service](./frontend/)
 2. [Search Service](./search-esdb-service/)
 3. [Authentication Service](./auth-service/)
 4. [Data Management Service](./data-management-service/)
+5. [Machine learning Service](./ml-service/)
 
 ## Data Source
 
@@ -108,6 +112,10 @@ To run this project, you will need to add the following environment variables to
 
 `DOCKERHUB_USERNAME` : username for docker hub use only in production
 
+`RABBITMQ_USERNAME` : username for rabbit mq service; this value will be set as default user and needed services will used this value as credential
+
+`RABBITMQ_PASSWORD` : password for rabbit mq service; this value will be set as default user and needed services will used this value as credential
+
 > _<u>Note</u>_ if you run each project without docker e.g. `go run main.go` you do not need to assign the .env variables each service has default env variables in app.env except `SENDER_PASSWORD`, which you are required to assign in `app.env`
 
 ## Tech Stack
@@ -120,7 +128,9 @@ To run this project, you will need to add the following environment variables to
 
 **Data management service:** Golang, Gin, MongoDB
 
-**Communication:** GRPC
+**Machine Learning service:** Python, Flask
+
+**Communication:** GRPC, RabbitMQ
 
 **Containerization:** Docker
 
@@ -137,6 +147,7 @@ To run this project, you will need to add the following environment variables to
     ├── .github/workflows           # Workflow files (CI/CD)
     ├── nginx                       # nginx file for both dev and prod
     ├── search-esdb-service
+    ├── ml-service
     ├── data                        # Store data source 
         ├── record                  # Records (Q&A , start & end time, URL, ...)
         ├── stopword                # List of stopword 

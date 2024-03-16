@@ -3,32 +3,40 @@ package main
 import (
 	"auth-service/config"
 	"auth-service/database"
+	"auth-service/logging"
 	"auth-service/server"
 	usersMigrate "auth-service/users/migrations"
-	"fmt"
-	"log"
+	"log/slog"
+	// "log"
 )
 
 func main() {
-	// TODO : Implementing log service 
-	log.Println("Initializing config")
-	config.InitializeViper("./")
+	logging.NewSLogger()
+
+	if err := config.InitializeViper("./"); err != nil {
+		slog.Error("failed to initialize viper %w", err)
+		return
+	}
+	slog.Info("Viper initialized successfully")
+
+	config.ReadConfig()
 	cfg := config.GetConfig()
-	log.Println("Success initiliazed config",cfg)
 
-	db := database.NewPostgresDatabase(&cfg)
-	log.Println("Success connect to database")
-
-	err := usersMigrate.UsersMigrate(db)
+	db, err := database.NewPostgresDatabase(&cfg)
 	if err != nil {
-		_ = fmt.Errorf("failed to migrate %w", err)
+		slog.Error("failed to connect to database %w", err)
+		return
+	}
+	slog.Info("Successfully connected to database!")
+
+	if err := usersMigrate.UsersMigrate(db); err != nil {
+		slog.Error("failed to migrate default user %w", err)
 		return
 	}
 
 	s := server.NewEchoServer(&cfg, db.GetDb())
 
-	go server.GRPCListen(s,&cfg)
+	go server.GRPCListen(s, &cfg)
 
 	s.Start()
-
 }

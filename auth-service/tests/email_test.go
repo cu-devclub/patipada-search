@@ -16,6 +16,7 @@ func TestSendEmailWithGmail(t *testing.T) {
 	}
 
 	config.InitializeViper("../")
+	config.ReadConfig()
 	cfg := config.GetConfig()
 
 	sender := emailService.NewUserJordanWrightEmailing(cfg.Email.SenderName, cfg.Email.SenderEmail, cfg.Email.SenderPassword)

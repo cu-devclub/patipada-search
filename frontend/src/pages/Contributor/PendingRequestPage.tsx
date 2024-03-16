@@ -16,7 +16,7 @@ function PendingRequestPage() {
   useEffect(() => {
     const getRequest = async () => {
       const username = getCookie("username");
-      await getRequestByParams({ status: "pending", username: username })
+      await getRequestByParams({ username: username })
         .then((res) => {
           const r = res.map((item) => {
             item.startTime = extractStringFromHTML(item.startTime);

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"auth-service/config"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -12,7 +13,7 @@ type postgresDatabase struct {
 	Db *gorm.DB
 }
 
-func NewPostgresDatabase(cfg *config.Config) Database {
+func NewPostgresDatabase(cfg *config.Config) (Database, error) {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=%s TimeZone=%s",
 		cfg.Db.Host,
@@ -26,10 +27,10 @@ func NewPostgresDatabase(cfg *config.Config) Database {
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		return nil, err
 	}
 
-	return &postgresDatabase{Db: db}
+	return &postgresDatabase{Db: db}, nil
 }
 
 func (p *postgresDatabase) GetDb() *gorm.DB {

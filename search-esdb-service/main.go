@@ -1,40 +1,69 @@
 package main
 
 import (
-	"log"
+	"log/slog"
+	"search-esdb-service/communication"
 	"search-esdb-service/config"
+	"search-esdb-service/constant"
 	"search-esdb-service/data"
 	"search-esdb-service/database"
+	"search-esdb-service/logging"
 	recordMigrator "search-esdb-service/record/migration"
 	"search-esdb-service/server"
 )
 
 func main() {
-	log.Println("Starting server...")
 
-	log.Println("Initializing config...")
-	config.InitializeViper("./")
+	logging.NewSLogger()
 
+	if err := config.InitializeViper("./"); err != nil {
+		slog.Error("failed to initialize viper %w", err)
+		return
+	}
+	slog.Info("Viper initialized successfully!")
+
+	config.ReadConfig()
 	cfg := config.GetConfig()
-	log.Println("Config initialized")
 
-	log.Println("Connecting to database...")
-	db := database.NewElasticDatabase(&cfg)
-	log.Println("Success connect to database:")
+	if err := data.ReadStopWord(&cfg); err != nil {
+		slog.Error("Failed to read stop word", slog.String("err", err.Error()))
+		return
+	}
+	slog.Info("Read stop word successfully!")
 
-	log.Println("Starting migration...")
-	recordMigrator.RecordMigrate(&cfg, db)
-	log.Println("Migration finished")
+	db, err := database.NewElasticDatabase(&cfg)
+	if err != nil {
+		slog.Error("Failed to connect to database", slog.String("err", err.Error()))
+		return
+	}
+	slog.Info("Connect to es db successfully!")
 
-	log.Println("Initalizing data.....")
-	d := data.NewData(&cfg)
+	err = recordMigrator.MigrateRecords(&cfg, db)
+	if err != nil {
+		slog.Error("Failed to migrate records", slog.String("err", err.Error()))
+		return
+	}
+	slog.Info("Migrate records successfully!")
 
-	s := server.NewGinServer(&cfg, db.GetDB(), &d)
+	s := server.NewGinServer(&cfg, db.GetDB())
 
-	log.Println("Starting gRPC server...")
+	rabbitMQ, err := communication.ConnectToRabbitMQ(&cfg, db.GetDB(), *s.GetRecordArch())
+	if err != nil {
+		slog.Error("Failed to connect to RabbitMQ", slog.String("err", err.Error()))
+		return
+	}
+	slog.Info("Connect to RabbitMQ successfully!")
+
+	comm := communication.NewCommunicationImpl(*rabbitMQ)
+
+	go func() {
+		err := comm.Listen([]string{constant.UPDATE_RECORD_TOPIC})
+		if err != nil {
+			slog.Error("Failed to listen to RabbitMQ", slog.String("err", err.Error()))
+		}
+	}()
 	go server.GRPCListen(s, &cfg)
 
-	log.Println("Starting HTTP server on Port", cfg.App.Port, "...")
 	s.Start()
 
 }

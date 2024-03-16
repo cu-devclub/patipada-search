@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"data-management/constant"
 	"data-management/request/entities"
 	"time"
 
@@ -25,16 +26,17 @@ import (
 // if it takes too long.
 //
 // Example:
-//     request := &entities.Request{
-//         ID: "60d5ecf7c88f9a200f9e2c5a",
-//         Question: "Updated question",
-//         Answer: "Updated answer"
-//         ....
-//     }
-//     err := r.UpdateRequest(request)
-//     if err != nil {
-//         log.Fatal(err)
-//     }
+//
+//	request := &entities.Request{
+//	    ID: "60d5ecf7c88f9a200f9e2c5a",
+//	    Question: "Updated question",
+//	    Answer: "Updated answer"
+//	    ....
+//	}
+//	err := r.UpdateRequest(request)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
 func (r *requestRepositories) UpdateRequest(request *entities.Request) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -65,18 +67,20 @@ func (r *requestRepositories) UpdateRequest(request *entities.Request) error {
 	return nil
 }
 
-
-func (r *requestRepositories) UpdateRecord(record *entities.Record) (bool,error) {
-	result, err := r.communicationClient.UpdateRecord(&entities.Record{
-		Index: record.Index,
-		Question: record.Question,
-		Answer: record.Answer,
-		StartTime: record.StartTime,
-		EndTime: record.EndTime,
-	})
-	if err != nil {
-		return false, err
+func (r *requestRepositories) UpdateRecord(record *entities.Record) error {
+	entity := &entities.UpdateRecord{
+		DocumentID: record.Index,
+		Question:   record.Question,
+		Answer:     record.Answer,
+		StartTime:  record.StartTime,
+		EndTime:    record.EndTime,
 	}
-
-	return result,nil
+	err := r.communicationClient.PublishUpdateRecordsToRabbitMQ(
+		constant.UPDATE_RECORD_PAYLOAD_NAME, 
+		entity,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
 }

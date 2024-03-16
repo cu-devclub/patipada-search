@@ -2,6 +2,10 @@
 
 frontend service of dhammanava search system
 
+#### CI/CD : 
+[deploy frontend service](../.github/workflows/frontend-deploy.yml)
+
+
 ## Prerequisites
 
 Make sure you have the following tools installed on your machine:

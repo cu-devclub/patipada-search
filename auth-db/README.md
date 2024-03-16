@@ -2,7 +2,7 @@ Description
 ============================
 > using to initialize authentication database (postgreSQL)
 
-The [init.sql](./init.sql) will automatically grab by [docker-compose.dev.yml](../docker-compose.dev.yml) file and used it in initialize docker container phase. 
+The [init.sql](./init.sql) will automatically grab by docker-compose.<dev/prod>.yml file and used it in initialize docker container phase. 
 ### init.sql : `users` table
 ```
 - ID                        # uuid 
@@ -15,3 +15,8 @@ The [init.sql](./init.sql) will automatically grab by [docker-compose.dev.yml](.
 - reset_token               # reset password token
 - reset_token_expires_at    # expire time (15 minutes)
 ```
+
+## Deploy 
+To deploy this service using both Makefile or docker compose file, you need to copy this directory to the destination server for docker compose file to grap and `init.sql`
+ 
+> This process is also has CI/CD pipelines [here](../.github/workflows/auth-db.yml) which copy this directory and restart container

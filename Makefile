@@ -12,14 +12,14 @@ up_build:  build_auth build_search build_data build_frontend
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq
 	@echo "Docker images built and started!"
 
 up_build_backend: build_auth build_search build_data
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service rabbitmq
 	@echo "Docker images built and started!"
 
 ####### AUTH SERVICE #######
@@ -74,6 +74,17 @@ down_search:
 	@echo "Stopping search service..."
 	docker compose -f docker-compose.dev.yml down search-service
 	@echo "Search service stopped!"
+
+## empty_elastic: stops elastic-db (if running), remove volumes, starts elastic-db
+## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
+empty_elastic:
+	@echo "Stopping elastic-db (if running...)"
+	docker compose -f docker-compose.dev.yml down elastic-db
+	@echo "Remove volumes..."
+	rm -rf ./volumes/database/elastic
+	@echo "starting elastic-db containers..."
+	docker compose -f docker-compose.dev.yml up --build -d elastic-db
+	@echo "elastic-db started!"
 
 ## up_dev_search: stops db container and rebuild and start go server
 up_dev_search:

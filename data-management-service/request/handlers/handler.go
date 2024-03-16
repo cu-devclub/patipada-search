@@ -1,6 +1,24 @@
 package handlers
 
-import "github.com/gin-gonic/gin"
+import (
+	"log/slog"
+
+	"github.com/gin-gonic/gin"
+)
+
+type HandlerOpts struct {
+	Name   string `json:"name"`
+	Method string `json:"method"`
+	Params any    `json:"params"`
+}
+
+func (h HandlerOpts) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("name", h.Name),
+		slog.String("method", h.Method),
+		slog.Any("params", h.Params),
+	)
+}
 
 type Handlers interface {
 	// InsertRequest is a HTTP handler function that inserts a new Request into the database.
@@ -79,12 +97,12 @@ type Handlers interface {
 	GetRequest(c *gin.Context)
 
 	// GetLastestRequestOfRecord is a handler function for the GET /request/latest endpoint.
-	// Query Parameters: 
+	// Query Parameters:
 	// 	- index: The index of the record.
 	// It retrieves the latest request of a record based on the provided index query parameter.
 	// The function responds with a JSON object that includes the latest request.
 	// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
-	// 
+	//
 	// Possible error status codes are
 	// 		400 (Bad Request) and
 	// 		500 (Internal Server Error).

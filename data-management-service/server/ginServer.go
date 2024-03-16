@@ -24,22 +24,27 @@ type ginServer struct {
 }
 
 func NewGinServer(cfg *config.Config, db *database.Database, v *validator.Validator, c communication.Communication) Server {
-	return &ginServer{
-		app:       gin.Default(),
+	g := gin.Default()
+	// Allow CORS from frontend
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{cfg.App.FrontendURL, "http://localhost:5173"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	g.Use(cors.New(config))
+
+	serv := &ginServer{
+		app:       g,
 		db:        db,
 		cfg:       cfg,
 		validator: v,
 		comm:      c,
 	}
+
+	serv.initializeRequestHttpHandler()
+
+	return serv
 }
 
 func (g *ginServer) Start() {
-	// Allow CORS from frontend
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{g.cfg.App.FrontendURL, "http://localhost:5173"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
-	g.app.Use(cors.New(config))
-	g.initializeRequestHttpHandler()
 	g.app.Run(fmt.Sprintf(":%d", g.cfg.App.Port))
 }
 

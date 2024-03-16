@@ -4,26 +4,51 @@ import (
 	"data-management/communication"
 	"data-management/config"
 	"data-management/database"
+	"data-management/logging"
 	"data-management/server"
 	validator "data-management/structValidator"
-	"log"
+	"log/slog"
 )
 
+// TODO : make service can run even other service not there (gRPC connection)
 func main() {
-	log.Println("Initializing config...")
-	config.InitializeViper("./")
-	log.Println("Getting config...")
+	logging.NewSLogger()
+
+	if err := config.InitializeViper("./"); err != nil {
+		slog.Error("failed to initialize viper %w", err)
+		return
+	}
+	slog.Info("Viper initialized successfully!")
+
+	config.ReadConfig()
 	cfg := config.GetConfig()
 
-	log.Println("Connecting to MongoDB...")
-	db := database.NewMongoDatabase(&cfg)
-	log.Println("Connected to MongoDB!")
+	db, err := database.NewMongoDatabase(&cfg)
+	if err != nil {
+		slog.Error("Failed to connect to database", slog.String("err", err.Error()))
+		return
+	}
+	slog.Info("Connect to es db successfully!")
 
 	validate := validator.NewValidator()
 
-	comm := communication.NewgRPC(&cfg)
-	// comm := communication.NewTempgRPC()
+	grpc, err := communication.NewgRPC(&cfg)
+	if err != nil {
+		slog.Error("Failed to connect to gRPC", slog.String("err", err.Error()))
+		return
+	}
+	// grpc := communication.NewMockgRPC()
+	slog.Info("Connect to gRPC successfully!")
 
-	log.Println("Starting server...")
+	rabbit, err := communication.ConnectToRabbitMQ(&cfg)
+	if err != nil {
+		slog.Error("Failed to connect to RabbitMQ", slog.String("err", err.Error()))
+		return
+	}
+	defer rabbit.Conn.Close()
+	slog.Info("Connect to RabbitMQ successfully!")
+
+	comm := communication.NewCommunicationImpl(*grpc, *rabbit)
+
 	server.NewGinServer(&cfg, &db, &validate, comm).Start()
 }

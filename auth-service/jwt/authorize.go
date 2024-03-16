@@ -29,6 +29,7 @@ func HasAuthorizeRole(requesterRole string, requiredRole string, allowEqualRole 
 		}
 	}
 
+	log.Println("HasAuthorizeRole : requesterRole : ", requesterRole, " requiredRole : ", requiredRole, " allowEqualRole : ", allowEqualRole, " return true")
 	return true
 }
 

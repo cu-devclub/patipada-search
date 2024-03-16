@@ -1,15 +1,16 @@
 package config
 
 import (
-	"log"
-
 	"github.com/spf13/viper"
 )
 
+var cfg *Config
+
 type (
 	Config struct {
-		App App
-		DB  Database
+		App      App
+		RabbitMQ RabbitMQ
+		DB       Database
 	}
 	App struct {
 		Port          int
@@ -17,6 +18,11 @@ type (
 		FrontendURL   string
 		AuthService   string
 		SearchService string
+	}
+	RabbitMQ struct {
+		URL      string
+		Username string
+		Password string
 	}
 	Database struct {
 		Host     string
@@ -27,25 +33,32 @@ type (
 	}
 )
 
-func InitializeViper(path string) {
+func InitializeViper(path string) error {
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Printf("Error reading config file, %s", err)
+		return err
 	}
+
+	return nil
 }
 
-func GetConfig() Config {
-	return Config{
+func ReadConfig() {
+	cfg = &Config{
 		App: App{
 			Port:          viper.GetInt("APP_PORT"),
 			GRPCPort:      viper.GetInt("GRPC_PORT"),
 			FrontendURL:   viper.GetString("FRONTEND_URL"),
 			AuthService:   viper.GetString("AUTH_SERVICE"),
 			SearchService: viper.GetString("SEARCH_SERVICE"),
+		},
+		RabbitMQ: RabbitMQ{
+			URL:      viper.GetString("RABBITMQ_URL"),
+			Username: viper.GetString("RABBITMQ_USERNAME"),
+			Password: viper.GetString("RABBITMQ_PASSWORD"),
 		},
 		DB: Database{
 			Host:     viper.GetString("MONGO_DB_HOST"),
@@ -55,4 +68,8 @@ func GetConfig() Config {
 			Dbname:   viper.GetString("MONGO_DB_NAME"),
 		},
 	}
+}
+
+func GetConfig() Config {
+	return *cfg
 }

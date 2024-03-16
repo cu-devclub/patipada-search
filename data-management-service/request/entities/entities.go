@@ -40,6 +40,14 @@ type (
 		StartTime  string `json:"startTime"`
 		EndTime    string `json:"endTime"`
 	}
+
+	UpdateRecord struct {
+		DocumentID string `json:"documentID"`
+		StartTime  string `json:"startTime"`
+		EndTime    string `json:"endTime"`
+		Question   string `json:"question"`
+		Answer     string `json:"answer"`
+	}
 )
 
 func (r *Request) MockData() {

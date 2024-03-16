@@ -3,9 +3,9 @@ package server
 import (
 	"fmt"
 	"search-esdb-service/config"
-	"search-esdb-service/data"
 	recordHandlers "search-esdb-service/record/handlers"
-	recordRepository "search-esdb-service/record/repositories"
+	mlRepository "search-esdb-service/record/repositories/mlRepository"
+	recordRepository "search-esdb-service/record/repositories/recordRepository"
 	recordUsecases "search-esdb-service/record/usecases"
 
 	"github.com/elastic/go-elasticsearch/v8"
@@ -14,35 +14,48 @@ import (
 )
 
 type ginServer struct {
-	app   *gin.Engine
-	db    *elasticsearch.Client
-	cfg   *config.Config
-	dataI *data.Data
+	app        *gin.Engine
+	db         *elasticsearch.Client
+	cfg        *config.Config
+	recordArch *RecordArch
 }
 
-func NewGinServer(cfg *config.Config, db *elasticsearch.Client, dataI *data.Data) Server {
-	return &ginServer{
-		app:   gin.Default(),
-		db:    db,
-		cfg:   cfg,
-		dataI: dataI,
+type RecordArch struct {
+	Repo    recordRepository.RecordRepository
+	Mlrepo  mlRepository.MLRepository
+	Usecase recordUsecases.RecordUsecase
+	Handler recordHandlers.RecordHandler
+}
+
+func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
+	serv := gin.Default()
+
+	// Allow CORS from frontend
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{cfg.App.FrontendURL, "http://localhost:5173"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	serv.Use(cors.New(config))
+
+	g := &ginServer{
+		app: serv,
+		db:  db,
+		cfg: cfg,
 	}
+
+	g.initializeRecordHttpHandler()
+
+	return g
 }
 
 func (g *ginServer) GetDB() *elasticsearch.Client {
 	return g.db
 }
 
+func (g *ginServer) GetRecordArch() *RecordArch {
+	return g.recordArch
+}
+
 func (g *ginServer) Start() {
-
-	// Allow CORS from frontend
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{g.cfg.App.FrontendURL, "http://localhost:5173"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
-	g.app.Use(cors.New(config))
-
-	g.initializeRecordHttpHandler()
-
 	g.app.Run(fmt.Sprintf(":%d", g.cfg.App.Port))
 }
 
@@ -53,10 +66,17 @@ func (g *ginServer) Start() {
 // endpoints of the record API, such as "/displayAllRecords" and "/search".
 func (g *ginServer) initializeRecordHttpHandler() {
 	recordESRepository := recordRepository.NewRecordESRepository(g.db)
-
-	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, *g.dataI)
+	mlRepository := mlRepository.NewMLServiceRepository()
+	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository)
 
 	recordHttpHandler := recordHandlers.NewRecordHttpHandler(recordUsecase)
+
+	g.recordArch = &RecordArch{
+		Repo:    recordESRepository,
+		Mlrepo:  mlRepository,
+		Usecase: recordUsecase,
+		Handler: recordHttpHandler,
+	}
 
 	// GetAllRecords retrieves all records from the elastic database
 	// and sends a response back to the client.
