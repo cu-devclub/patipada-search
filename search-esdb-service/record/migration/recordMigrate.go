@@ -2,7 +2,7 @@ package migration
 
 import (
 	"encoding/csv"
-	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"search-esdb-service/config"
@@ -73,8 +73,7 @@ const (
 `
 )
 
-func MigrateRecords(cfg *config.Config, es database.Database) {
-	log.Println("Starting migration...")
+func MigrateRecords(cfg *config.Config, es database.Database) error {
 	client := es.GetDB()
 	indexName := "record"
 	exists, err := doesIndexExist(client, indexName)
@@ -82,39 +81,36 @@ func MigrateRecords(cfg *config.Config, es database.Database) {
 		panic(err)
 	}
 	if exists {
-		log.Println("-----Index already exists, no need to migrate ------")
-		return
+		slog.Info("-----Index already exists, no need to migrate ------")
+		return nil
 	}
 
-	log.Println("Creating index record ....")
-	res, err := client.Indices.Create(
+	_, err = client.Indices.Create(
 		indexName,
 		client.Indices.Create.WithBody(strings.NewReader(IndexCreationBody)),
 	)
 	if err != nil {
-		panic(err)
+		return err
 	}
-	log.Println("Creating index record response:", res)
 
-	log.Println("Converting CSV to records and updating with LDA...")
 	records, err := ConvertCSVToRecords(cfg)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	records, err = UpdateRecordsWithLDA(cfg, records)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	es.CheckClusterHealth()
 
-	log.Println("Bulk inserting records...")
 	recordESRepository := recordRepository.NewRecordESRepository(es.GetDB())
 	if err := recordESRepository.BulkInsert(records); err != nil {
-		panic(err)
+		return err
 	}
-	log.Println("Migration finished !!!!")
+
+	return nil
 }
 
 func doesIndexExist(client *elasticsearch.Client, indexName string) (bool, error) {
@@ -257,4 +253,3 @@ func UpdateRecordsWithLDA(cfg *config.Config, records []*entities.Record) ([]*en
 
 	return records, nil
 }
-

@@ -14,33 +14,48 @@ import (
 )
 
 type ginServer struct {
-	app *gin.Engine
-	db  *elasticsearch.Client
-	cfg *config.Config
+	app        *gin.Engine
+	db         *elasticsearch.Client
+	cfg        *config.Config
+	recordArch *RecordArch
+}
+
+type RecordArch struct {
+	Repo    recordRepository.RecordRepository
+	Mlrepo  mlRepository.MLRepository
+	Usecase recordUsecases.RecordUsecase
+	Handler recordHandlers.RecordHandler
 }
 
 func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
-	return &ginServer{
-		app: gin.Default(),
+	serv := gin.Default()
+
+	// Allow CORS from frontend
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{cfg.App.FrontendURL, "http://localhost:5173"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	serv.Use(cors.New(config))
+
+	g := &ginServer{
+		app: serv,
 		db:  db,
 		cfg: cfg,
 	}
+
+	g.initializeRecordHttpHandler()
+
+	return g
 }
 
 func (g *ginServer) GetDB() *elasticsearch.Client {
 	return g.db
 }
 
+func (g *ginServer) GetRecordArch() *RecordArch {
+	return g.recordArch
+}
+
 func (g *ginServer) Start() {
-
-	// Allow CORS from frontend
-	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{g.cfg.App.FrontendURL, "http://localhost:5173"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
-	g.app.Use(cors.New(config))
-
-	g.initializeRecordHttpHandler()
-
 	g.app.Run(fmt.Sprintf(":%d", g.cfg.App.Port))
 }
 
@@ -55,6 +70,13 @@ func (g *ginServer) initializeRecordHttpHandler() {
 	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository)
 
 	recordHttpHandler := recordHandlers.NewRecordHttpHandler(recordUsecase)
+
+	g.recordArch = &RecordArch{
+		Repo:    recordESRepository,
+		Mlrepo:  mlRepository,
+		Usecase: recordUsecase,
+		Handler: recordHttpHandler,
+	}
 
 	// GetAllRecords retrieves all records from the elastic database
 	// and sends a response back to the client.

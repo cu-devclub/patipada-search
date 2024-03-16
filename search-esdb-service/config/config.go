@@ -1,11 +1,10 @@
 package config
 
 import (
-	"fmt"
-	"log"
-
 	"github.com/spf13/viper"
 )
+
+var cfg *Config
 
 type (
 	Config struct {
@@ -38,22 +37,20 @@ type (
 	}
 )
 
-func InitializeViper(path string) {
-	log.Println("Initializing viper...")
+func InitializeViper(path string) error {
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("fatal error config file: %v", err))
+		return err
 	}
-	log.Println("Viper initialized")
+	return nil
 }
 
-func GetConfig() Config {
-	log.Println("Getting config...")
-	return Config{
+func ReadConfig() {
+	cfg = &Config{
 		App: App{
 			Port:        viper.GetInt("SERVER_PORT"),
 			FrontendURL: viper.GetString("FRONTEND_URL"),
@@ -76,4 +73,8 @@ func GetConfig() Config {
 			StopwordPath: viper.GetString("STOPWORD_PATH"),
 		},
 	}
+}
+
+func GetConfig() Config {
+	return *cfg
 }

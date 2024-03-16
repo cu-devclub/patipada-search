@@ -14,28 +14,32 @@ import (
 )
 
 type echoServer struct {
-	App  *echo.Echo
-	db   *gorm.DB
-	cfg  *config.Config
+	App *echo.Echo
+	db  *gorm.DB
+	cfg *config.Config
 }
 
 func NewEchoServer(cfg *config.Config, db *gorm.DB) Server {
-	return &echoServer{
-		App: echo.New(),
-		db:  db,
-		cfg: cfg,
-	}
-}
+	e := echo.New()
 
-func (s *echoServer) Start() {
-	s.initializeUsersHttpHandler()
-
-	s.App.Use(middleware.Logger())
-	s.App.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{s.cfg.App.FrontendURL, "http://localhost:5173"},
+	e.Use(middleware.Logger())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{cfg.App.FrontendURL, "http://localhost:5173"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 	}))
 
+	s := &echoServer{
+		App: e,
+		db:  db,
+		cfg: cfg,
+	}
+
+	s.initializeUsersHttpHandler()
+
+	return s
+}
+
+func (s *echoServer) Start() {
 	serverUrl := fmt.Sprintf(":%d", s.cfg.App.Port)
 	s.App.Logger.Fatal(s.App.Start(serverUrl))
 }
@@ -120,7 +124,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 500 internal server error
 	s.App.POST("/reset-password", usersHttpHandler.ResetPassword)
 
-	// Change Password : manual change 
+	// Change Password : manual change
 	// Header Authorization - token
 	// Parameter(JSON)
 	// - oldPassword (string) ; old password ; 8 <= length <= 50
@@ -154,7 +158,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 
 	// Authorize to verify the user authorization
 	// Header - Authorization : <token>
-	// 
+	//
 	// Query Params
 	// - requiredRole (string) ; one of admin, super-admin, user
 	//
@@ -164,7 +168,7 @@ func (s *echoServer) initializeUsersHttpHandler() {
 	// - 401 Unauthorize ; invalid token
 	// - 500 internal server error
 	s.App.GET("/authorize", usersHttpHandler.Authorize)
-	
+
 	// Remove user by username & requestor role must be higher
 	// Header - Authorization : <token>
 	// Parameters (Route Param) :

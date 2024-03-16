@@ -3,7 +3,6 @@ package event
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"search-esdb-service/config"
 	"search-esdb-service/constant"
 	recordUsecases "search-esdb-service/record/usecases"
@@ -17,7 +16,6 @@ type Consumer struct {
 }
 
 func NewConsumer(conn *amqp.Connection, cfg *config.Config, recordUsecase recordUsecases.RecordUsecase) (Consumer, error) {
-	log.Println("Creating new consumer...")
 	consumer := Consumer{
 		conn:          conn,
 		recordUsecase: recordUsecase,
@@ -28,7 +26,6 @@ func NewConsumer(conn *amqp.Connection, cfg *config.Config, recordUsecase record
 		return Consumer{}, err
 	}
 
-	log.Println("Consumer created successfully!")
 	return consumer, nil
 }
 
@@ -75,10 +72,8 @@ func (consumer *Consumer) Listen(topics []string) error {
 	forever := make(chan bool)
 	go func() {
 		for d := range messages {
-			log.Println("Received a message...")
 			var payload Payload
 			_ = json.Unmarshal(d.Body, &payload)
-			log.Println("Received a message:", payload)
 			go consumer.handlePayload(payload)
 		}
 	}()

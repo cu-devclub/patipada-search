@@ -17,7 +17,7 @@ func (g *ginServer) AuthMiddleware(requiredRole string) gin.HandlerFunc {
 		}
 
 		result, err := g.comm.Authorization(token, requiredRole)
-		if err != nil || result == false {
+		if err != nil || !result {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}

@@ -3,56 +3,75 @@ package handlers
 import (
 	"data-management/errors"
 	"data-management/messages"
-	"log"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (r *requestHandler) GetRequest(c *gin.Context) {
+	handlerOpts := &HandlerOpts{
+		Name:   c.Request.URL.Path,
+		Method: c.Request.Method,
+		Params: c.Request.URL.Query(),
+	}
+
 	status := c.Query("status")
 	username := c.Query("username")
 	requestID := c.Query("requestID")
 	index := c.Query("index")
 	approvedBy := c.Query("approvedBy")
-	log.Println("GetRequest handler : starting handler ..... with status: ", status,
-		" username: ", username,
-		" requestID: ", requestID,
-		" index: ", index,
-		" approvedBy: ", approvedBy,
-	)
 
 	modelsRequest, err := r.requestUsecase.GetRequest(status, username, requestID, index, approvedBy)
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
-			responseJSON(c, er.StatusCode, er.Error(), nil)
+			r.errorResponse(c, handlerOpts, er.StatusCode, er.Error())
 			return
 		} else {
-			responseJSON(c, 500, messages.INTERNAL_SERVER_ERROR, nil)
+			r.errorResponse(c, handlerOpts, 500, messages.INTERNAL_SERVER_ERROR)
 			return
 		}
 	}
 
-	responseJSON(c, 200, messages.SUCCESS_GET_REQUEST, modelsRequest)
+	resp := ResponseOptions{
+		Response: modelsRequest,
+		OptionalResponse: &ArrayRequestsLog{
+			Length: len(modelsRequest),
+		},
+	}
+
+	r.successResponse(c, *handlerOpts, 200, resp)
 }
 
 func (r *requestHandler) GetLastestRequestOfRecord(c *gin.Context) {
+	handlerOpts := &HandlerOpts{
+		Name:   c.Request.URL.Path,
+		Method: c.Request.Method,
+		Params: c.Request.URL.Query(),
+	}
+
 	index := c.Query("index")
-	log.Println("GetLastestRequestOfRecord handler : starting handler with index ",index," .....")
 	if index == "" {
-		responseJSON(c, 400, messages.BAD_REQUEST, nil)
+		r.errorResponse(c, handlerOpts, 400, messages.MISSING_REQUEST_INDEX)
 		return
 	}
 
 	modelsRequest, err := r.requestUsecase.GetLastestRequestOfRecord(index)
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
-			responseJSON(c, er.StatusCode, er.Error(), nil)
+			r.errorResponse(c, handlerOpts, er.StatusCode, er.Error())
 			return
 		} else {
-			responseJSON(c, 500, messages.INTERNAL_SERVER_ERROR, nil)
+			r.errorResponse(c, handlerOpts, 500, messages.INTERNAL_SERVER_ERROR)
 			return
 		}
 	}
 
-	responseJSON(c, 200, messages.SUCCESS_GET_REQUEST, modelsRequest)
+	resp := ResponseOptions{
+		Response: modelsRequest,
+		OptionalResponse: &RequestLog{
+			RequestID: modelsRequest.RequestID,
+			Status:    modelsRequest.Status,
+		},
+	}
+
+	r.successResponse(c, *handlerOpts, 200, resp)
 }

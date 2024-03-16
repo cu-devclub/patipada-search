@@ -7,7 +7,6 @@ import (
 	"auth-service/users/entities"
 	"auth-service/users/helper"
 	"auth-service/users/models"
-	"log"
 
 	"github.com/go-playground/validator"
 )
@@ -35,7 +34,6 @@ func (u *UsersUsecaseImpl) RegisterUser(requesterRole string, in *models.Registe
 	// Validate data
 	validator := validator.New()
 	if err := validator.Struct(in); err != nil {
-		log.Println("RegisterUser : Error while validating request body: ", err)
 		return "", errors.CreateError(400, err.Error())
 	}
 
@@ -43,7 +41,6 @@ func (u *UsersUsecaseImpl) RegisterUser(requesterRole string, in *models.Registe
 	if in.Role == "admin" || in.Role == "super-admin" {
 		ch := jwt.HasAuthorizeRole(requesterRole, in.Role, true)
 		if !ch {
-			log.Println("RegisterUser : No permission")
 			return "", errors.CreateError(409, messages.NO_PERMISSION)
 		}
 	}
@@ -51,16 +48,13 @@ func (u *UsersUsecaseImpl) RegisterUser(requesterRole string, in *models.Registe
 	// Check if username or email already exists
 	users, err := u.usersRepository.GetAllUsersData()
 	if err != nil {
-		log.Println("RegisterUser : Error while getting all users data: ", err)
 		return "", err
 	}
 	for _, user := range users {
 		if user.Username == in.Username {
-			log.Println("RegisterUser : Username already exists")
 			return "", errors.CreateError(400, messages.USERNAME_ALREADY_EXISTS)
 		}
 		if user.Email == in.Email {
-			log.Println("RegisterUser : Email already exists")
 			return "", errors.CreateError(400, messages.EMAIL_ALREADY_EXISTS)
 		}
 	}
@@ -68,7 +62,6 @@ func (u *UsersUsecaseImpl) RegisterUser(requesterRole string, in *models.Registe
 	// INSERT USER
 	uuid, err := helper.GenerateUUID()
 	if err != nil {
-		log.Println("RegisterUser : Error while generating uuid: ", err)
 		return "", err
 	}
 
@@ -90,4 +83,34 @@ func (u *UsersUsecaseImpl) RegisterUser(requesterRole string, in *models.Registe
 		return "", err
 	}
 	return uuid, nil
+}
+
+// Remove user by username & requestor role must be higher
+// Parameters  :
+// - requester Role (string) ; one of admin, super-admin, user
+// - models.RemoveUserDto
+//   - username (string)
+//
+// Response
+// - 200 OK
+// - 400 bad request (invalid/missing username)
+// - 401 Unauthorize ; missing token
+// - 403 Forbidden ; no permission
+// - 404 User not found (invalid username)
+// - 500 internal server error
+func (u *UsersUsecaseImpl) RemoveUser(requesterRole string, in *models.RemoveUserDto) error {
+	// Get User data
+	user, err := u.usersRepository.GetUserByUsername(in.Username)
+	if err != nil {
+		return errors.CreateError(404, messages.USER_NOT_FOUND)
+	}
+
+	// Check roles
+	ch := jwt.HasAuthorizeRole(requesterRole, user.Role, false)
+	if !ch {
+		return errors.CreateError(403, messages.NO_PERMISSION)
+	}
+
+	// Remove User
+	return u.usersRepository.RemoveUser(in.Username)
 }

@@ -1,10 +1,10 @@
 package config
 
 import (
-	"log"
-
 	"github.com/spf13/viper"
 )
+
+var cfg *Config
 
 type (
 	Config struct {
@@ -33,21 +33,21 @@ type (
 	}
 )
 
-func InitializeViper(path string) {
-	log.Println("Initializing viper...")
+func InitializeViper(path string) error {
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
 	viper.AutomaticEnv()
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Printf("Error reading config file, %s", err)
+		return err
 	}
+
+	return nil
 }
 
-func GetConfig() Config {
-	log.Println("Getting config...")
-	return Config{
+func ReadConfig() {
+	cfg = &Config{
 		App: App{
 			Port:          viper.GetInt("APP_PORT"),
 			GRPCPort:      viper.GetInt("GRPC_PORT"),
@@ -68,4 +68,8 @@ func GetConfig() Config {
 			Dbname:   viper.GetString("MONGO_DB_NAME"),
 		},
 	}
+}
+
+func GetConfig() Config {
+	return *cfg
 }

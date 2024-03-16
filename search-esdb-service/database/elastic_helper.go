@@ -32,12 +32,6 @@ func (es *elasticDatabase) CheckClusterHealth() {
 		log.Printf("Error: %s", res.Status())
 		return
 	}
-
-	// Print the cluster health information
-	log.Println("Elastic Cluster Health:")
-	log.Println("---------------")
-	log.Printf("Status: %s\n", res.Status())
-
 }
 
 // checkPlugins checks the installed plugins in Elasticsearch.

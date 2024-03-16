@@ -12,7 +12,10 @@ type recordUsecaseImpl struct {
 	mlRepository     mlRepository.MLRepository
 }
 
-func NewRecordUsecase(recordRepository recordRepository.RecordRepository, mlRepository mlRepository.MLRepository) RecordUsecase {
+func NewRecordUsecase(
+	recordRepository recordRepository.RecordRepository,
+	mlRepository mlRepository.MLRepository,
+) RecordUsecase {
 	return &recordUsecaseImpl{
 		recordRepository: recordRepository,
 		mlRepository:     mlRepository,

@@ -2,17 +2,15 @@ package communication
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"math"
 	"search-esdb-service/config"
 	"search-esdb-service/event"
+	"search-esdb-service/server"
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v8"
 	amqp "github.com/rabbitmq/amqp091-go"
-
-	recordESRepositories "search-esdb-service/record/repositories/recordRepository"
-	recordUsecases "search-esdb-service/record/usecases"
 )
 
 type RabbitMQStruct struct {
@@ -20,8 +18,7 @@ type RabbitMQStruct struct {
 	Consumer event.Consumer
 }
 
-func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client) (*RabbitMQStruct, error) {
-	log.Println("Connecting to RabbitMQ...")
+func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client, recordArch server.RecordArch) (*RabbitMQStruct, error) {
 	var counts int64
 	var backOff = 1 * time.Second
 	var connection *amqp.Connection
@@ -30,13 +27,11 @@ func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client) (*RabbitMQS
 		cfg.RabbitMQ.Password,
 		cfg.RabbitMQ.URL,
 	)
-	log.Println("Rabbit MQ connection URL:", connectionURL)
 	// don't continue until we have a connection
 	for {
-
 		c, err := amqp.Dial(connectionURL)
 		if err != nil {
-			fmt.Println("Rabbit MQ is not ready yet....")
+			slog.Warn("Rabbit MQ is not ready yet....")
 			counts++
 		} else {
 			connection = c
@@ -44,7 +39,7 @@ func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client) (*RabbitMQS
 		}
 
 		if counts > 5 {
-			fmt.Println("Rabbit MQ is not ready, giving up....", err)
+			slog.Warn("Rabbit MQ is not ready, giving up....", err)
 			return nil, err
 		}
 
@@ -52,15 +47,11 @@ func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client) (*RabbitMQS
 		time.Sleep(backOff)
 	}
 
-	log.Println("Connected to RabbitMQ!")
-
-	recordRepository := recordESRepositories.NewRecordESRepository(db)
-	recordUsecases := recordUsecases.NewRecordUsecase(recordRepository, nil)
-
-	consumer, err := event.NewConsumer(connection, cfg, recordUsecases)
+	consumer, err := event.NewConsumer(connection, cfg, recordArch.Usecase)
 	if err != nil {
 		return nil, err
 	}
+	slog.Info("Creating Consumer successfully!")
 
 	return &RabbitMQStruct{
 		Conn:     connection,
@@ -69,6 +60,6 @@ func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client) (*RabbitMQS
 }
 
 func (c *CommunicationImpl) Listen(topics []string) error {
-	log.Println("Listening to topics...", topics)
+	slog.Info("Listening to", slog.Any("topics", topics))
 	return c.RabbitMQ.Consumer.Listen(topics)
 }
