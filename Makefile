@@ -177,3 +177,10 @@ down:
 	@echo "Stopping Docker images..."
 	docker compose -f docker-compose.dev.yml down
 	@echo "Docker images stopped!"
+
+
+## monitoring service
+up_monitoring:
+	@echo "Starting monitoring service..."
+	docker compose -f docker-compose.dev.yml up -d loki promtail grafana
+	@echo "Monitoring service started!"

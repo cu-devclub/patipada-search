@@ -192,3 +192,9 @@ down:
 	@echo "Stopping Docker containers..."
 	docker compose -f docker-compose.prod.yml down
 	@echo "Docker containers stopped!"
+
+## monitoring service
+up_monitoring:
+	@echo "Starting monitoring service..."
+	docker compose -f docker-compose.dev.yml up -d loki promtail grafana
+	@echo "Monitoring service started!"
