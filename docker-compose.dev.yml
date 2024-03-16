@@ -20,9 +20,12 @@ services:
       - 8081:8081
     depends_on:
       - elastic-db
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
     networks:
-      - backbone
-  
+      - dhammanava_network
+
   ml-service:
     container_name: ml-container
     image: ${DOCKERHUB_USERNAME}/dhammanava-ml-image
@@ -33,12 +36,14 @@ services:
       - FLASK_ENV=development
       - FLASK_RUN_HOST=0.0.0.0
       - FLASK_RUN_PORT=8084
-    restart: 
-      always
+    restart: always
     ports:
       - 8084:8084
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
     networks:
-      - backbone
+      - dhammanava_network
     command: ["python", "-m", "flask", "run"]
 
   elastic-db:
@@ -53,8 +58,11 @@ services:
       - ./volumes/database/elastic:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
     networks:
-      - backbone
+      - dhammanava_network
 
   frontend:
     image: ${DOCKERHUB_USERNAME}/dhammanava-frontend-image
@@ -64,8 +72,11 @@ services:
     ports:
       - 5173:8080
     restart: always
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
     networks:
-      - backbone
+      - dhammanava_network
 
   auth-service:
     container_name: auth-container
@@ -93,8 +104,11 @@ services:
     restart: always
     depends_on:
       - auth-db
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
     networks:
-      - backbone
+      - dhammanava_network
 
   auth-db:
     image: postgres:latest
@@ -110,7 +124,7 @@ services:
       - ./auth-db:/docker-entrypoint-initdb.d
       - ./volumes/database/auth:/var/lib/postgresql/data
     networks:
-      - backbone
+      - dhammanava_network
 
   data-service:
     container_name: data-container
@@ -130,10 +144,13 @@ services:
     ports:
       - 8083:8083
     restart: always
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
     depends_on:
       - data-db
     networks:
-      - backbone
+      - dhammanava_network
 
   data-db:
     image: mongo:4.4
@@ -148,7 +165,7 @@ services:
     volumes:
       - ./volumes/database/mongo-data:/data/db
     networks:
-      - backbone
+      - dhammanava_network
 
   rabbitmq:
     image: "rabbitmq:3.12-management"
@@ -158,7 +175,7 @@ services:
     volumes:
       - ./volumes/rabbitmq:/var/lib/rabbitmq
     networks:
-      - backbone
+      - dhammanava_network
 
   nginx:
     image: nginx:latest
@@ -172,9 +189,48 @@ services:
       - auth-service
       - data-service
       - frontend
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
     networks:
-      - backbone
+      - dhammanava_network
+
+  loki:
+    image: grafana/loki:2.9.2
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - dhammanava_network
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./monitoring/promtail.yaml:/etc/promtail/docker-config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/docker-config.yaml
+    depends_on:
+      - loki
+    networks:
+      - dhammanava_network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+    volumes:
+      - ./monitoring/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    networks:
+      - dhammanava_network
 
 networks:
-  backbone:
+  dhammanava_network:
     driver: bridge

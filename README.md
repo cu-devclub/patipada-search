@@ -3,6 +3,7 @@
 This project is a part of the Waris Lakthong senior project, focusing on developing a hybrid search system for Dhammanva question-answer videos. The system is designed using a microservices architecture, with each backend service adhering to clean architecture principles.
 
 ## !! Important Note
+
 To deploy / develop each service or each database please check README.md for each one. This README.md provided only overall of the project.
 
 ## Services Overview
@@ -28,6 +29,7 @@ All data is extracted from Dhammanva live question-answer video transcripts ([vi
 The data is stored in the [data](./data/record/) directory.
 
 ### Stop words
+
 The stop word dictionary use in this project is currently from pythainlp
 as store in [stopwords](./data/stopword/)
 
@@ -60,13 +62,15 @@ or
 ```bash
 docker compose -f docker-compose.dev.yml up -d
 ```
+
 - Or in case you want to run each service individually, you can navigate to each service and reading through README.md
 
-## Production 
-By default you should use github workflow and deploy to produciton by trigger each jobs you want. However if you want something more you can use docker-compose.prod.yml and Makefile to set the service as you want.
-| These 2 files already have ci action to savely deploy to server 
+## Production
 
-- docker-compose.prod.yml ; manipulate through docker compose 
+By default you should use github workflow and deploy to produciton by trigger each jobs you want. However if you want something more you can use docker-compose.prod.yml and Makefile to set the service as you want.
+| These 2 files already have ci action to savely deploy to server
+
+- docker-compose.prod.yml ; manipulate through docker compose
 
 - Makefile is the collection of commands I prebuilt which you can run using `make <command>` all the details for each command provided in the comment section in Makefile
 
@@ -116,23 +120,29 @@ To run this project, you will need to add the following environment variables to
 
 `RABBITMQ_PASSWORD` : password for rabbit mq service; this value will be set as default user and needed services will used this value as credential
 
+`GRAFANA_USERNAME` : username for login to grafana dashboard
+
+`GRAFANA_PASSWORD` : password for login to grafana dashboard
+
 > _<u>Note</u>_ if you run each project without docker e.g. `go run main.go` you do not need to assign the .env variables each service has default env variables in app.env except `SENDER_PASSWORD`, which you are required to assign in `app.env`
 
 ## Tech Stack
 
 **Frontend:** React, Typescript, Vite, Chakra UI, Tiptap
 
-**Search service:** Golang, Gin, ElasticSearch
+**Search service:** Golang, ElasticSearch
 
-**Authentication service:** Golang, Echo, PostgreSQL
+**Authentication service:** Golang, PostgreSQL
 
-**Data management service:** Golang, Gin, MongoDB
+**Data management service:** Golang, MongoDB
 
 **Machine Learning service:** Python, Flask
 
 **Communication:** GRPC, RabbitMQ
 
 **Containerization:** Docker
+
+**Monitoring:** Loki, Promtail, Grafana
 
 ## Project structure
 
@@ -148,9 +158,10 @@ To run this project, you will need to add the following environment variables to
     ├── nginx                       # nginx file for both dev and prod
     ├── search-esdb-service
     ├── ml-service
-    ├── data                        # Store data source 
+    ├── data                        # Store data source
         ├── record                  # Records (Q&A , start & end time, URL, ...)
-        ├── stopword                # List of stopword 
+        ├── stopword                # List of stopword
+    |- monitoring                   # directory store config file for monitoring related
     ├── .env.template               # template of .env
     ├── .secrets.template           # template of .secrets used in act (test workflow locally)
     ├── README.md
