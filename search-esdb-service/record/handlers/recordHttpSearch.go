@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"log"
+	"net/http"
 	"search-esdb-service/constant"
 	"search-esdb-service/errors"
 	"search-esdb-service/messages"
@@ -11,11 +11,18 @@ import (
 )
 
 func (r *recordHttpHandler) Search(c *gin.Context) {
-	log.Println("Search Handler ...")
+	handlerOpts := &HandlerOpts{
+		Name:   c.Request.URL.Path,
+		Method: c.Request.Method,
+		Params: c.Request.URL.Query(),
+	}
+
 	// retrieve query
 	query := c.Query("query")
 	if query == "" {
-		errorResponse(c, 400, messages.BAD_REQUEST, messages.QUERY_PARAMETER_EMPTY)
+		r.errorResponse(c, handlerOpts, http.StatusBadRequest,
+			messages.BAD_REQUEST, messages.QUERY_PARAMETER_EMPTY,
+		)
 		return
 	}
 
@@ -26,7 +33,9 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		var err error
 		amount, err = strconv.Atoi(sAmount)
 		if err != nil {
-			errorResponse(c, 400, messages.BAD_REQUEST, messages.AMOUNT_INSUFFICENT)
+			r.errorResponse(c, handlerOpts, http.StatusBadRequest,
+				messages.BAD_REQUEST, messages.AMOUNT_INSUFFICENT,
+			)
 			return
 		}
 	}
@@ -37,49 +46,68 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		searchType = constant.SEARCH_BY_DEFAULT
 	}
 
-	log.Println("With query:", query, "amount:", amount, "searchType:", searchType)
-
 	// search for records
 	records, err := r.recordUsecase.Search("record", query, searchType, amount)
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
-			errorResponse(c, er.StatusCode, er.Message, er.Error())
+			r.errorResponse(c, handlerOpts, er.StatusCode, er.Message, er.Error())
 			return
 		} else {
-			errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
+			r.errorResponse(c, handlerOpts, http.StatusInternalServerError,
+				messages.INTERNAL_SERVER_ERROR, err.Error(),
+			)
 			return
 		}
 	}
-	successResponse(c, 200, records)
 
+	resp := ResponseOptions{
+		Response: records,
+		OptionalResponse: &SearchRecordLogResponse{
+			Length: len(records.Results),
+		},
+	}
+
+	r.successResponse(c, handlerOpts, http.StatusOK, resp)
 }
 
 func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
-	log.Println("SearchByRecordIndex Handler ...")
+	handlerOpts := &HandlerOpts{
+		Name:   c.Request.URL.Path,
+		Method: c.Request.Method,
+	}
 	// retrieve query
 	recordIndex := c.Param("recordIndex")
 	if recordIndex == "" {
-		errorResponse(c, 400, messages.BAD_REQUEST, messages.QUERY_PARAMETER_EMPTY)
+		r.errorResponse(c, handlerOpts, http.StatusBadRequest,
+			messages.BAD_REQUEST, messages.QUERY_PARAMETER_EMPTY,
+		)
 		return
 	}
-
-	log.Println("With recordIndex:", recordIndex)
 
 	record, err := r.recordUsecase.SearchByRecordIndex("record", recordIndex)
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
-			errorResponse(c, er.StatusCode, er.Message, er.Error())
+			r.errorResponse(c, handlerOpts, er.StatusCode, er.Message, er.Error())
 			return
 		} else {
-			errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
+			r.errorResponse(c, handlerOpts, http.StatusInternalServerError,
+				messages.INTERNAL_SERVER_ERROR, err.Error(),
+			)
 			return
 		}
 	}
 	if record == nil {
-		errorResponse(c, 404, messages.NOT_FOUND, messages.RECORD_INDEX_NOT_FOUND)
+		r.errorResponse(c, handlerOpts, http.StatusNotFound, messages.NOT_FOUND, messages.RECORD_INDEX_NOT_FOUND)
 		return
 	}
-	successResponse(c, 200, record)
+
+	res := ResponseOptions{
+		Response: record,
+		OptionalResponse: &RecordIndexLogResponse{
+			Index: recordIndex,
+		},
+	}
+	r.successResponse(c, handlerOpts, http.StatusOK, res)
 }
 
 // GetAllRecords retrieves all records from the elastic database
@@ -89,16 +117,28 @@ func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
 // - 200 & A list of all records retrieved from the database.
 // - 500: An internal server error occurred.
 func (r *recordHttpHandler) GetAllRecords(c *gin.Context) {
-	log.Println("GetAllRecords Handler ...")
+	handlerOpts := &HandlerOpts{
+		Name:   c.Request.URL.Path,
+		Method: c.Request.Method,
+		Params: "",
+	}
+
 	records, err := r.recordUsecase.GetAllRecords("record")
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
-			errorResponse(c, er.StatusCode, er.Message, er.Error())
+			r.errorResponse(c, handlerOpts, er.StatusCode, er.Message, er.Error())
 			return
 		} else {
-			errorResponse(c, 500, messages.INTERNAL_SERVER_ERROR, err.Error())
+			r.errorResponse(c, handlerOpts, http.StatusInternalServerError, messages.INTERNAL_SERVER_ERROR, err.Error())
 			return
 		}
 	}
-	successResponse(c, 200, records)
+
+	res := ResponseOptions{
+		Response: records,
+		OptionalResponse: &SearchRecordLogResponse{
+			Length: len(records),
+		},
+	}
+	r.successResponse(c, handlerOpts, http.StatusOK, res)
 }

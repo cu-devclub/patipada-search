@@ -41,7 +41,6 @@ func NewEmitter(conn *amqp.Connection, cfg *config.Config) (*Emitter, error) {
 
 func (e *Emitter) Emit(message string, key string) error {
 	// key == topics in RabbitMQ
-	log.Println("Emitting message.....")
 	channel, err := e.conn.Channel()
 	if err != nil {
 		return err
@@ -65,6 +64,5 @@ func (e *Emitter) Emit(message string, key string) error {
 		return err
 	}
 
-	log.Println("Success Emitting.....")
 	return nil
 }

@@ -8,7 +8,6 @@ import (
 	"data-management/proto/auth_proto"
 	"data-management/proto/search_proto"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -28,36 +27,27 @@ func NewMockgRPC() *GRPCStruct {
 	}
 }
 
-func NewgRPC(cfg *config.Config) *GRPCStruct {
-	log.Println("Initializing gRPC communication....")
-	log.Println("Connecting to auth service via gRPC...")
+func NewgRPC(cfg *config.Config) (*GRPCStruct, error) {
 	authConn, err := grpc.Dial(fmt.Sprintf("%s:%d", cfg.App.AuthService, cfg.App.GRPCPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
-		log.Printf("Error connecting to auth service via gRPC %v", err)
-		return nil
+		return nil, errors.CreateError(500, "Error connecting to auth service via gRPC "+err.Error())
 	}
-	log.Println("Connected to auth service via gRPC!")
 
-	log.Println("Connecting to search service via gRPC...")
 	searchConn, err := grpc.Dial(fmt.Sprintf("%s:%d", cfg.App.SearchService, cfg.App.GRPCPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
-		log.Printf("Error connecting to search service via gRPC %v", err)
-		return nil
+		return nil, errors.CreateError(500, "Error connecting to search service via gRPC "+err.Error())
 	}
-	log.Println("Connected to search service via gRPC!")
 
 	authClient := auth_proto.NewAuthServiceClient(authConn)
 	searchClient := search_proto.NewSearchServiceClient(searchConn)
 
-	log.Println("gRPC communication initialized!")
 	return &GRPCStruct{
 		AuthClient:   authClient,
 		SearchClient: searchClient,
-	}
+	}, nil
 }
 
 func (g *CommunicationImpl) Authorization(token string, requiredRole string) (bool, error) {
-	log.Println("Authorization via auth service gRPC....")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -76,7 +66,6 @@ func (g *CommunicationImpl) Authorization(token string, requiredRole string) (bo
 }
 
 func (g *CommunicationImpl) VerifyUsername(username string) (bool, error) {
-	log.Println("Verify Username : ", username, " via auth service gRPC....")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -95,7 +84,6 @@ func (g *CommunicationImpl) VerifyUsername(username string) (bool, error) {
 }
 
 func (g *CommunicationImpl) SearchRecord(recordID string) (bool, error) {
-	log.Println("Search Record : ", recordID, " via search service gRPC....")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 

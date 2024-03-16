@@ -1,7 +1,7 @@
 package validator
 
 import (
-	"log"
+	"log/slog"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -12,10 +12,9 @@ type playgroundValidator struct {
 }
 
 func NewValidator() Validator {
-	log.Println("Creating new validator.....")
 	v := validator.New()
 	v.RegisterValidation("youtubeTime", validateYoutubeTime)
-	log.Println("Success creating new validator!")
+	slog.Info("Success creating new validator!")
 	return &playgroundValidator{
 		validate: v,
 	}

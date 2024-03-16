@@ -13,10 +13,15 @@ import (
 
 func setUpTestEnvironment() usersHandlers.UsersHandler {
 	config.InitializeViper("../")
+	config.ReadConfig()
 	cfg := config.GetConfig()
-	db := database.NewPostgresDatabase(&cfg)
+	db, err := database.NewPostgresDatabase(&cfg)
+	if err != nil {
+		_ = fmt.Errorf("failed to connect to database %w", err)
+		return nil
+	}
 
-	err := usersMigrate.UsersMigrate(db)
+	err = usersMigrate.UsersMigrate(db)
 	if err != nil {
 		_ = fmt.Errorf("failed to migrate %w", err)
 		return nil
@@ -35,7 +40,11 @@ func setUpTestEnvironment() usersHandlers.UsersHandler {
 }
 
 func getResetPasswordToken(cfg config.Config, email string) (string, error) {
-	db := database.NewPostgresDatabase(&cfg)
+	db, err := database.NewPostgresDatabase(&cfg)
+	if err != nil {
+		return "", err
+	}
+
 	usersPostgresRepository := usersRepositories.NewUsersPostgresRepository(db.GetDb())
 	userEmailRepository := usersRepositories.NewUserJordanWrightEmailing(cfg.Email.SenderName, cfg.Email.SenderEmail, cfg.Email.SenderPassword)
 	usersUsecase := usersUsecases.NewUsersUsecaseImpl(

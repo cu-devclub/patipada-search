@@ -1,6 +1,24 @@
 package handlers
 
-import "github.com/labstack/echo/v4"
+import (
+	"log/slog"
+
+	"github.com/labstack/echo/v4"
+)
+
+type HandlerOpts struct {
+	Name   string `json:"name"`
+	Method string `json:"method"`
+	Params any    `json:"params"`
+}
+
+func (h HandlerOpts) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("name", h.Name),
+		slog.String("method", h.Method),
+		slog.Any("params", h.Params),
+	)
+}
 
 type UsersHandler interface {
 	// RegisterUser handles the HTTP request to register users.

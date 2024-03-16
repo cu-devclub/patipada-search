@@ -5,6 +5,7 @@ import (
 	"data-management/communication"
 	"data-management/config"
 	"data-management/database"
+	"data-management/logging"
 	"data-management/request/handlers"
 	"data-management/request/repositories"
 	"data-management/request/usecases"
@@ -16,11 +17,13 @@ import (
 )
 
 func setUpTestEnvironment() handlers.Handlers {
+	logging.NewSLogger()
 	config.InitializeViper("../")
+	config.ReadConfig()
 	cfg := config.GetConfig()
-	db := database.NewMongoDatabase(&cfg)
+	db, _ := database.NewMongoDatabase(&cfg)
 	v := validator.NewValidator()
-	grpc := communication.NewgRPC(&cfg)
+	grpc, _ := communication.NewgRPC(&cfg)
 	rabbit, err := communication.ConnectToRabbitMQ(&cfg)
 	if err != nil {
 		log.Println("Error connecting to RabbitMQ", err)

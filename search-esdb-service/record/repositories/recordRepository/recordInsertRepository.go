@@ -85,7 +85,7 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) error {
 
 	// Report the results: number of indexed docs, number of errors, duration, indexing rate
 	//
-	log.Println(strings.Repeat("▔", 65))
+	fmt.Println(strings.Repeat("▔", 65))
 
 	dur := time.Since(start)
 

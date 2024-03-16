@@ -1,8 +1,9 @@
 package database
 
 import (
-	"log"
+	"fmt"
 	"search-esdb-service/config"
+	"search-esdb-service/errors"
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
@@ -20,8 +21,7 @@ type elasticDatabase struct {
 // It creates an Elasticsearch client and checks the health of the Elasticsearch cluster.
 // It also checks the plugins and returns an error if there is any.
 // Finally, it returns a pointer to an elasticDatabase struct which contains the Elasticsearch client.
-func NewElasticDatabase(cfg *config.Config) Database {
-	log.Println("Creating Elasticsearch client...")
+func NewElasticDatabase(cfg *config.Config) (Database, error) {
 	retryBackoff := backoff.NewExponentialBackOff()
 	esCfg := elasticsearch.Config{
 		Addresses: []string{cfg.ESDB.URL}, // Elasticsearch cluster URL
@@ -48,7 +48,7 @@ func NewElasticDatabase(cfg *config.Config) Database {
 	// Create an Elasticsearch client
 	client, err := elasticsearch.NewClient(esCfg)
 	if err != nil {
-		panic("Error creating Elasticsearch client")
+		return nil, errors.CreateError(500, "Error creating Elasticsearch client")
 	}
 
 	es := &elasticDatabase{
@@ -60,14 +60,12 @@ func NewElasticDatabase(cfg *config.Config) Database {
 
 	//* Check plugins => icu analyzer to extract token
 	if err = es.checkPlugins(); err != nil {
-		panic("Error checking Plugins:" + err.Error())
+		return nil, errors.CreateError(500, fmt.Sprintf("Error checking Elasticsearch plugins: %v", err.Error()))
 	}
-
-	log.Println("Elasticsearch client created!")
 
 	return &elasticDatabase{
 		Db: client,
-	}
+	}, nil
 }
 
 func (es elasticDatabase) GetDB() *elasticsearch.Client {
