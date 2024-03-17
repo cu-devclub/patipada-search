@@ -72,9 +72,6 @@ services:
     ports:
       - 5173:8080
     restart: always
-    labels:
-      logging: "promtail"
-      loggin_jobname: "containerlogs"
     networks:
       - dhammanava_network
 
@@ -133,6 +130,8 @@ services:
       context: ./data-management-service
     environment:
       FRONTEND_URL: http://frontend:5173
+      SEARCH_SERVICE: search-service
+      AUTH_SERVICE: auth-service
       MONGO_DB_HOST: data-db
       MONGO_DB_PORT: 27017
       MONGO_DB_USERNAME: ${DATA_MNGMNT_DB_USER}
@@ -197,6 +196,7 @@ services:
 
   loki:
     image: grafana/loki:2.9.2
+    container_name: loki
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
@@ -218,6 +218,7 @@ services:
 
   grafana:
     image: grafana/grafana:latest
+    container_name: grafana
     ports:
       - 3000:3000
     volumes:

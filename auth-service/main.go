@@ -7,7 +7,6 @@ import (
 	"auth-service/server"
 	usersMigrate "auth-service/users/migrations"
 	"log/slog"
-	// "log"
 )
 
 func main() {

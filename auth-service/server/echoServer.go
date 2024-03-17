@@ -21,8 +21,6 @@ type echoServer struct {
 
 func NewEchoServer(cfg *config.Config, db *gorm.DB) Server {
 	e := echo.New()
-
-	e.Use(middleware.Logger())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{cfg.App.FrontendURL, "http://localhost:5173"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},

@@ -15,6 +15,13 @@ up_build:  build_auth build_search build_data build_frontend
 	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq
 	@echo "Docker images built and started!"
 
+up_build_service_monitoring:  build_auth build_search build_data build_frontend 
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq loki promtail grafana
+	@echo "Docker images built and started!"
+
 up_build_backend: build_auth build_search build_data
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
@@ -184,3 +191,8 @@ up_monitoring:
 	@echo "Starting monitoring service..."
 	docker compose -f docker-compose.dev.yml up -d loki promtail grafana
 	@echo "Monitoring service started!"
+
+down_monitoring:
+	@echo "Stopping monitoring service..."
+	docker compose -f docker-compose.dev.yml down loki promtail grafana
+	@echo "Monitoring service stopped!"

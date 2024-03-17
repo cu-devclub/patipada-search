@@ -8,11 +8,8 @@ import (
 )
 
 func (r *requestHandler) GetRequest(c *gin.Context) {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-		Params: c.Request.URL.Query(),
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = c.Request.URL.Query()
 
 	status := c.Query("status")
 	username := c.Query("username")
@@ -42,11 +39,8 @@ func (r *requestHandler) GetRequest(c *gin.Context) {
 }
 
 func (r *requestHandler) GetLastestRequestOfRecord(c *gin.Context) {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-		Params: c.Request.URL.Query(),
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = c.Request.URL.Query()
 
 	index := c.Query("index")
 	if index == "" {

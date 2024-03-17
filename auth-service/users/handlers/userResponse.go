@@ -19,7 +19,7 @@ func (handler *usersHttpHandler) successResponse(c echo.Context, handlerOpts *Ha
 		Body: body,
 	}
 	slog.Info(
-		"Success Response",
+		"Success Request",
 		slog.Any("Handler", handlerOpts),
 		slog.Any("Response", res),
 	)
@@ -32,7 +32,7 @@ func (handler *usersHttpHandler) errorResponse(c echo.Context, handlerOpts *Hand
 		Body: errMessage,
 	}
 	slog.Error(
-		"Error Response",
+		"Error Request",
 		slog.Any("Handler", handlerOpts),
 		slog.Any("Response", res),
 	)
