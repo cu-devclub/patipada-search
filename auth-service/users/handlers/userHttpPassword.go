@@ -23,12 +23,7 @@ import (
 // - 500 internal server error
 func (h *usersHttpHandler) ChangePassword(c echo.Context) error {
 	reqBody := new(models.ChangePassword)
-
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: "", //! Not binding because do not want to expose password
-	}
+	handlerOpts := NewHandlerOpts(c)
 
 	if err := c.Bind(reqBody); err != nil {
 		return h.errorResponse(c, handlerOpts, http.StatusBadRequest, messages.BAD_REQUEST)
@@ -75,12 +70,8 @@ func (h *usersHttpHandler) ChangePassword(c echo.Context) error {
 // - 500 internal server error
 func (h *usersHttpHandler) ForgetPassword(c echo.Context) error {
 	in := new(models.ForgetPassword)
-
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: in,
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = in
 
 	email := c.Param("email")
 	if email == "" {
@@ -111,7 +102,6 @@ func (h *usersHttpHandler) ForgetPassword(c echo.Context) error {
 
 	return h.successResponse(c, handlerOpts, http.StatusOK, resp)
 }
-
 
 // Reset Password : change password when forget password from reset link
 // Parameters(JSON)

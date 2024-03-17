@@ -32,11 +32,8 @@ import (
 // - 500 internal server error
 func (h *usersHttpHandler) RegisterUser(c echo.Context) error {
 
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: &models.RegisterLogDto{},
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = &models.RegisterLogDto{}
 
 	reqBody := new(models.RegisterDto)
 	if err := c.Bind(reqBody); err != nil {
@@ -95,11 +92,8 @@ func (h *usersHttpHandler) RegisterUser(c echo.Context) error {
 // - 500 internal server error
 func (h *usersHttpHandler) RemoveUser(c echo.Context) error {
 	reqBody := new(models.RemoveUserDto)
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: reqBody,
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = reqBody
 
 	username := c.Param("username")
 	if username == "" {

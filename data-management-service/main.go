@@ -10,7 +10,6 @@ import (
 	"log/slog"
 )
 
-// TODO : make service can run even other service not there (gRPC connection)
 func main() {
 	logging.NewSLogger()
 
@@ -46,6 +45,7 @@ func main() {
 		return
 	}
 	defer rabbit.Conn.Close()
+	// rabbit := communication.MockRabbitMQ()
 	slog.Info("Connect to RabbitMQ successfully!")
 
 	comm := communication.NewCommunicationImpl(*grpc, *rabbit)

@@ -51,17 +51,22 @@ for more information please visit [.github/workflows](./.github/workflows/)
 
 - Copy `.env.template`, paste in the same directory then rename to `.env` (for more information in env variable navigate to [Environment Variables](#environment-variables))
 
-- Open your terminal and type
-
-```bash
-make up_build
-```
-
-or
-
-```bash
-docker compose -f docker-compose.dev.yml up -d
-```
+- Start services (2 ways)
+    1. Using Make
+        - Install Make
+        - run
+        ```bash
+        make up_build
+        make up_monitoring
+        ```
+    2. Using docker 
+        - Navigate to each service Dockerfile
+        - Delete all comments line (to build service)
+        - cd to root project
+        - run
+        ```bash
+        docker compose -f docker-compose.dev.yml up -d
+        ```
 
 - Or in case you want to run each service individually, you can navigate to each service and reading through README.md
 

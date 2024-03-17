@@ -24,7 +24,7 @@ type ginServer struct {
 }
 
 func NewGinServer(cfg *config.Config, db *database.Database, v *validator.Validator, c communication.Communication) Server {
-	g := gin.Default()
+	g := gin.New()
 	// Allow CORS from frontend
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{cfg.App.FrontendURL, "http://localhost:5173"}
@@ -103,8 +103,8 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	//     500: An internal server error occurred.
 	userRoutes.POST("/requests", requestHandlers.InsertRequest)
 
-	authRoutes := g.app.Group("/")
-	authRoutes.Use(g.AuthMiddleware("admin"))
+	adminRoutes := g.app.Group("/")
+	adminRoutes.Use(g.AuthMiddleware("admin"))
 
 	// PUT /request route is used to update a request.
 	//
@@ -131,6 +131,6 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	// - 400 Bad Request: The request body could not be bound to a models.Request struct or some fields are invalid.
 	// - 500 Internal Server Error: An internal server error occurred.
 	//
-	// Usage: authRoutes.PUT("/request", requestHandlers.UpdateRequest)
-	authRoutes.PUT("/request", requestHandlers.UpdateRequest)
+	// Usage: adminRoutes.PUT("/request", requestHandlers.UpdateRequest)
+	adminRoutes.PUT("/request", requestHandlers.UpdateRequest)
 }

@@ -11,11 +11,8 @@ import (
 )
 
 func (r *recordHttpHandler) Search(c *gin.Context) {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-		Params: c.Request.URL.Query(),
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = c.Request.URL.Query()
 
 	// retrieve query
 	query := c.Query("query")
@@ -71,10 +68,8 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 }
 
 func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = map[string]string{"recordIndex": c.Param("recordIndex")}
 	// retrieve query
 	recordIndex := c.Param("recordIndex")
 	if recordIndex == "" {
@@ -117,11 +112,7 @@ func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
 // - 200 & A list of all records retrieved from the database.
 // - 500: An internal server error occurred.
 func (r *recordHttpHandler) GetAllRecords(c *gin.Context) {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-		Params: "",
-	}
+	handlerOpts := NewHandlerOpts(c)
 
 	records, err := r.recordUsecase.GetAllRecords("record")
 	if err != nil {

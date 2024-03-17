@@ -28,7 +28,7 @@ type RecordArch struct {
 }
 
 func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
-	serv := gin.Default()
+	serv := gin.New()
 
 	// Allow CORS from frontend
 	config := cors.DefaultConfig()

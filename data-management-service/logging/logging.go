@@ -65,7 +65,7 @@ func NewPrettyHandler(
 	out io.Writer,
 	opts PrettyHandlerOptions,
 ) *PrettyHandler {
-	var sloghandler slog.Handler = slog.NewTextHandler(out, &opts.SlogOpts)
+	var sloghandler slog.Handler = slog.NewJSONHandler(out, &opts.SlogOpts)
 
 	h := &PrettyHandler{
 		Handler: sloghandler,

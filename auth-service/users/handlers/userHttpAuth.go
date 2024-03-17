@@ -23,11 +23,8 @@ import (
 // - 500 internal server error
 func (h *usersHttpHandler) Login(c echo.Context) error {
 	reqBody := new(models.LoginDto)
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: &models.LoginLogDto{},
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = reqBody
 
 	if err := c.Bind(reqBody); err != nil {
 		return h.errorResponse(c, handlerOpts, http.StatusBadRequest, messages.BAD_REQUEST)
@@ -74,11 +71,8 @@ func (h *usersHttpHandler) Login(c echo.Context) error {
 // - 401 Unauthorize ; invalid token
 // - 500 internal server error
 func (h *usersHttpHandler) Authorize(c echo.Context) error {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: map[string]string{"requiredRole": ""},
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = map[string]string{"requiredRole": ""}
 
 	requiredRole := c.QueryParam("requiredRole")
 	if requiredRole == "" {

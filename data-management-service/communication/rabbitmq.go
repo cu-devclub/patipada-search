@@ -19,6 +19,14 @@ type RabbitMQStruct struct {
 	rabbitconfig *config.RabbitMQ
 }
 
+func MockRabbitMQ() *RabbitMQStruct {
+	return &RabbitMQStruct{
+		Conn:         nil,
+		Emitter:      nil,
+		rabbitconfig: nil,
+	}
+}
+
 func ConnectToRabbitMQ(cfg *config.Config) (*RabbitMQStruct, error) {
 	var counts int64
 	var backOff = 1 * time.Second

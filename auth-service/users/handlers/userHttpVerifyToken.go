@@ -17,11 +17,9 @@ import (
 // - 401 Unauthorize ; invalid token
 // - 500 internal server error
 func (h *usersHttpHandler) VerifyToken(c echo.Context) error {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: map[string]string{"token": ""},
-	}
+
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = map[string]string{"token": ""}
 
 	token := c.Request().Header.Get("Authorization")
 	if token == "" {
@@ -57,11 +55,8 @@ func (h *usersHttpHandler) VerifyToken(c echo.Context) error {
 // - 404 Not found ; token == "" or not attach token
 // - 500 internal server error
 func (h *usersHttpHandler) VerifyResetToken(c echo.Context) error {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: map[string]string{"token": ""},
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = map[string]string{"token": ""}
 
 	token := c.Param("token")
 	if token == "" {

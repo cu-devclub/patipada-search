@@ -64,9 +64,6 @@ services:
     ports:
       - 5173:8080
     restart: always
-    labels:
-      logging: "promtail"
-      loggin_jobname: "containerlogs"
     networks:
       - dhammanava_network
 
@@ -122,6 +119,8 @@ services:
     image: ${DOCKERHUB_USERNAME}/dhammanava-data-image:latest
     environment:
       FRONTEND_URL: http://frontend:5173
+      SEARCH_SERVICE: search-service
+      AUTH_SERVICE: auth-service
       MONGO_DB_HOST: data-db
       MONGO_DB_PORT: 27017
       MONGO_DB_USERNAME: ${DATA_MNGMNT_DB_USER}
