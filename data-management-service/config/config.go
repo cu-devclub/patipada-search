@@ -20,6 +20,7 @@ type (
 		AuthGRPCPort   int
 		SearchService  string
 		SearchGRPCPort int
+		DataSourcePath string
 	}
 	RabbitMQ struct {
 		URL      string
@@ -58,6 +59,7 @@ func ReadConfig() {
 			AuthGRPCPort:   viper.GetInt("AUTH_GRPC_PORT"),
 			SearchService:  viper.GetString("SEARCH_SERVICE"),
 			SearchGRPCPort: viper.GetInt("SEARCH_GRPC_PORT"),
+			DataSourcePath: viper.GetString("STATIC_DATA"),
 		},
 		RabbitMQ: RabbitMQ{
 			URL:      viper.GetString("RABBITMQ_URL"),
