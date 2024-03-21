@@ -1,12 +1,14 @@
 package usecases
 
 import (
+	"auth-service/config"
 	"auth-service/errors"
 	"auth-service/jwt"
 	"auth-service/messages"
 	"auth-service/users/entities"
 	"auth-service/users/helper"
 	"auth-service/users/models"
+	"sort"
 
 	"github.com/go-playground/validator"
 )
@@ -85,23 +87,64 @@ func (u *UsersUsecaseImpl) RegisterUser(requesterRole string, in *models.Registe
 	return uuid, nil
 }
 
-// Remove user by username & requestor role must be higher
+func (u *UsersUsecaseImpl) GetAllUsersData() ([]*models.Users, error) {
+	en, err := u.usersRepository.GetAllUsersData()
+	if err != nil {
+		return nil, err
+	}
+
+	var users []*models.Users
+	for _, user := range en {
+		users = append(users, &models.Users{
+			ID:       user.Id,
+			Username: user.Username,
+			Email:    user.Email,
+			Role:     user.Role,
+		})
+	}
+
+	cfg := config.GetConfig()
+	sort.Slice(users, func(i, j int) bool {
+		roleI := cfg.App.RolesMap[users[i].Role]
+		roleJ := cfg.App.RolesMap[users[j].Role]
+		if roleI != roleJ {
+			return roleI > roleJ
+		}
+
+		return users[i].Username < users[j].Username
+	})
+	
+	return users, nil
+}
+
+// Remove user by id & requestor role must be higher
 // Parameters  :
 // - requester Role (string) ; one of admin, super-admin, user
 // - models.RemoveUserDto
-//   - username (string)
+//   - id (string)
 //
 // Response
 // - 200 OK
-// - 400 bad request (invalid/missing username)
+// - 400 bad request (invalid/missing id)
 // - 401 Unauthorize ; missing token
 // - 403 Forbidden ; no permission
-// - 404 User not found (invalid username)
+// - 404 User not found (invalid id)
 // - 500 internal server error
 func (u *UsersUsecaseImpl) RemoveUser(requesterRole string, in *models.RemoveUserDto) error {
 	// Get User data
-	user, err := u.usersRepository.GetUserByUsername(in.Username)
+	users, err := u.usersRepository.GetAllUsersData()
 	if err != nil {
+		return err
+	}
+
+	var user *entities.Users
+	for _, u := range users {
+		if u.Id == in.ID {
+			user = u
+			break
+		}
+	}
+	if user == nil {
 		return errors.CreateError(404, messages.USER_NOT_FOUND)
 	}
 
@@ -112,5 +155,5 @@ func (u *UsersUsecaseImpl) RemoveUser(requesterRole string, in *models.RemoveUse
 	}
 
 	// Remove User
-	return u.usersRepository.RemoveUser(in.Username)
+	return u.usersRepository.RemoveUser(in.ID)
 }

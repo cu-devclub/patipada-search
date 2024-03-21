@@ -94,7 +94,7 @@ func (h *usersHttpHandler) ForgetPassword(c echo.Context) error {
 			Message: messages.SUCCESSFUL_SEND_EMAIL_FORGET_PASSWORD,
 			Token:   token,
 		},
-		OptionalResponse: &forgetPasswordResLogStruct{
+		LogResponseOptional: &forgetPasswordResLogStruct{
 			Email:   email,
 			Message: messages.SUCCESSFUL_SEND_EMAIL_FORGET_PASSWORD,
 		},

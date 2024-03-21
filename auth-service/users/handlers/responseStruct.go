@@ -1,10 +1,13 @@
 package handlers
 
-import "log/slog"
+import (
+	"auth-service/users/models"
+	"log/slog"
+)
 
 type ResponseOptions struct {
-	Response         any
-	OptionalResponse any
+	Response            any
+	LogResponseOptional any
 }
 
 type baseResponseStruct struct {
@@ -49,6 +52,17 @@ type forgetPasswordStruct struct {
 
 type forgetPasswordResLogStruct struct {
 	Email   string `json:"email"`
+	Message string `json:"message"`
+}
+
+type getAllUserResponse struct {
+	Amount  int             `json:"amount"`
+	Users   []*models.Users `json:"users"`
+	Message string          `json:"message"`
+}
+
+type getAllUserLogResponse struct {
+	Amount  int    `json:"amount"`
 	Message string `json:"message"`
 }
 

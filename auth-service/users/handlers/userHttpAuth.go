@@ -50,7 +50,7 @@ func (h *usersHttpHandler) Login(c echo.Context) error {
 			Token:   token,
 			Message: messages.SUCCESSFUL_LOGIN,
 		},
-		OptionalResponse: &loginResponseLogStruct{
+		LogResponseOptional: &loginResponseLogStruct{
 			Username: reqBody.Username,
 			Role:     role,
 		},
