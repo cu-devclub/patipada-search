@@ -127,6 +127,17 @@ down_data:
 	docker compose -f docker-compose.dev.yml down data-service
 	@echo "Data service stopped!"
 
+## empty_data_db: stops data-db (if running), removes volumes and starts data-db
+## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
+empty_data_db:
+	@echo "Stopping data-db (if running...)"
+	docker compose -f docker-compose.dev.yml down data-db
+	@echo "Remove volumes..."
+	rm -rf ./volumes/database/mongo-data
+	@echo "starting data-db containers..."
+	docker compose -f docker-compose.dev.yml up --build -d data-db
+	@echo "Data-db started!"
+
 ## up_dev_data: stops db container and rebuild and start go server
 up_dev_data:
 	@echo "Stopping docker images (if running...)"
