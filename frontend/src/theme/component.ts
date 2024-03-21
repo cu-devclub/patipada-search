@@ -44,7 +44,7 @@ const inputSelectedStyles = {
 
 const buttonStyle = {
   baseStyle: {
-    fontWeight: "medium",
+    fontWeight: "bold",
   },
   props: {
     myProp: String, // Define the type for myProp
@@ -99,11 +99,11 @@ const buttonStyle = {
 const textStyle = {
   baseStyle: {
     fontWeight: "light",
-    letterSpacing: "tighter"
+    letterSpacing: "tighter",
   },
   variants: {
     question: {
-      fontWeight: "normal",
+      fontWeight: "semibold",
     },
     answer: {
       fontWeight: "light",
