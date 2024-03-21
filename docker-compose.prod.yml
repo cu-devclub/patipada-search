@@ -17,7 +17,7 @@ services:
       logging: "promtail"
       loggin_jobname: "containerlogs"
     volumes:
-      - ./data:/app/datasource
+      - ./data/record:/app/datasource
     restart: always
     depends_on:
       - elastic-db
@@ -129,6 +129,8 @@ services:
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       RABBITMQ_URL: rabbitmq
+    volumes:
+      - ./data/record:/app/datasource
     ports:
       - 8083:8083
     restart: always
