@@ -13,12 +13,12 @@ export const forgetPassword = async (email: string) => {
      if (requestError.status === 400) {
        returnError = {
          message: ERR_Messages.NOT_FOUND_TOKEN,
-         status: 404,
+         status: 400,
          toastStatus: ToastStatus.ERROR,
        };
      } else if (requestError.status === 404) {
        returnError = {
-         message: ERR_Messages.NOT_FOUND_TOKEN,
+         message: ERR_Messages.NOT_FOUND,
          status: 404,
          toastStatus: ToastStatus.ERROR,
        };
