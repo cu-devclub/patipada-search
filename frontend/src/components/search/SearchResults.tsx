@@ -22,11 +22,11 @@ function SearchResults({ data, query, tokens }: SearchResultInterface) {
       px={8}
     >
       <VStack spacing={8} w={{ base: "100%", md: "80%", xl: "70%" }}>
-        {data.map((item) => (
-          <>
+        {data.map((item, key) => (
+          <VStack key={key} w="full">
             <QA_Vdo data={item} query={query} tokens={tokens} />
             <Divider />
-          </>
+          </VStack>
         ))}
       </VStack>
     </Flex>
