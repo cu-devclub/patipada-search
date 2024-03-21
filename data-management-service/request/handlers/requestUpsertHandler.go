@@ -32,7 +32,7 @@ func (r *requestHandler) InsertRequest(c *gin.Context) {
 	}
 
 	resp := ResponseOptions{
-		Response: request.ToString(),
+		Response: request,
 	}
 
 	r.successResponse(c, *handlerOpts, http.StatusCreated, resp)
@@ -61,7 +61,7 @@ func (r *requestHandler) UpdateRequest(c *gin.Context) {
 	}
 
 	resp := ResponseOptions{
-		Response: request.ToString(),
+		Response: request,
 	}
 	r.successResponse(c, *handlerOpts, http.StatusOK, resp)
 }

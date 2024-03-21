@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"data-management/constant"
 	"data-management/errors"
 	"data-management/messages"
 	"data-management/request/entities"
@@ -9,9 +10,9 @@ import (
 	"data-management/util"
 )
 
-var statusArr = []string{"pending", "approved", "rejected"}
-
 func (r *requestUsecase) GetRequest(status, username, requestID, index, approvedBy string) ([]*models.Request, error) {
+	var statusArr = []string{constant.REQUEST_STATUS_PENDING, constant.REQUEST_STATUS_REVIEWED}
+
 	// validate status
 	if status != "" && !util.Contains(status, statusArr) {
 		return nil, errors.CreateError(400, messages.BAD_REQUEST)

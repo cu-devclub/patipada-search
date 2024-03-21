@@ -29,7 +29,10 @@ func (r *requestHandler) GetRequest(c *gin.Context) {
 	}
 
 	resp := ResponseOptions{
-		Response: modelsRequest,
+		Response: &RequestResponse{
+			RequestS: modelsRequest,
+			Amount:   len(modelsRequest),
+		},
 		OptionalResponse: &ArrayRequestsLog{
 			Length: len(modelsRequest),
 		},
@@ -65,6 +68,27 @@ func (r *requestHandler) GetLastestRequestOfRecord(c *gin.Context) {
 			RequestID: modelsRequest.RequestID,
 			Status:    modelsRequest.Status,
 		},
+	}
+
+	r.successResponse(c, *handlerOpts, 200, resp)
+}
+
+func (r *requestHandler) GetSummary(c *gin.Context) {
+	handlerOpts := NewHandlerOpts(c)
+
+	summary, err := r.requestUsecase.SummaryData()
+	if err != nil {
+		if er, ok := err.(*errors.RequestError); ok {
+			r.errorResponse(c, handlerOpts, er.StatusCode, er.Error())
+			return
+		} else {
+			r.errorResponse(c, handlerOpts, 500, messages.INTERNAL_SERVER_ERROR)
+			return
+		}
+	}
+
+	resp := ResponseOptions{
+		Response: summary,
 	}
 
 	r.successResponse(c, *handlerOpts, 200, resp)

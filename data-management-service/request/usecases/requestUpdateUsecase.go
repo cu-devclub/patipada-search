@@ -52,7 +52,7 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) error {
 			continue
 		}
 
-		req.Status = constant.STATUS_REVIEWED
+		req.Status = constant.REQUEST_STATUS_REVIEWED
 		requestEntitiy := helper.ModelsToEntity(req)
 		requestEntitiy.UpdatedAt = time.Now()
 		if err := r.requestRepositories.UpdateRequest(requestEntitiy); err != nil {
@@ -63,7 +63,7 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) error {
 	// --- Update the current request
 	requestEntity := helper.ModelsToEntity(request)
 	requestEntity.UpdatedAt = time.Now()
-	requestEntity.Status = constant.STATUS_REVIEWED
+	requestEntity.Status = constant.REQUEST_STATUS_REVIEWED
 	if err := r.requestRepositories.UpdateRequest(requestEntity); err != nil {
 		if err == mongo.ErrNoDocuments {
 			return errors.CreateError(400, messages.BAD_REQUEST)

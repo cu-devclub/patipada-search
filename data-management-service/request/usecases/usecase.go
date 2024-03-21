@@ -76,4 +76,6 @@ type UseCase interface {
 	//			400 (Bad Request) and
 	//          500 (Internal Server Error).
 	GetLastestRequestOfRecord(index string) (*models.Request, error)
+
+	SummaryData() (*models.Summary, error)
 }

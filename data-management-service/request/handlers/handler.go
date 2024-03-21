@@ -129,4 +129,6 @@ type Handlers interface {
 	// 		400 (Bad Request) and
 	// 		500 (Internal Server Error).
 	GetLastestRequestOfRecord(c *gin.Context)
+
+	GetSummary(c *gin.Context)
 }
