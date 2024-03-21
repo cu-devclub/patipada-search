@@ -25,7 +25,7 @@ export interface SearchResultInterface {
   tokens: string[];
 }
 
-export const mapResponseToDataItem = (data:any): DataItem => {
+export const mapResponseToDataItem = (data: any): DataItem => {
   return {
     index: data.index,
     question: data.question,
@@ -35,3 +35,8 @@ export const mapResponseToDataItem = (data:any): DataItem => {
     youtubeURL: data.youtubeURL,
   };
 };
+
+export interface RecordSummary {
+  recordAmount: number;
+  youtubeClipAmount: number;
+}
