@@ -17,7 +17,8 @@ services:
       logging: "promtail"
       loggin_jobname: "containerlogs"
     volumes:
-      - ./data/record:/app/datasource
+      - ./data:/app/datasource
+      - ./logs:/app/logs
     restart: always
     depends_on:
       - elastic-db
@@ -230,6 +231,16 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    networks:
+      - dhammanava_network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
     networks:
       - dhammanava_network
 

@@ -11,6 +11,8 @@ import (
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 type ginServer struct {
@@ -65,6 +67,7 @@ func (g *ginServer) Start() {
 // usecase, and HTTP handler. It registers the handlers for the different
 // endpoints of the record API, such as "/displayAllRecords" and "/search".
 func (g *ginServer) initializeRecordHttpHandler() {
+
 	recordESRepository := recordRepository.NewRecordESRepository(g.db)
 	mlRepository := mlRepository.NewMLServiceRepository()
 	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository)
@@ -101,4 +104,6 @@ func (g *ginServer) initializeRecordHttpHandler() {
 
 	g.app.GET("/search/:recordIndex", recordHttpHandler.SearchByRecordIndex)
 
+	// Prometheus metrics
+	g.app.GET("/metrics", gin.WrapH(promhttp.Handler()))
 }

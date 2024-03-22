@@ -147,7 +147,7 @@ To run this project, you will need to add the following environment variables to
 
 **Containerization:** Docker
 
-**Monitoring:** Loki, Promtail, Grafana
+**Monitoring:** Loki, Promtail, Grafana, Prometheus
 
 ## Project structure
 

@@ -200,10 +200,10 @@ down:
 ## monitoring service
 up_monitoring:
 	@echo "Starting monitoring service..."
-	docker compose -f docker-compose.dev.yml up -d loki promtail grafana
+	docker compose -f docker-compose.dev.yml up -d loki promtail grafana prometheus
 	@echo "Monitoring service started!"
 
 down_monitoring:
 	@echo "Stopping monitoring service..."
-	docker compose -f docker-compose.dev.yml down loki promtail grafana
+	docker compose -f docker-compose.dev.yml down loki promtail grafana prometheus
 	@echo "Monitoring service stopped!"
