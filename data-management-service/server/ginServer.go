@@ -16,15 +16,22 @@ import (
 )
 
 type ginServer struct {
-	app       *gin.Engine
-	db        *database.Database
-	cfg       *config.Config
-	validator *validator.Validator
-	comm      communication.Communication
+	app         *gin.Engine
+	db          *database.Database
+	cfg         *config.Config
+	validator   *validator.Validator
+	comm        communication.Communication
+	requestArch *RequestArch
+}
+
+type RequestArch struct {
+	Repo    repositories.Repositories
+	Usecase usecases.UseCase
+	Handler handlers.Handlers
 }
 
 func NewGinServer(cfg *config.Config, db *database.Database, v *validator.Validator, c communication.Communication) Server {
-	g := gin.Default()
+	g := gin.New()
 	// Allow CORS from frontend
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{cfg.App.FrontendURL, "http://localhost:5173"}
@@ -44,6 +51,10 @@ func NewGinServer(cfg *config.Config, db *database.Database, v *validator.Valida
 	return serv
 }
 
+func (g *ginServer) GetRequestArch() *RequestArch {
+	return g.requestArch
+}
+
 func (g *ginServer) Start() {
 	g.app.Run(fmt.Sprintf(":%d", g.cfg.App.Port))
 }
@@ -56,6 +67,17 @@ func (g *ginServer) initializeRequestHttpHandler() {
 
 	requestHandlers := handlers.NewRequestHandler(requestUsecase)
 
+	g.requestArch = &RequestArch{
+		Repo:    requestRepositories,
+		Usecase: requestUsecase,
+		Handler: requestHandlers,
+	}
+
+	g.initializedUserRoutes(requestHandlers)
+	g.initializedAdminRoutes(requestHandlers)
+}
+
+func (g *ginServer) initializedUserRoutes(handler handlers.Handlers) {
 	userRoutes := g.app.Group("/")
 	userRoutes.Use(g.AuthMiddleware("user"))
 
@@ -70,7 +92,7 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	//   200: The operation was successful. The response body contains the matching requests.
 	//   400: Bad Request. The request was invalid or cannot be served. The exact error is provided in the response.
 	//   500: Internal Server Error. The server encountered an unexpected condition which prevented it from fulfilling the request.
-	userRoutes.GET("/requests", requestHandlers.GetRequest)
+	userRoutes.GET("/requests", handler.GetRequest)
 
 	// GetLastestRequestOfRecord is a handler function for the GET /request/latest endpoint.
 	// Query Parameters:
@@ -82,7 +104,7 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	// Possible error status codes are
 	// 		400 (Bad Request) and
 	// 		500 (Internal Server Error).
-	userRoutes.GET("/request/latestRecord", requestHandlers.GetLastestRequestOfRecord)
+	userRoutes.GET("/request/latestRecord", handler.GetLastestRequestOfRecord)
 
 	// POST /requests is a route that inserts a new request into the database.
 	// It expects a JSON body that matches the structure of the models.Request struct.
@@ -101,10 +123,12 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	//     201: The request was successfully created. The response body contains the created request.
 	//     400: The request body could not be bound to a models.Request struct, or the request index does not exist.
 	//     500: An internal server error occurred.
-	userRoutes.POST("/requests", requestHandlers.InsertRequest)
+	userRoutes.POST("/requests", handler.InsertRequest)
+}
 
-	authRoutes := g.app.Group("/")
-	authRoutes.Use(g.AuthMiddleware("admin"))
+func (g *ginServer) initializedAdminRoutes(handler handlers.Handlers) {
+	adminRoutes := g.app.Group("/")
+	adminRoutes.Use(g.AuthMiddleware("admin"))
 
 	// PUT /request route is used to update a request.
 	//
@@ -123,7 +147,7 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	//	CreatedAt:  The creation time of the request. It is a time.Time and is optional.
 	//	UpdatedAt:  The update time of the request. It is a time.Time and is optional.
 	//	By: 	   The user who created the request. It is a string.
-	//  ApprovedBy: The user who approved the request. It is a string.
+	//  approvedBy: The user who approved the request. It is a string.
 	//  Status:     The status of the request. It is a string.
 	//
 	// Responses:
@@ -131,6 +155,10 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	// - 400 Bad Request: The request body could not be bound to a models.Request struct or some fields are invalid.
 	// - 500 Internal Server Error: An internal server error occurred.
 	//
-	// Usage: authRoutes.PUT("/request", requestHandlers.UpdateRequest)
-	authRoutes.PUT("/request", requestHandlers.UpdateRequest)
+	// Usage: adminRoutes.PUT("/request", requestHandlers.UpdateRequest)
+	adminRoutes.PUT("/request", handler.UpdateRequest)
+
+	// GET /summary route is used to retrieve the summary of the requests and records.
+	adminRoutes.GET("/summary", handler.GetSummary)
+
 }

@@ -8,6 +8,7 @@ import (
 	"search-esdb-service/data"
 	"search-esdb-service/database"
 	"search-esdb-service/logging"
+	"search-esdb-service/monitoring"
 	recordMigrator "search-esdb-service/record/migration"
 	"search-esdb-service/server"
 )
@@ -24,6 +25,10 @@ func main() {
 
 	config.ReadConfig()
 	cfg := config.GetConfig()
+
+	// If the usecase is bigger, this one can be an object
+	// right now it used only to set up the prometheus counter
+	monitoring.NewMonitoring()
 
 	if err := data.ReadStopWord(&cfg); err != nil {
 		slog.Error("Failed to read stop word", slog.String("err", err.Error()))

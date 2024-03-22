@@ -1333,10 +1333,20 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.56.0.tgz"
   integrity sha512-gMsVel9D7f2HLkBma9VbtzZRehRogVRfbr++f06nL2vnCGCNlzOD+/MUov/F4p8myyAHspEhVobgjpX64q5m6A==
 
+"@fontsource-variable/nunito@^5.0.18":
+  version "5.0.18"
+  resolved "https://registry.yarnpkg.com/@fontsource-variable/nunito/-/nunito-5.0.18.tgz#8d0e6692680810bb3accab4af57f0a3e2db8f015"
+  integrity sha512-DaAMnvCuwxv2tCjUIGudvayzO3jjsDEH2DcqcgwRZnjBp5RZRynYkV4aBmvMkQ+Grzpm7MMTqNltiLcJxqSeAQ==
+
 "@fontsource/mitr@^5.0.8":
   version "5.0.8"
   resolved "https://registry.npmjs.org/@fontsource/mitr/-/mitr-5.0.8.tgz"
   integrity sha512-7w8wPPa3yjQLvIGR+XVM+VRLc9j2Ul9Kk1mHGvoza6oC77vCduUoc5Ak3npQ1+XBKvVSMJY+F5PutN7Av0cdCg==
+
+"@fontsource/sarabun@^5.0.19":
+  version "5.0.19"
+  resolved "https://registry.yarnpkg.com/@fontsource/sarabun/-/sarabun-5.0.19.tgz#8137f9fff9a789c0e8c2931ec4ec846baba3b88d"
+  integrity sha512-VXnYsa14s77BBCTbRrfzNNFc1jBE70iy4GtC3AbFD8swZPv9zzydYa26tNwmkPDqkis4S0wGe7NlkizgRKqdxQ==
 
 "@humanwhocodes/config-array@^0.11.13":
   version "0.11.13"

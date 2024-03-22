@@ -64,18 +64,18 @@ type UsersUsecase interface {
 	// - 500 internal server error
 	ResetPassword(in *models.ResetPassword) error
 
-	// Remove user by username & requestor role must be higher
+	// Remove user by id & requestor role must be higher
 	// Parameters  :
 	// - requester Role (string) ; one of admin, super-admin, user
 	// - models.RemoveUserDto
-	// 		- username (string)
+	// 		- id (string)
 	//
 	// Response
 	// - 200 OK
-	// - 400 bad request (invalid/missing username)
+	// - 400 bad request (invalid/missing id)
 	// - 401 Unauthorize ; missing token
 	// - 403 Forbidden ; no permission
-	// - 404 User not found (invalid username)
+	// - 404 User not found (invalid id)
 	// - 500 internal server error
 	RemoveUser(requesterRole string, in *models.RemoveUserDto) error
 
@@ -125,4 +125,6 @@ type UsersUsecase interface {
 	// - 401 Unauthorize ; invalid token
 	// - 500 internal server error
 	Authorize(c echo.Context, requireRole string) (bool, error)
+
+	GetAllUsersData() ([]*models.Users, error)
 }

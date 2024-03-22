@@ -32,11 +32,8 @@ import (
 // - 500 internal server error
 func (h *usersHttpHandler) RegisterUser(c echo.Context) error {
 
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: &models.RegisterLogDto{},
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = &models.RegisterLogDto{}
 
 	reqBody := new(models.RegisterDto)
 	if err := c.Bind(reqBody); err != nil {
@@ -81,32 +78,29 @@ func (h *usersHttpHandler) RegisterUser(c echo.Context) error {
 	return h.successResponse(c, handlerOpts, http.StatusCreated, res)
 }
 
-// Remove user by username & requestor role must be higher
+// Remove user by id & requestor role must be higher
 // Header - Authorization : <token>
 // Parameters (Route Param) :
-// - username (string)
+// - id (string)
 //
 // Response
 // - 200 OK
-// - 400 bad request (invalid/missing username)
+// - 400 bad request (invalid/missing id)
 // - 401 Unauthorize ; missing token
 // - 403 Forbidden ; no permission
-// - 404 User not found (invalid username)
+// - 404 User not found (invalid id)
 // - 500 internal server error
 func (h *usersHttpHandler) RemoveUser(c echo.Context) error {
 	reqBody := new(models.RemoveUserDto)
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request().URL.Path,
-		Method: c.Request().Method,
-		Params: reqBody,
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = reqBody
 
-	username := c.Param("username")
-	if username == "" {
+	id := c.Param("id")
+	if id == "" {
 		return h.errorResponse(c, handlerOpts, http.StatusBadRequest, messages.BAD_REQUEST)
 	}
 
-	reqBody.Username = username
+	reqBody.ID = id
 
 	requesterRole, err := jwt.GetRole(c)
 	if err != nil {
@@ -124,6 +118,29 @@ func (h *usersHttpHandler) RemoveUser(c echo.Context) error {
 	res := ResponseOptions{
 		Response: &baseResponseStruct{
 			Message: messages.SUCCESSFUL_REMOVE_USER,
+		},
+	}
+
+	return h.successResponse(c, handlerOpts, http.StatusOK, res)
+}
+
+func (h *usersHttpHandler) GetAllUsers(c echo.Context) error {
+	handlerOpts := NewHandlerOpts(c)
+
+	users, err := h.usersUsecase.GetAllUsersData()
+	if err != nil {
+		return h.errorResponse(c, handlerOpts, http.StatusInternalServerError, messages.INTERNAL_SERVER_ERROR)
+	}
+
+	res := ResponseOptions{
+		Response: &getAllUserResponse{
+			Message: messages.SUCCESSFUL_GET_ALL_USERS,
+			Users:   users,
+			Amount:  len(users),
+		},
+		LogResponseOptional: &getAllUserLogResponse{
+			Amount:  len(users),
+			Message: messages.SUCCESSFUL_GET_ALL_USERS,
 		},
 	}
 

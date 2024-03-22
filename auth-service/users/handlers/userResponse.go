@@ -8,20 +8,20 @@ import (
 
 func (handler *usersHttpHandler) successResponse(c echo.Context, handlerOpts *HandlerOpts, responseCode int, resp ResponseOptions) error {
 	var body interface{}
-	if resp.OptionalResponse == nil {
+	if resp.LogResponseOptional == nil {
 		body = resp.Response
 	} else {
-		body = resp.OptionalResponse
+		body = resp.LogResponseOptional
 	}
 
-	res := &Response{
+	logRes := &Response{
 		Code: responseCode,
 		Body: body,
 	}
 	slog.Info(
-		"Success Response",
+		"Success Request",
 		slog.Any("Handler", handlerOpts),
-		slog.Any("Response", res),
+		slog.Any("Response", logRes),
 	)
 	return c.JSON(responseCode, resp.Response)
 }
@@ -32,7 +32,7 @@ func (handler *usersHttpHandler) errorResponse(c echo.Context, handlerOpts *Hand
 		Body: errMessage,
 	}
 	slog.Error(
-		"Error Response",
+		"Error Request",
 		slog.Any("Handler", handlerOpts),
 		slog.Any("Response", res),
 	)

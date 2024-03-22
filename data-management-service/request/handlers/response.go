@@ -20,7 +20,7 @@ func (r *requestHandler) successResponse(c *gin.Context, handlerOpts HandlerOpts
 	}
 
 	slog.Info(
-		"Success Response",
+		"Success Request",
 		slog.Any("Handler", handlerOpts),
 		slog.Any("Response", res),
 	)
@@ -35,7 +35,7 @@ func (r *requestHandler) errorResponse(c *gin.Context, handlerOpts *HandlerOpts,
 	}
 
 	slog.Error(
-		"Error Response",
+		"Error Request",
 		slog.Any("Handler", handlerOpts),
 		slog.Any("Response", res),
 	)

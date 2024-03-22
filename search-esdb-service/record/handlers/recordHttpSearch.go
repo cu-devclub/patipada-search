@@ -2,20 +2,23 @@ package handlers
 
 import (
 	"net/http"
+	"search-esdb-service/config"
 	"search-esdb-service/constant"
 	"search-esdb-service/errors"
+	"search-esdb-service/logging"
 	"search-esdb-service/messages"
+	"search-esdb-service/monitoring"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 func (r *recordHttpHandler) Search(c *gin.Context) {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-		Params: c.Request.URL.Query(),
-	}
+	searchCounter := monitoring.GetSearchCounter()
+	searchCounter.Inc()
+
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = c.Request.URL.Query()
 
 	// retrieve query
 	query := c.Query("query")
@@ -26,6 +29,9 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		return
 	}
 
+	cfg := config.GetConfig()
+	logging.WriteLogsToFile(cfg.Static.LogsPath, cfg.Static.SearchLogsPath, "Search: "+query)
+	
 	// retrieve amount
 	sAmount := c.Query("amount")
 	amount := 50 // default to 50 results
@@ -71,10 +77,8 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 }
 
 func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-	}
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = map[string]string{"recordIndex": c.Param("recordIndex")}
 	// retrieve query
 	recordIndex := c.Param("recordIndex")
 	if recordIndex == "" {
@@ -117,11 +121,7 @@ func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
 // - 200 & A list of all records retrieved from the database.
 // - 500: An internal server error occurred.
 func (r *recordHttpHandler) GetAllRecords(c *gin.Context) {
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-		Params: "",
-	}
+	handlerOpts := NewHandlerOpts(c)
 
 	records, err := r.recordUsecase.GetAllRecords("record")
 	if err != nil {

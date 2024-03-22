@@ -22,7 +22,7 @@ const MessageToast = () =>  {
       status: newRes.status,
       position: "top",
       isClosable: true,
-      duration: 5000,
+      duration: 1000,
       variant: "left-accent",
     });
   };

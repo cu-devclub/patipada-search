@@ -6,8 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
-
 // Implement as success response for future improvement
 // if return has more condition, can implement successResponse further
 func (r *recordHttpHandler) successResponse(c *gin.Context, handlerOpts *HandlerOpts, responseCode int, resp ResponseOptions) {

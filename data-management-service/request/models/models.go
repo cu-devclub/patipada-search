@@ -21,6 +21,22 @@ type (
 		ApprovedBy string    `json:"approved_by,omitempty"`
 		CommentUID string    `json:"comment_uid,omitempty"`
 	}
+
+	Summary struct {
+		RecordSummary  *RecordSummary  `json:"recordSummary"`
+		RequestSummary *RequestSummary `json:"requestSummary"`
+	}
+
+	RecordSummary struct {
+		RecordAmount      int `json:"recordAmount"`
+		YouTubeClipAmount int `json:"youtubeClipAmount"`
+	}
+
+	RequestSummary struct {
+		RequestAmount  int `json:"requestAmount"`
+		ReviewedAmount int `json:"reviewedAmount"`
+		PendingAmount  int `json:"pendingAmount"`
+	}
 )
 
 func (r *Request) ToString() string {

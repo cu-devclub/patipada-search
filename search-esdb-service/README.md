@@ -26,24 +26,24 @@ docker compose -f docker-compose.dev.yml up -d elastic-db
 ```
 
 #### Steps
-1. Open your terminal
-
-2. Naviage to this directory 
-```bash
-cd <your-path>/search-esdb-service
-```
-
-3. Run
-```bash
-go get ./...
-```
-```bash
-go mod vendor
-```
-```bash
-go run main.go 
-```
-
+There are 2 ways to run the service 
+  1. Using golang 
+      ``` bash
+      cd <your-path>/search-esdb-service
+      ```
+      ```bash
+      go get ./...
+      go mod vendor
+      go run main.go 
+      ```
+  2. Using docker
+    - uncomment every line in [Dockerfile](./Dockerfile)
+    - Navigate to root directory
+    - Run
+      ```bash
+      docker compose -f docker-compose.dev.yml up -d search-service 
+      ```
+      
 ## API Reference
 
 #### Get all items
@@ -61,7 +61,7 @@ go run main.go
 #### Search
 
 ```http
-  GET /search?query=&amount=&searchType
+  GET /search?query=&amount=&searchType=&
 ```
 ###### Query  String
 | Name         | Type   | Description           |Restrict           |

@@ -11,11 +11,10 @@ import (
 
 func (r *requestHandler) InsertRequest(c *gin.Context) {
 	var request models.Request
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-		Params: request,
-	}
+
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = request
+	
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.errorResponse(c, handlerOpts, http.StatusBadRequest, messages.MISSING_REQUEST_INDEX)
 		return
@@ -33,7 +32,7 @@ func (r *requestHandler) InsertRequest(c *gin.Context) {
 	}
 
 	resp := ResponseOptions{
-		Response: request.ToString(),
+		Response: request,
 	}
 
 	r.successResponse(c, *handlerOpts, http.StatusCreated, resp)
@@ -41,11 +40,10 @@ func (r *requestHandler) InsertRequest(c *gin.Context) {
 
 func (r *requestHandler) UpdateRequest(c *gin.Context) {
 	var request models.Request
-	handlerOpts := &HandlerOpts{
-		Name:   c.Request.URL.Path,
-		Method: c.Request.Method,
-		Params: request,
-	}
+
+	handlerOpts := NewHandlerOpts(c)
+	handlerOpts.Params = request
+	
 	if err := c.ShouldBind(&request); err != nil {
 		r.errorResponse(c, handlerOpts, http.StatusBadRequest, messages.MISSING_REQUEST_INDEX)
 		return
@@ -63,7 +61,7 @@ func (r *requestHandler) UpdateRequest(c *gin.Context) {
 	}
 
 	resp := ResponseOptions{
-		Response: request.ToString(),
+		Response: request,
 	}
 	r.successResponse(c, *handlerOpts, http.StatusOK, resp)
 }

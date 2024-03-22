@@ -1,6 +1,9 @@
 package handlers
 
-import "log/slog"
+import (
+	"data-management/request/models"
+	"log/slog"
+)
 
 type ResponseOptions struct {
 	Response         any
@@ -26,4 +29,9 @@ type RequestLog struct {
 
 type ArrayRequestsLog struct {
 	Length int
+}
+
+type RequestResponse struct {
+	RequestS []*models.Request `json:"request"`
+	Amount   int               `json:"amount"`
 }

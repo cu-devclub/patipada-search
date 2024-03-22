@@ -42,7 +42,7 @@ func (r *requestUsecase) InsertRequest(request *models.Request) error {
 		EndTime:    request.EndTime,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
-		Status:     constant.STATUS_PENDING,
+		Status:     constant.REQUEST_STATUS_PENDING,
 		By:         request.By,
 		ApprovedBy: "",
 	}

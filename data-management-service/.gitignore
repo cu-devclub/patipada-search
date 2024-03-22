@@ -26,3 +26,7 @@ volumes/
 
 # Binary code
 dataApp
+
+datasource
+
+todo

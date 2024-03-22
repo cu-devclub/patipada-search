@@ -13,11 +13,14 @@ type (
 		DB       Database
 	}
 	App struct {
-		Port          int
-		GRPCPort      int
-		FrontendURL   string
-		AuthService   string
-		SearchService string
+		Port           int
+		GRPCPort       int
+		FrontendURL    string
+		AuthService    string
+		AuthGRPCPort   int
+		SearchService  string
+		SearchGRPCPort int
+		DataSourcePath string
 	}
 	RabbitMQ struct {
 		URL      string
@@ -49,11 +52,14 @@ func InitializeViper(path string) error {
 func ReadConfig() {
 	cfg = &Config{
 		App: App{
-			Port:          viper.GetInt("APP_PORT"),
-			GRPCPort:      viper.GetInt("GRPC_PORT"),
-			FrontendURL:   viper.GetString("FRONTEND_URL"),
-			AuthService:   viper.GetString("AUTH_SERVICE"),
-			SearchService: viper.GetString("SEARCH_SERVICE"),
+			Port:           viper.GetInt("APP_PORT"),
+			GRPCPort:       viper.GetInt("GRPC_PORT"),
+			FrontendURL:    viper.GetString("FRONTEND_URL"),
+			AuthService:    viper.GetString("AUTH_SERVICE"),
+			AuthGRPCPort:   viper.GetInt("AUTH_GRPC_PORT"),
+			SearchService:  viper.GetString("SEARCH_SERVICE"),
+			SearchGRPCPort: viper.GetInt("SEARCH_GRPC_PORT"),
+			DataSourcePath: viper.GetString("STATIC_DATA"),
 		},
 		RabbitMQ: RabbitMQ{
 			URL:      viper.GetString("RABBITMQ_URL"),

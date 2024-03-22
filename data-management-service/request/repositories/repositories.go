@@ -52,7 +52,7 @@ type Repositories interface {
 	//     }
 	UpdateRequest(request *entities.Request) error
 
-	// IncrementRequestCounter increments the sequence number in the "counters" collection in MongoDB.
+	// GetNextRequestCounter increments the sequence number in the "counters" collection in MongoDB.
 	// This function is used to generate a unique sequence number for each new Request.
 	// It returns the next sequence number and any error encountered.
 	//
@@ -61,14 +61,14 @@ type Repositories interface {
 	// If the document does not exist, MongoDB will return an error.
 	//
 	// Usage:
-	//     nextSeq, err := RequestRepositories.IncrementRequestCounter()
+	//     nextSeq, err := RequestRepositories.GetNextRequestCounter()
 	//     if err != nil {
 	//         log.Fatal(err)
 	//     }
 	//     nextRequestID := fmt.Sprintf("REQ%d", nextSeq)
 	//
 	// This will generate a unique RequestID for each new Request, like "REQ1", "REQ2", etc.
-	IncrementRequestCounter() (int, error)
+	GetNextRequestCounter() (int, error)
 
 	// GetRequest retrieves requests from the database based on the provided filter.
 	// The filter is a map where the key is the field name and the value is the value to match.
@@ -96,4 +96,8 @@ type Repositories interface {
 	ValidateUsername(username string) (bool, error)
 
 	UpdateRecord(record *entities.Record) error
+
+	UpsertRecordCounter(recordCounter *entities.RecordCounter) error
+
+	GetRecordCounter() (*entities.RecordCounter, error)
 }

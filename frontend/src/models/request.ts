@@ -26,6 +26,12 @@ export interface InsertRequestModels {
   by: string;
 }
 
+export interface RequestSummary {
+  requestAmount: number;
+  pendingAmount: number;
+  reviewedAmount: number;
+}
+
 export const mapRequestToInsertRequestModels = (
   data: Request
 ): InsertRequestModels => {

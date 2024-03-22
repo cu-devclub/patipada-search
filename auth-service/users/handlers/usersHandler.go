@@ -2,14 +2,32 @@ package handlers
 
 import (
 	"log/slog"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
 
 type HandlerOpts struct {
-	Name   string `json:"name"`
-	Method string `json:"method"`
-	Params any    `json:"params"`
+	Name      string `json:"name"`
+	Method    string `json:"method"`
+	Params    any    `json:"params"`
+	Time      string `json:"time"`
+	RemoteIP  string `json:"remote_ip"`
+	Host      string `json:"host"`
+	UserAgent string `json:"user_agent"`
+}
+
+func NewHandlerOpts(c echo.Context) *HandlerOpts {
+	start := time.Now()
+	return &HandlerOpts{
+		Name:      c.Request().URL.Path,
+		Method:    c.Request().Method,
+		Params:    nil,
+		Time:      start.Format(time.RFC3339Nano),
+		RemoteIP:  c.Request().RemoteAddr,
+		Host:      c.Request().Host,
+		UserAgent: c.Request().UserAgent(),
+	}
 }
 
 func (h HandlerOpts) LogValue() slog.Value {
@@ -17,6 +35,10 @@ func (h HandlerOpts) LogValue() slog.Value {
 		slog.String("name", h.Name),
 		slog.String("method", h.Method),
 		slog.Any("params", h.Params),
+		slog.String("time", h.Time),
+		slog.String("remote_ip", h.RemoteIP),
+		slog.String("host", h.Host),
+		slog.String("user_agent", h.UserAgent),
 	)
 }
 
@@ -80,18 +102,18 @@ type UsersHandler interface {
 	// - 500 internal server error
 	ResetPassword(c echo.Context) error
 
-	// Remove user by username & requestor role must be higher
-	// Header - Authorization : <token>
-	// Parameters (Route Param) :
-	// - username (string)
-	//
-	// Response
-	// - 200 OK
-	// - 400 bad request (invalid/missing username)
-	// - 401 Unauthorize ; missing token
-	// - 403 Forbidden ; no permission
-	// - 404 User not found (invalid username)
-	// - 500 internal server error
+// Remove user by id & requestor role must be higher
+// Header - Authorization : <token>
+// Parameters (Route Param) :
+// - id (string)
+//
+// Response
+// - 200 OK
+// - 400 bad request (invalid/missing id)
+// - 401 Unauthorize ; missing token
+// - 403 Forbidden ; no permission
+// - 404 User not found (invalid id)
+// - 500 internal server error
 	RemoveUser(c echo.Context) error
 
 	// Verify Reset Token to verify the time valid of token (15 minute)
@@ -137,4 +159,6 @@ type UsersHandler interface {
 	// - 401 Unauthorize ; invalid token
 	// - 500 internal server error
 	Authorize(c echo.Context) error
+
+	GetAllUsers(c echo.Context) error
 }

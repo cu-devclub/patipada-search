@@ -2,7 +2,6 @@ package jwt
 
 import (
 	"auth-service/config"
-	"log"
 
 	"github.com/labstack/echo/v4"
 )
@@ -29,16 +28,13 @@ func HasAuthorizeRole(requesterRole string, requiredRole string, allowEqualRole 
 		}
 	}
 
-	log.Println("HasAuthorizeRole : requesterRole : ", requesterRole, " requiredRole : ", requiredRole, " allowEqualRole : ", allowEqualRole, " return true")
 	return true
 }
 
 func GetRole(c echo.Context) (string, error) {
 	claims, err := ValidateAndExtractClaims(c)
-	log.Println("GetRole : claims : ", claims, " err : ", err, " err != nil : ", err != nil)
 	if err != nil {
 		return "", err
 	}
-	log.Println("GetRole : claims.Role : ", claims.Role, "Return nil")
 	return claims.Role, nil
 }

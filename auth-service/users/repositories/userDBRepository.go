@@ -7,5 +7,5 @@ type UsersRepository interface {
 	GetAllUsersData() ([]*entities.Users, error)
 	GetUserByUsername(username string) (*entities.Users, error)
 	UpdateUser(in *entities.Users) error
-	RemoveUser(username string) error
+	RemoveUser(id string) error
 }

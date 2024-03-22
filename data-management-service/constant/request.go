@@ -1,6 +1,6 @@
 package constant
 
 const (
-	STATUS_PENDING  = "pending"
-	STATUS_REVIEWED = "reviewed"
+	REQUEST_STATUS_PENDING  = "pending"
+	REQUEST_STATUS_REVIEWED = "reviewed"
 )

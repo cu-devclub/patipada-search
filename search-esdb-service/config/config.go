@@ -34,6 +34,8 @@ type (
 		RecordPath   string
 		LDAPath      string
 		StopwordPath string
+		LogsPath     string
+		SearchLogsPath string
 	}
 )
 
@@ -67,10 +69,12 @@ func ReadConfig() {
 			Password: viper.GetString("RABBITMQ_PASSWORD"),
 		},
 		Static: Static{
-			DataPath:     viper.GetString("STATIC_DATA"),
-			RecordPath:   viper.GetString("RECORD_DATA_PATH"),
-			LDAPath:      viper.GetString("LDA_DATA_PATH"),
-			StopwordPath: viper.GetString("STOPWORD_PATH"),
+			DataPath:      viper.GetString("STATIC_DATA"),
+			RecordPath:    viper.GetString("RECORD_DATA_PATH"),
+			LDAPath:       viper.GetString("LDA_DATA_PATH"),
+			StopwordPath:  viper.GetString("STOPWORD_PATH"),
+			LogsPath:      viper.GetString("LOGS_PATH"),
+			SearchLogsPath: viper.GetString("SEARCH_LOG_PATH"),
 		},
 	}
 }

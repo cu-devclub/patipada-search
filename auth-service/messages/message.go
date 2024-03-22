@@ -10,6 +10,7 @@ const (
 	SUCCESSFUL_SEND_EMAIL_FORGET_PASSWORD = "Successful send email for forget password"
 	SUCCESSFUL_RESET_PASSWORD             = "Successful reset password"
 	SUCCESSFUL_REMOVE_USER                = "Successful remove user"
+	SUCCESSFUL_GET_ALL_USERS              = "Successful get all users"
 	INTERNAL_SERVER_ERROR                 = "Internal server error"
 	NO_PERMISSION                         = "No permission"
 	BAD_REQUEST                           = "Bad request"

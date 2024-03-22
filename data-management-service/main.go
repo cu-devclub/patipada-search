@@ -5,12 +5,12 @@ import (
 	"data-management/config"
 	"data-management/database"
 	"data-management/logging"
+	"data-management/request/migration"
 	"data-management/server"
 	validator "data-management/structValidator"
 	"log/slog"
 )
 
-// TODO : make service can run even other service not there (gRPC connection)
 func main() {
 	logging.NewSLogger()
 
@@ -28,7 +28,7 @@ func main() {
 		slog.Error("Failed to connect to database", slog.String("err", err.Error()))
 		return
 	}
-	slog.Info("Connect to es db successfully!")
+	slog.Info("Connect to db successfully!")
 
 	validate := validator.NewValidator()
 
@@ -46,9 +46,19 @@ func main() {
 		return
 	}
 	defer rabbit.Conn.Close()
+	// rabbit := communication.MockRabbitMQ()
 	slog.Info("Connect to RabbitMQ successfully!")
 
 	comm := communication.NewCommunicationImpl(*grpc, *rabbit)
 
-	server.NewGinServer(&cfg, &db, &validate, comm).Start()
+	serv := server.NewGinServer(&cfg, &db, &validate, comm)
+	slog.Info("Server initialized successfully!")
+
+	if err = migration.Migration(cfg, db, serv); err != nil {
+		slog.Error("failed to migrate %w", err)
+		return
+	}
+	slog.Info("Migration successfully!")
+
+	serv.Start()
 }

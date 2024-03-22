@@ -15,6 +15,13 @@ up_build:  build_auth build_search build_data build_frontend
 	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq
 	@echo "Docker images built and started!"
 
+up_build_service_monitoring:  build_auth build_search build_data build_frontend 
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq loki promtail grafana
+	@echo "Docker images built and started!"
+
 up_build_backend: build_auth build_search build_data
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
@@ -120,6 +127,17 @@ down_data:
 	docker compose -f docker-compose.dev.yml down data-service
 	@echo "Data service stopped!"
 
+## empty_data_db: stops data-db (if running), removes volumes and starts data-db
+## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
+empty_data_db:
+	@echo "Stopping data-db (if running...)"
+	docker compose -f docker-compose.dev.yml down data-db
+	@echo "Remove volumes..."
+	rm -rf ./volumes/database/mongo-data
+	@echo "starting data-db containers..."
+	docker compose -f docker-compose.dev.yml up --build -d data-db
+	@echo "Data-db started!"
+
 ## up_dev_data: stops db container and rebuild and start go server
 up_dev_data:
 	@echo "Stopping docker images (if running...)"
@@ -177,3 +195,15 @@ down:
 	@echo "Stopping Docker images..."
 	docker compose -f docker-compose.dev.yml down
 	@echo "Docker images stopped!"
+
+
+## monitoring service
+up_monitoring:
+	@echo "Starting monitoring service..."
+	docker compose -f docker-compose.dev.yml up -d loki promtail grafana prometheus
+	@echo "Monitoring service started!"
+
+down_monitoring:
+	@echo "Stopping monitoring service..."
+	docker compose -f docker-compose.dev.yml down loki promtail grafana prometheus
+	@echo "Monitoring service stopped!"
