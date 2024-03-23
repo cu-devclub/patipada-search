@@ -200,6 +200,7 @@ services:
 
   loki:
     image: grafana/loki:2.9.2
+    container_name: loki
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
@@ -207,7 +208,7 @@ services:
       - dhammanava_network
 
   promtail:
-    image: grafana/promtail:latest
+    image: grafana/promtail:2.8.11
     container_name: promtail
     volumes:
       - ./monitoring/promtail.yaml:/etc/promtail/docker-config.yaml
@@ -220,11 +221,13 @@ services:
       - dhammanava_network
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:10.3.5
     ports:
       - 3000:3000
     volumes:
-      - ./monitoring/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./monitoring/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./monitoring/grafana/main-dashboard.json:/var/lib/grafana/dashboards/dashboard.json
+      - ./monitoring/grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/main.yml
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -235,7 +238,7 @@ services:
       - dhammanava_network
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.51.0
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
