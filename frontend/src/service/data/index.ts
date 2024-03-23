@@ -1,16 +1,21 @@
-import { getRequestByRecordIndex, getRequestByParams } from "./getRequest";
+import {
+  getRequestByRecordIndexService,
+  getRequestByParamsService,
+  getDataSummaryService,
+} from "./getRequest";
 
-import { insertRequest } from "./insertRequest";
+import { insertRequestService } from "./insertRequest";
 
-import { updateRequest } from "./updateRequest";
+import { updateRequestService } from "./updateRequest";
 
-import { insertRatings, getAverageRatings } from "./ratings";
+import { insertRatingsService, getAverageRatingsService } from "./ratings";
 
 export {
-  getRequestByRecordIndex,
-  insertRequest,
-  getRequestByParams,
-  updateRequest,
-  insertRatings,
-  getAverageRatings,
+  getRequestByRecordIndexService,
+  insertRequestService,
+  getRequestByParamsService,
+  updateRequestService,
+  insertRatingsService,
+  getAverageRatingsService,
+  getDataSummaryService,
 };

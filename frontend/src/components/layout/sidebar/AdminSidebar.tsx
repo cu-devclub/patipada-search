@@ -6,7 +6,7 @@ interface AdminSidebarProps {
 function AdminSidebar({ activePage }: AdminSidebarProps) {
   const navigate = useNavigate();
 
-  const pages = ["Dashboard", "Request", "Users"];
+  const pages = ["Dashboard", "Request", "Users","Ratings"];
 
   return (
     <Box w="full" h="full" bg="brand_orange.400" pl={2}>

@@ -4,7 +4,7 @@ import { CreateCustomError, ReturnError } from "../error";
 import { authURL } from "../../constant/serviceURL";
 import { getCookie } from "typescript-cookie";
 
-export const removeUser = async (id: string) => {
+export const removeUserService = async (id: string) => {
   try {
     axios.defaults.headers.common["Authorization"] = getCookie("token");
 
@@ -24,7 +24,7 @@ export const removeUser = async (id: string) => {
         message: ERR_Messages.INVALID_TOKEN,
         status: 401,
         toastStatus: ToastStatus.ERROR,
-      } 
+      };
     } else if (requestError.status === 403) {
       returnError = {
         message: ERR_Messages.NO_PERMISSION_DELETE,

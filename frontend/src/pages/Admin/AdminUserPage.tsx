@@ -10,10 +10,13 @@ import {
   ToastStatus,
 } from "../../constant";
 import { AuthorizeAdmin } from "../../functions";
-import { getAllUsers } from "../../service/user/getUser";
 import { RegisterDTO, User } from "../../models/user";
 import { ReturnError } from "../../service/error";
-import { register, removeUser } from "../../service/user";
+import {
+  registerService,
+  removeUserService,
+  getAllUsersService,
+} from "../../service/user";
 import { Button, Flex, useDisclosure } from "@chakra-ui/react";
 import { AddUserModal } from "../../components/modal";
 import { AddUserForm } from "../../components/user/forms";
@@ -36,7 +39,7 @@ function AdminUserPage() {
       }
     })();
     const getUsers = async () => {
-      await getAllUsers()
+      await getAllUsersService()
         .then((res: User[]) => {
           setUsers(res);
           addToast({
@@ -56,7 +59,7 @@ function AdminUserPage() {
   }, []);
 
   const deleteUser = async (id: string) => {
-    await removeUser(id)
+    await removeUserService(id)
       .then(() => {
         addToast({
           description: "ลบผู้ใช้สำเร็จ",
@@ -95,7 +98,7 @@ function AdminUserPage() {
       id: "",
     };
 
-    await register(registerDTO)
+    await registerService(registerDTO)
       .then((res) => {
         newUser.id = res.user_id;
         addToast({

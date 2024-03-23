@@ -6,13 +6,15 @@ import { AdminBasePage } from "./AdminBasePage";
 import { Box, StatGroup } from "@chakra-ui/react";
 import { RatingStat, RecordStat, RequestStat, Userstat } from "../../components/stat";
 import { AuthSummary, User } from "../../models/user";
-import { getAllUsers } from "../../service/user/getUser";
+import { getAllUsersService } from "../../service/user";
 import { MessageToast } from "../../components";
-import { getDataSummary } from "../../service/data/getRequest";
 import { RecordSummary } from "../../models/qa";
 import { RequestSummary } from "../../models/request";
 import { RatingSummary } from "../../models/ratings";
-import { getAverageRatings } from "../../service/data";
+import {
+  getAverageRatingsService,
+  getDataSummaryService,
+} from "../../service/data";
 function AdminDashboard() {
   const navigate = useNavigate();
   const { addToast } = MessageToast();
@@ -48,7 +50,7 @@ function AdminDashboard() {
     })();
 
     const getUsers = async () => {
-      await getAllUsers()
+      await getAllUsersService()
         .then((res: User[]) => {
           const totalUser = res.filter(
             (user) => user.role === Role.USER
@@ -76,7 +78,7 @@ function AdminDashboard() {
     getUsers();
 
     const getDataSum = async () => {
-      await getDataSummary()
+      await getDataSummaryService()
         .then((res) => {
           if (res.recordSummary) {
             const recSum: RecordSummary = {
@@ -105,7 +107,7 @@ function AdminDashboard() {
     getDataSum();
 
     const getAverageRatingFunc = async () => {
-      await getAverageRatings()
+      await getAverageRatingsService()
         .then((res) => {
           setAverageRating(res);
         })

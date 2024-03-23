@@ -5,7 +5,7 @@ import { authURL } from "../../constant/serviceURL";
 import { User } from "../../models/user";
 import { getCookie } from "typescript-cookie";
 
-export const getAllUsers = async (): Promise<User[]> => {
+export const getAllUsersService = async (): Promise<User[]> => {
   try {
     axios.defaults.headers.common["Authorization"] = getCookie("token");
 

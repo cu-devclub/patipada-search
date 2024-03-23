@@ -13,7 +13,7 @@ import { useState } from "react";
 import RadioCard from "./RadioCard";
 import { MessageToast } from "..";
 import { Rating } from "../../models/ratings";
-import { insertRatings } from "../../service/data";
+import { insertRatingsService } from "../../service/data";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 
 interface RatingFormProps {
@@ -44,7 +44,7 @@ function RatingForm({ closeModal }: RatingFormProps) {
       comment: comment,
     };
 
-    await insertRatings(ratingModel)
+    await insertRatingsService(ratingModel)
       .then(() => {
         addToast({
           description: "ข้อเสนอแนะของคุณถูกบันทึกเรียบร้อยแล้ว",

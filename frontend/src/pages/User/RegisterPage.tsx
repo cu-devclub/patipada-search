@@ -9,8 +9,7 @@ import {
   SERVER_ERROR_MESSAGE,
 } from "../../constant";
 import { RegisterDTO, LoginDTO } from "../../models/user";
-import { register } from "../../service/user";
-import { login } from "../../service/user";
+import { registerService, loginService } from "../../service/user";
 import { setCookie } from "typescript-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ReturnError } from "../../service/error";
@@ -35,7 +34,7 @@ const RegisterPage = () => {
       role: Role.USER,
     };
 
-    await register(registerDTO)
+    await registerService(registerDTO)
       .then(() => {
         addToast({
           description: "register successfully",
@@ -72,7 +71,7 @@ const RegisterPage = () => {
       password: password,
     };
 
-    await login(loginDTO)
+    await loginService(loginDTO)
       .then((response) => {
         addToast({
           description: "Login successfully",

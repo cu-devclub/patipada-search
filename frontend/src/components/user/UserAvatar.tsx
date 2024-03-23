@@ -14,7 +14,7 @@ import { MessageToast } from "..";
 import { useNavigate } from "react-router-dom";
 import { getCookie } from "typescript-cookie";
 import { useLocation } from "react-router-dom";
-import { verifyToken } from "../../service/user";
+import { verifyTokenService } from "../../service/user";
 import { useEffect } from "react";
 import { ReturnError } from "../../service/error";
 
@@ -33,19 +33,19 @@ function UserAvatar({ username }: UserAvatarProps) {
   useEffect(() => {
     const verifyTokenAsync = async () => {
         const token = getCookie("token");
-        await verifyToken(token || "")
-        .then((response) => {
-          if (response == false) {
+        await verifyTokenService(token || "")
+          .then((response) => {
+            if (response == false) {
+              SignOut();
+            }
+          })
+          .catch((error: ReturnError) => {
+            addToast({
+              description: error.message,
+              status: error.toastStatus,
+            });
             SignOut();
-          }
-        })
-        .catch((error: ReturnError) => {
-          addToast({
-            description: error.message,
-            status: error.toastStatus,
           });
-          SignOut();
-        });
     }
     
     verifyTokenAsync();

@@ -1,3 +1,3 @@
 import RatingForm from "./RatingForm";
-
-export { RatingForm };
+import RatingTable from "./RatingTable";
+export { RatingForm, RatingTable };

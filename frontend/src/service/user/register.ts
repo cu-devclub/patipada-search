@@ -3,7 +3,7 @@ import { CreateCustomError, ReturnError } from "../error";
 import { RegisterDTO } from "../../models/user";
 import { ERR_Messages, ToastStatus } from "../../constant";
 import { authURL } from '../../constant/serviceURL';
-export const register = async (registerDTO: RegisterDTO) => {
+export const registerService = async (registerDTO: RegisterDTO) => {
   try {
     const response = await axios.post(`${authURL}/register`, {
       username: registerDTO.username,

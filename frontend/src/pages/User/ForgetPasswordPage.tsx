@@ -1,7 +1,7 @@
 import { ForgetPasswordForm } from "../../components/user/forms";
 import { Text, Heading, Button, Flex } from "@chakra-ui/react";
 import { MessageToast } from "../../components";
-import { forgetPassword } from "../../service/user";
+import { forgetPasswordService } from "../../service/user";
 import { useState } from "react";
 import { ReturnError } from "../../service/error";
 import { UserBasePage } from "./UserBasePage";
@@ -16,7 +16,7 @@ function ForgetPasswordPage() {
 
   const submit = async (email: string) => {
     setIsLoading(true);
-    await forgetPassword(email)
+    await forgetPasswordService(email)
       .then(() => {
         setemailError(false);
         setformSuccess(true);

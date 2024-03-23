@@ -9,7 +9,7 @@ import { searchURL } from "../../constant/serviceURL";
  * @param {string} searchType - Optional. The search type to use. Defaults to "tf_idf".
  * @return {Promise<SearchResultInterface>} - A promise that resolves with the search results.
  */
-export const search = async (
+export const searchService = async (
   query: string,
   searchType: string = "tf_idf"
 ): Promise<SearchResultInterface> => {
@@ -42,13 +42,11 @@ export const search = async (
   }
 };
 
-export const searchRecordIndex = async (
+export const searchRecordIndexService = async (
   recordIndex: string
 ): Promise<DataItem> => {
   try {
-    const response = await axios.get(
-      `${searchURL}/search/${recordIndex}`
-    );
+    const response = await axios.get(`${searchURL}/search/${recordIndex}`);
     const item: DataItem = {
       index: response.data.index,
       youtubeURL: response.data.youtubeURL,
