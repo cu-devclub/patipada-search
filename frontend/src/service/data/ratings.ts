@@ -1,4 +1,4 @@
-import axios from "../axiosInstance";
+import axios from "axios";
 import { CreateCustomError } from "../error";
 import { Rating } from "../../models/ratings";
 import { dataURL } from "../../constant/serviceURL";
