@@ -15,11 +15,11 @@ up_build:  build_auth build_search build_data build_frontend
 	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq
 	@echo "Docker images built and started!"
 
-up_build_service_monitoring:  build_auth build_search build_data build_frontend 
+up_build_full_service:  build_auth build_search build_data build_frontend 
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq loki promtail grafana
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq loki promtail grafana prometheus
 	@echo "Docker images built and started!"
 
 up_build_backend: build_auth build_search build_data
