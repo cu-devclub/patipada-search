@@ -14,6 +14,7 @@ import {
   AdminRequestPage,
   AdminEditRequestPage,
   AdminUserPage,
+  AdminRatingPage,
 } from "./pages/Admin";
 import { PendingRequestPage, EditRecordPage } from "./pages/Contributor";
 export default function App() {
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="users" element={<AdminUserPage />} />
           <Route path="choosePage" element={<AdminChoosePage />} />
           <Route path="request" element={<AdminRequestPage />} />
+          <Route path="ratings" element={<AdminRatingPage />} />
           <Route
             path="edit-request/:requestID"
             element={<AdminEditRequestPage />}
