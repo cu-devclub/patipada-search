@@ -4,9 +4,13 @@ import (
 	"data-management/communication"
 	"data-management/config"
 	"data-management/database"
-	"data-management/request/handlers"
-	"data-management/request/repositories"
-	"data-management/request/usecases"
+	requestHandlers "data-management/request/handlers"
+	requestRepositories "data-management/request/repositories"
+	requestUsecases "data-management/request/usecases"
+
+	ratingHandlers "data-management/ratings/handlers"
+	ratingRepositories "data-management/ratings/repositories"
+	ratingUsecases "data-management/ratings/usecases"
 	validator "data-management/structValidator"
 
 	"fmt"
@@ -25,9 +29,9 @@ type ginServer struct {
 }
 
 type RequestArch struct {
-	Repo    repositories.Repositories
-	Usecase usecases.UseCase
-	Handler handlers.Handlers
+	Repo    requestRepositories.Repositories
+	Usecase requestUsecases.UseCase
+	Handler requestHandlers.Handlers
 }
 
 func NewGinServer(cfg *config.Config, db *database.Database, v *validator.Validator, c communication.Communication) Server {
@@ -61,23 +65,29 @@ func (g *ginServer) Start() {
 
 func (g *ginServer) initializeRequestHttpHandler() {
 	database := *g.db
-	requestRepositories := repositories.NewRequestRepositories(database.GetDb(), g.comm)
+	requestRepository := requestRepositories.NewRequestRepositories(database.GetDb(), g.comm)
 
-	requestUsecase := usecases.NewRequestUsecase(requestRepositories, *g.validator)
+	requestUsecase := requestUsecases.NewRequestUsecase(requestRepository, *g.validator)
 
-	requestHandlers := handlers.NewRequestHandler(requestUsecase)
+	requestHandler := requestHandlers.NewRequestHandler(requestUsecase)
 
 	g.requestArch = &RequestArch{
-		Repo:    requestRepositories,
+		Repo:    requestRepository,
 		Usecase: requestUsecase,
-		Handler: requestHandlers,
+		Handler: requestHandler,
 	}
 
-	g.initializedUserRoutes(requestHandlers)
-	g.initializedAdminRoutes(requestHandlers)
+	g.initializedRequestUserRoutes(requestHandler)
+	g.initializedRequestAdminRoutes(requestHandler)
+
+	ratingRepository := ratingRepositories.NewRatingRepository(database.GetDb())
+	ratingUsecase := ratingUsecases.NewRatingUsecase(ratingRepository)
+	ratingHandler := ratingHandlers.NewRatingHandler(ratingUsecase)
+
+	g.initializedRatingRoutes(ratingHandler)
 }
 
-func (g *ginServer) initializedUserRoutes(handler handlers.Handlers) {
+func (g *ginServer) initializedRequestUserRoutes(handler requestHandlers.Handlers) {
 	userRoutes := g.app.Group("/")
 	userRoutes.Use(g.AuthMiddleware("user"))
 
@@ -126,7 +136,7 @@ func (g *ginServer) initializedUserRoutes(handler handlers.Handlers) {
 	userRoutes.POST("/requests", handler.InsertRequest)
 }
 
-func (g *ginServer) initializedAdminRoutes(handler handlers.Handlers) {
+func (g *ginServer) initializedRequestAdminRoutes(handler requestHandlers.Handlers) {
 	adminRoutes := g.app.Group("/")
 	adminRoutes.Use(g.AuthMiddleware("admin"))
 
@@ -160,5 +170,39 @@ func (g *ginServer) initializedAdminRoutes(handler handlers.Handlers) {
 
 	// GET /summary route is used to retrieve the summary of the requests and records.
 	adminRoutes.GET("/summary", handler.GetSummary)
+}
 
+func (g *ginServer) initializedRatingRoutes(handler ratingHandlers.Handlers) {
+	ratingRoutes := g.app.Group("/ratings")
+
+	// POST /ratings route is used to insert a new rating into the database.
+	// It expects a JSON body that matches the structure of the models.Rating struct.
+	//
+	//  RatingID: The ID of the rating. It is a string and is optional.
+	//  Stars:    The number of stars given in the rating. It is an integer and is required.
+	//  Comment:  The comment given in the rating. It is a string and is optional.
+	//
+	// Responses:
+	// - 201 Created: The rating was successfully created. The response body contains the created rating.
+	// - 400 Bad Request: The request body could not be bound to a models.Rating struct.
+	// - 500 Internal Server Error: An internal server error occurred.
+	ratingRoutes.POST("", handler.InsertRating)
+
+	// GET /ratings route is used to retrieve all ratings from the database.
+	// The function responds with a JSON object that includes all ratings.
+	// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
+	//
+	// Responses:
+	// - 200 OK: The operation was successful. The response body contains all ratings.
+	// - 500 Internal Server Error: The server encountered an unexpected condition which prevented it from fulfilling the request.
+	ratingRoutes.GET("", handler.GetRatings)
+
+	// GET /ratings/average route is used to retrieve the average rating from the database.
+	// The function responds with a JSON object that includes the average rating.
+	// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
+	//
+	// Responses:
+	// - 200 OK: The operation was successful. The response body contains the average rating.
+	// - 500 Internal Server Error: The server encountered an unexpected condition which prevented it from fulfilling the request.
+	ratingRoutes.GET("/average", handler.GetAverageRatings)
 }

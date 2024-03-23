@@ -14,11 +14,14 @@ func (r *requestHandler) InsertRequest(c *gin.Context) {
 
 	handlerOpts := NewHandlerOpts(c)
 	handlerOpts.Params = request
-	
+
 	if err := c.ShouldBindJSON(&request); err != nil {
 		r.errorResponse(c, handlerOpts, http.StatusBadRequest, messages.MISSING_REQUEST_INDEX)
 		return
 	}
+
+	handlerOpts.Params = request
+
 
 	err := r.requestUsecase.InsertRequest(&request)
 	if err != nil {
@@ -48,6 +51,8 @@ func (r *requestHandler) UpdateRequest(c *gin.Context) {
 		r.errorResponse(c, handlerOpts, http.StatusBadRequest, messages.MISSING_REQUEST_INDEX)
 		return
 	}
+
+	handlerOpts.Params = request
 
 	err := r.requestUsecase.UpdateRequest(&request)
 	if err != nil {

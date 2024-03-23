@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (r *requestHandler) successResponse(c *gin.Context, handlerOpts HandlerOpts, responseCode int, resp ResponseOptions) {
+func (r *ratingHandler) successResponse(c *gin.Context, handlerOpts HandlerOpts, responseCode int, resp ResponseOptions) {
 	var body interface{}
 	if resp.OptionalResponse == nil {
 		body = resp.Response
@@ -28,7 +28,7 @@ func (r *requestHandler) successResponse(c *gin.Context, handlerOpts HandlerOpts
 	c.JSON(responseCode, resp.Response)
 }
 
-func (r *requestHandler) errorResponse(c *gin.Context, handlerOpts *HandlerOpts, responseCode int, response any) {
+func (r *ratingHandler) errorResponse(c *gin.Context, handlerOpts *HandlerOpts, responseCode int, response any) {
 	res := &Response{
 		Code: responseCode,
 		Body: response,

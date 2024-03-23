@@ -10,7 +10,7 @@ import {
 
 interface BaseModalProps {
   modalTitle?: string;
-  modalBody: JSX.Element | string;
+  modalBody: React.ReactNode | string;
   openModal: boolean;
   closeModal: () => void;
   ActionButtons?: React.ReactNode;
