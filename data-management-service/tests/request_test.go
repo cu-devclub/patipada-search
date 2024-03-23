@@ -32,11 +32,11 @@ func setUpTestEnvironment() handlers.Handlers {
 
 	comm := communication.NewCommunicationImpl(*grpc, *rabbit)
 
-	requestRepositories := repositories.NewRequestRepositories(db.GetDb(), comm)
+	requestRepositories := repositories.NewRequestRepositories(db.GetDb(), &comm)
 
-	requestUsecase := usecases.NewRequestUsecase(requestRepositories, v)
+	requestUsecase := usecases.NewRequestUsecase(&requestRepositories, &v)
 
-	requestHandlers := handlers.NewRequestHandler(requestUsecase)
+	requestHandlers := handlers.NewRequestHandler(&requestUsecase)
 
 	return requestHandlers
 }

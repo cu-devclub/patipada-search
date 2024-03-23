@@ -11,9 +11,9 @@ type UsecaseImpl struct {
 	ratingsRepository repositories.Repository
 }
 
-func NewRatingUsecase(ratingsRepository repositories.Repository) Usecase {
+func NewRatingUsecase(ratingsRepository *repositories.Repository) Usecase {
 	return &UsecaseImpl{
-		ratingsRepository: ratingsRepository,
+		ratingsRepository: *ratingsRepository,
 	}
 }
 

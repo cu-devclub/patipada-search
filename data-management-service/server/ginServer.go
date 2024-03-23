@@ -34,7 +34,7 @@ type RequestArch struct {
 	Handler requestHandlers.Handlers
 }
 
-func NewGinServer(cfg *config.Config, db *database.Database, v *validator.Validator, c communication.Communication) Server {
+func NewGinServer(cfg *config.Config, db *database.Database, v *validator.Validator, c *communication.Communication) Server {
 	g := gin.New()
 	// Allow CORS from frontend
 	config := cors.DefaultConfig()
@@ -47,7 +47,7 @@ func NewGinServer(cfg *config.Config, db *database.Database, v *validator.Valida
 		db:        db,
 		cfg:       cfg,
 		validator: v,
-		comm:      c,
+		comm:      *c,
 	}
 
 	serv.initializeRequestHttpHandler()
@@ -65,11 +65,11 @@ func (g *ginServer) Start() {
 
 func (g *ginServer) initializeRequestHttpHandler() {
 	database := *g.db
-	requestRepository := requestRepositories.NewRequestRepositories(database.GetDb(), g.comm)
+	requestRepository := requestRepositories.NewRequestRepositories(database.GetDb(), &g.comm)
 
-	requestUsecase := requestUsecases.NewRequestUsecase(requestRepository, *g.validator)
+	requestUsecase := requestUsecases.NewRequestUsecase(&requestRepository, g.validator)
 
-	requestHandler := requestHandlers.NewRequestHandler(requestUsecase)
+	requestHandler := requestHandlers.NewRequestHandler(&requestUsecase)
 
 	g.requestArch = &RequestArch{
 		Repo:    requestRepository,
@@ -81,8 +81,8 @@ func (g *ginServer) initializeRequestHttpHandler() {
 	g.initializedRequestAdminRoutes(requestHandler)
 
 	ratingRepository := ratingRepositories.NewRatingRepository(database.GetDb())
-	ratingUsecase := ratingUsecases.NewRatingUsecase(ratingRepository)
-	ratingHandler := ratingHandlers.NewRatingHandler(ratingUsecase)
+	ratingUsecase := ratingUsecases.NewRatingUsecase(&ratingRepository)
+	ratingHandler := ratingHandlers.NewRatingHandler(&ratingUsecase)
 
 	g.initializedRatingRoutes(ratingHandler)
 }

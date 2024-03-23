@@ -13,13 +13,13 @@ type requestRepositories struct {
 	communicationClient      communication.Communication
 }
 
-func NewRequestRepositories(mongo *mongo.Client,c communication.Communication) Repositories {
+func NewRequestRepositories(mongo *mongo.Client,c *communication.Communication) Repositories {
 	requestCollection := mongo.Database("data").Collection("request")
 	requestCounterCollection := mongo.Database("data").Collection("counters")
 	return &requestRepositories{
 		mongo:                    mongo,
 		requestCollection:        requestCollection,
 		requestCounterCollection: requestCounterCollection,
-		communicationClient:      c,
+		communicationClient:      *c,
 	}
 }

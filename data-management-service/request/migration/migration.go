@@ -9,12 +9,13 @@ import (
 	"os"
 )
 
-func Migration(cfg config.Config, db database.Database, serv server.Server) error {
+func Migration(cfg *config.Config, db *database.Database, serv *server.Server) error {
 	// TODO : Implement the migration of request
 	// Make a queue message to search for the request that need to be updated
 
 	// ---- Migrate Record data ----
-	requestArch := serv.GetRequestArch()
+	s := *serv
+	requestArch := s.GetRequestArch()
 
 	rawDataPath := cfg.App.DataSourcePath + "/raw-data.csv"
 	recordsAmount, youtubeAmount, err := processRawRecordFile(rawDataPath)

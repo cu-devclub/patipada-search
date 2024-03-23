@@ -9,7 +9,7 @@ import (
 )
 
 func (r *requestUsecase) SummaryData() (*models.Summary, error) {
-	filter := entities.Filter{}
+	filter := &entities.Filter{}
 	bsonFilter, err := filter.ConvertToBsonM()
 	if err != nil {
 		return nil, errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)

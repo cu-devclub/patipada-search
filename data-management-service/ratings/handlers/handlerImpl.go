@@ -14,9 +14,9 @@ type ratingHandler struct {
 	ratingsUsecase usecases.Usecase
 }
 
-func NewRatingHandler(ratingsUsecase usecases.Usecase) Handlers {
+func NewRatingHandler(ratingsUsecase *usecases.Usecase) Handlers {
 	return &ratingHandler{
-		ratingsUsecase: ratingsUsecase,
+		ratingsUsecase: *ratingsUsecase,
 	}
 }
 

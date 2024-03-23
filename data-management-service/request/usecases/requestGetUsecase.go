@@ -42,7 +42,7 @@ func (r *requestUsecase) GetRequest(status, username, requestID, index, approved
 	}
 
 	// create filter
-	filter := entities.Filter{
+	filter := &entities.Filter{
 		Status:     status,
 		By:         username,
 		RequestID:  requestID,
@@ -81,7 +81,7 @@ func (r *requestUsecase) GetLastestRequestOfRecord(index string) (*models.Reques
 	}
 
 	// create filter
-	filter := entities.Filter{
+	filter := &entities.Filter{
 		Index: index,
 	}
 	bsonFilter, err := filter.ConvertToBsonM()

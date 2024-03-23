@@ -6,8 +6,8 @@ type requestHandler struct {
 	requestUsecase usecases.UseCase
 }
 
-func NewRequestHandler(requestUsecase usecases.UseCase) Handlers {
+func NewRequestHandler(requestUsecase *usecases.UseCase) Handlers {
 	return &requestHandler{
-		requestUsecase: requestUsecase,
+		requestUsecase: *requestUsecase,
 	}
 }

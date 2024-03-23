@@ -10,9 +10,9 @@ type requestUsecase struct {
 	validator           validator.Validator
 }
 
-func NewRequestUsecase(requestRepositories repositories.Repositories, validator validator.Validator) UseCase {
+func NewRequestUsecase(requestRepositories *repositories.Repositories, validator *validator.Validator) UseCase {
 	return &requestUsecase{
-		requestRepositories: requestRepositories,
-		validator:           validator,
+		requestRepositories: *requestRepositories,
+		validator:           *validator,
 	}
 }
