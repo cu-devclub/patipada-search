@@ -131,4 +131,8 @@ type Handlers interface {
 	GetLastestRequestOfRecord(c *gin.Context)
 
 	GetSummary(c *gin.Context)
+
+	SyncRequestRecord(c *gin.Context)
+
+	SyncAllRequestRecords(c *gin.Context)
 }

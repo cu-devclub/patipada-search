@@ -170,6 +170,12 @@ func (g *ginServer) initializedRequestAdminRoutes(handler requestHandlers.Handle
 
 	// GET /summary route is used to retrieve the summary of the requests and records.
 	adminRoutes.GET("/summary", handler.GetSummary)
+
+	// POST /sync route is used to sync the record in the request to the search.
+	adminRoutes.POST("/sync", handler.SyncRequestRecord)
+
+	// POST /sync-all route is used to sync all records in the request to the search.
+	adminRoutes.POST("/sync-all", handler.SyncAllRequestRecords)
 }
 
 func (g *ginServer) initializedRatingRoutes(handler ratingHandlers.Handlers) {
