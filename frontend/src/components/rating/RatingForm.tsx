@@ -15,6 +15,7 @@ import { MessageToast } from "..";
 import { Rating } from "../../models/ratings";
 import { insertRatingsService } from "../../service/data";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
+import { evaluateWebsiteFormURL } from "../../constant/externalLink";
 
 interface RatingFormProps {
   closeModal: () => void;
@@ -90,7 +91,7 @@ function RatingForm({ closeModal }: RatingFormProps) {
 
       <Text>
         <Text as="u">หรือ</Text> ทำแบบประเมินโดยละเอียดผ่าน{" "}
-        <Link href="https://chakra-ui.com" isExternal color="blue.600">
+        <Link href={evaluateWebsiteFormURL} isExternal color="blue.600">
           Google form <ExternalLinkIcon mx="2px" />
         </Link>
       </Text>

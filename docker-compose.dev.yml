@@ -27,25 +27,25 @@ services:
     networks:
       - dhammanava_network
 
-  ml-service:
-    container_name: ml-container
-    image: ${DOCKERHUB_USERNAME}/dhammanava-ml-image
-    build:
-      context: ./ml-service
-    environment:
-      - FLASK_APP=run.py
-      - FLASK_ENV=development
-      - FLASK_RUN_HOST=0.0.0.0
-      - FLASK_RUN_PORT=8084
-    restart: always
-    ports:
-      - 8084:8084
-    labels:
-      logging: "promtail"
-      loggin_jobname: "containerlogs"
-    networks:
-      - dhammanava_network
-    command: ["python", "-m", "flask", "run"]
+  # ml-service:
+  #   container_name: ml-container
+  #   image: ${DOCKERHUB_USERNAME}/dhammanava-ml-image
+  #   build:
+  #     context: ./ml-service
+  #   environment:
+  #     - FLASK_APP=run.py
+  #     - FLASK_ENV=development
+  #     - FLASK_RUN_HOST=0.0.0.0
+  #     - FLASK_RUN_PORT=8084
+  #   restart: always
+  #   ports:
+  #     - 8084:8084
+  #   labels:
+  #     logging: "promtail"
+  #     loggin_jobname: "containerlogs"
+  #   networks:
+  #     - dhammanava_network
+  #   command: ["python", "-m", "flask", "run"]
 
   elastic-db:
     container_name: elastic-container
@@ -70,6 +70,8 @@ services:
     container_name: frontend-container
     build:
       context: ./frontend
+    environment:
+      - DHAMMANAVA_EVALUATION_FORM_URL=${EVALUATION_FORM_URL}
     ports:
       - 5173:8080
     restart: always
