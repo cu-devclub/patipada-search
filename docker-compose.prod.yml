@@ -58,6 +58,9 @@ services:
     ports:
       - 9200:9200
     restart: always
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
     mem_limit: 1g
     networks:
       - dhammanava_network
@@ -213,6 +216,8 @@ services:
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./volumes/monitoring/loki:/loki
     networks:
       - dhammanava_network
 
@@ -251,6 +256,7 @@ services:
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./volumes/monitoring/prometheus:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
     networks:
