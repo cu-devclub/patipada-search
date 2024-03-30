@@ -4,6 +4,7 @@ import (
 	"data-management/constant"
 	"data-management/errors"
 	"data-management/messages"
+	"data-management/request/entities"
 	"data-management/request/helper"
 	"data-management/request/models"
 	"time"
@@ -79,6 +80,88 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (r *requestUsecase) SyncRequestRecord(request *models.SyncRequestRecord) error {
+	filter := &entities.Filter{
+		RequestID: request.RequestId,
+	}
+
+	bsonFilter, err := filter.ConvertToBsonM()
+	if err != nil {
+		return err
+	}
+
+	requests, err := r.requestRepositories.GetRequest(bsonFilter)
+	if err != nil {
+		return err
+	}
+
+	if len(requests) == 0 {
+		return errors.CreateError(400, messages.BAD_REQUEST)
+	}
+
+	if len(requests) > 1 {
+		return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
+	}
+
+	requestFetched := requests[0]
+
+	if requestFetched.Status != constant.REQUEST_STATUS_REVIEWED {
+		return errors.CreateError(400, messages.BAD_REQUEST)
+	}
+
+	recordEntity := helper.RequestToRecordsEntity(requestFetched)
+	recordEntity.ExtractHTML()
+
+	err = r.requestRepositories.UpdateRecord(recordEntity)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *requestUsecase) SyncAllRequestRecords() error {
+	filter := &entities.Filter{
+		Status: constant.REQUEST_STATUS_REVIEWED,
+	}
+	bsonFilter,err := filter.ConvertToBsonM()
+	if err != nil {
+		return err
+	}
+
+	requests, err := r.requestRepositories.GetRequest(bsonFilter)
+	if err != nil {
+		return err
+	}
+
+	// Get the latest one for each record index sort by request ID
+	latestRequests := make(map[string]*entities.Request)
+	for _, request := range requests {
+		if _, ok := latestRequests[request.Index]; !ok {
+			latestRequests[request.Index] = request
+			continue
+		}
+
+		if latestRequests[request.Index].ID < request.ID {
+			latestRequests[request.Index] = request
+		}
+	}
+
+	for _, request := range latestRequests {
+		recordEntity := helper.RequestToRecordsEntity(request)
+		recordEntity.ExtractHTML()
+
+		err = r.requestRepositories.UpdateRecord(recordEntity)
+		if err != nil {
+			return err
+		}
+	}
+
+
 
 	return nil
 }

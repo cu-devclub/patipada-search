@@ -7,6 +7,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"time"
 
 	"github.com/fatih/color"
 )
@@ -48,8 +49,10 @@ func (h *PrettyHandler) Handle(ctx context.Context, r slog.Record) error {
 			return err
 		}
 	}
-
-	timeStr := r.Time.Format("[15:05:05.000]")
+	// IST is 7 hours ahead of UTC => Thailand
+	location := time.FixedZone("IST", 7*60*60)
+	timeStr := r.Time.In(location).Format("[2006-01-02 15:04:05]")
+	
 	msg := color.CyanString(r.Message)
 
 	if len(b) > 0 {

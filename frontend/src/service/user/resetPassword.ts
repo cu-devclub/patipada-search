@@ -3,7 +3,7 @@ import { ERR_Messages, ToastStatus } from "../../constant";
 import { CreateCustomError, ReturnError } from "../error";
 import { authURL } from '../../constant/serviceURL';
 
-export const verifyResetPasswordToken = async (token: string) => {
+export const verifyResetPasswordTokenService = async (token: string) => {
   try {
     const response = await axios.get(`${authURL}/verify-reset-token/${token}`);
     return response.data;
@@ -27,7 +27,7 @@ export const verifyResetPasswordToken = async (token: string) => {
   }
 };
 
-export const resetPassword = async (token: string, password: string) => {
+export const resetPasswordService = async (token: string, password: string) => {
   try {
     const response = await axios.post(`${authURL}/reset-password`, {
       token: token,
@@ -49,7 +49,7 @@ export const resetPassword = async (token: string, password: string) => {
         status: 401,
         toastStatus: ToastStatus.ERROR,
       };
-    }  else {
+    } else {
       returnError = {
         message: ERR_Messages.SYSTEM_ERROR,
         status: 500,

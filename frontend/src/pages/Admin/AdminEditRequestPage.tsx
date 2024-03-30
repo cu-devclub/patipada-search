@@ -1,5 +1,9 @@
 import { useParams } from "react-router-dom";
-import { getRequestByParams, updateRequest,insertRequest } from "../../service/data";
+import {
+  getRequestByParamsService,
+  updateRequestService,
+  insertRequestService,
+} from "../../service/data";
 import { useEffect, useState } from "react";
 import { EditRequestForm } from "../../components/admin";
 import {  MessageToast } from "../../components";
@@ -18,7 +22,7 @@ function AdminEditRequestPage() {
     // 1. Try getting data from request first
     // 2. If not found, try searching
     const getRecord = async (requestID: string) => {
-      await getRequestByParams({ requestID: requestID })
+      await getRequestByParamsService({ requestID: requestID })
         .then((res) => {
           setData(res[0]);
           addToast({
@@ -46,7 +50,7 @@ function AdminEditRequestPage() {
     data.approved_by = getCookie("username") || "";
     data = createEncodeRequest(data);
 
-    await updateRequest(data)
+    await updateRequestService(data)
       .then(() => {
         addToast({
           description: "ส่งคำขอแก้ไขสำเร็จ",
@@ -65,7 +69,7 @@ function AdminEditRequestPage() {
   const insert = async (data: Request) => {
     data.by = getCookie("username") || "";
     const insertRequestData = mapRequestToInsertRequestModels(data);
-    await insertRequest(insertRequestData)
+    await insertRequestService(insertRequestData)
       .then(() => {
         addToast({
           description: "ส่งคำขอแก้ไขสำเร็จ",

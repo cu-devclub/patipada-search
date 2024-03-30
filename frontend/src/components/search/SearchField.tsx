@@ -15,7 +15,7 @@ import {
 } from "@choc-ui/chakra-autocomplete";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
-import { search } from "../../service/search";
+import { searchService } from "../../service/search";
 import { SearchResultInterface } from "../../models/qa";
 
 interface SearchOptions {
@@ -32,7 +32,7 @@ interface SearchOptions {
 async function filterResults(term:string) {
   let data: SearchOptions[] = [];
   try {
-    const response = await search(term);
+    const response = await searchService(term);
     if (response) {
       data = response.data.map((item) => ({
         key: item.index,
@@ -121,7 +121,7 @@ function SearchField({
     if (q) {
       query = q.question;
     }
-    const response = await search(query);
+    const response = await searchService(query);
 
     const tokens = [query, ...response.tokens];
 

@@ -49,7 +49,7 @@ func (a *GRPCServer) SearchRecord(ctx context.Context, req *search_proto.SearchR
 	}
 
 	if result != nil {
-		slog.Info("Record found", slog.String("Record", result.ToString()))
+		slog.Info("Record found", slog.String("Record", result.Index))
 	}
 
 	return &search_proto.SearchResponse{

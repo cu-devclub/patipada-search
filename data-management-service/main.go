@@ -51,10 +51,10 @@ func main() {
 
 	comm := communication.NewCommunicationImpl(*grpc, *rabbit)
 
-	serv := server.NewGinServer(&cfg, &db, &validate, comm)
+	serv := server.NewGinServer(&cfg, &db, &validate, &comm)
 	slog.Info("Server initialized successfully!")
 
-	if err = migration.Migration(cfg, db, serv); err != nil {
+	if err = migration.Migration(&cfg, &db, &serv); err != nil {
 		slog.Error("failed to migrate %w", err)
 		return
 	}

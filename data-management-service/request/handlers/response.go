@@ -40,5 +40,5 @@ func (r *requestHandler) errorResponse(c *gin.Context, handlerOpts *HandlerOpts,
 		slog.Any("Response", res),
 	)
 
-	c.JSON(responseCode, response)
+	c.JSON(responseCode, gin.H{"error": response})
 }

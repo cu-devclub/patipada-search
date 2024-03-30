@@ -4,7 +4,9 @@ import { CreateCustomError, ReturnError } from "../error";
 import { mapResponseToRequest, Request } from "../../models/request";
 import { getCookie } from "typescript-cookie";
 import { dataURL } from "../../constant/serviceURL";
-export const getRequestByRecordIndex = async (id: string): Promise<Request> => {
+export const getRequestByRecordIndexService = async (
+  id: string
+): Promise<Request> => {
   try {
     axios.defaults.headers.common["Authorization"] = getCookie("token");
     const response = await axios.get(
@@ -52,7 +54,7 @@ export const getRequestByRecordIndex = async (id: string): Promise<Request> => {
   }
 };
 
-export const getRequestByParams = async (params: {
+export const getRequestByParamsService = async (params: {
   status?: string;
   username?: string;
   requestID?: string;
@@ -104,7 +106,7 @@ export const getRequestByParams = async (params: {
   }
 };
 
-export const getDataSummary = async () => {
+export const getDataSummaryService = async () => {
   try {
     axios.defaults.headers.common["Authorization"] = getCookie("token");
     const response = await axios.get(`${dataURL}/summary`);

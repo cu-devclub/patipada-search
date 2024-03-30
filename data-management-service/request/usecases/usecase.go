@@ -78,4 +78,8 @@ type UseCase interface {
 	GetLastestRequestOfRecord(index string) (*models.Request, error)
 
 	SummaryData() (*models.Summary, error)
+
+	SyncRequestRecord(*models.SyncRequestRecord) error
+
+	SyncAllRequestRecords() error
 }

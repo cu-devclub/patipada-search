@@ -12,6 +12,13 @@ up_containers:
 	docker compose -f docker-compose.prod.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq
 	@echo "Docker container built and started!"
 
+up_build_full_service:
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.prod.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq loki promtail grafana prometheus
+	@echo "Docker images built and started!"
+
 ## up_backend: starts backend containers ; auth, search and data
 up_backend: 
 	@echo "Starting docker containers..."

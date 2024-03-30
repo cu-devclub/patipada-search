@@ -5,6 +5,10 @@ import (
 )
 
 type (
+	SyncRequestRecord struct {
+		RequestId string `json:"requestId" binding:"required" validate:"required"`
+	}
+
 	Request struct {
 		ID         string    `json:"id,omitempty"`
 		RequestID  string    `json:"request_id"`

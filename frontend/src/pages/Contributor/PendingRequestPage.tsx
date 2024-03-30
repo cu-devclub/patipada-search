@@ -4,7 +4,7 @@ import { MessageToast } from "../../components";
 import { PendingRequestHeader, Footer } from "../../components/layout";
 import { useEffect, useState } from "react";
 import { Request } from "../../models/request";
-import { getRequestByParams } from "../../service/data";
+import { getRequestByParamsService } from "../../service/data";
 import { getCookie } from "typescript-cookie";
 import { ToastStatus } from "../../constant";
 import { convertStatusWord, extractStringFromHTML } from "../../functions";
@@ -16,7 +16,7 @@ function PendingRequestPage() {
   useEffect(() => {
     const getRequest = async () => {
       const username = getCookie("username");
-      await getRequestByParams({ username: username })
+      await getRequestByParamsService({ username: username })
         .then((res) => {
           const r = res.map((item) => {
             item.startTime = extractStringFromHTML(item.startTime);

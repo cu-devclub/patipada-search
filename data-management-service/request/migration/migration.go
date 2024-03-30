@@ -3,19 +3,18 @@ package migration
 import (
 	"data-management/config"
 	"data-management/database"
+
 	"data-management/request/entities"
 	"data-management/server"
 	"encoding/csv"
 	"os"
 )
 
-func Migration(cfg config.Config, db database.Database, serv server.Server) error {
-	// TODO : Implement the migration of request
-	// Make a queue message to search for the request that need to be updated
+func Migration(cfg *config.Config, db *database.Database, serv *server.Server) error {
+	s := *serv
+	requestArch := s.GetRequestArch()
 
 	// ---- Migrate Record data ----
-	requestArch := serv.GetRequestArch()
-
 	rawDataPath := cfg.App.DataSourcePath + "/raw-data.csv"
 	recordsAmount, youtubeAmount, err := processRawRecordFile(rawDataPath)
 	if err != nil {

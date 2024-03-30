@@ -16,7 +16,7 @@ func (r *recordUsecaseImpl) UpdateRecord(record *models.UpdateRecord) error {
 		return err
 	}
 
-	slog.Info("Update record successfully", slog.String("Record", record.ToString()))
+	slog.Info("Update record successfully", slog.String("Record", record.DocumentID))
 
 	return nil
 }

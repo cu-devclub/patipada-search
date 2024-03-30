@@ -32,7 +32,7 @@ func (r *requestUsecase) InsertRequest(request *models.Request) error {
 		return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
 	}
 
-	requestEntity := entities.Request{
+	requestEntity := &entities.Request{
 		RequestID:  requestID,
 		Index:      request.Index,
 		YoutubeURL: request.YoutubeURL,
@@ -48,7 +48,7 @@ func (r *requestUsecase) InsertRequest(request *models.Request) error {
 	}
 
 	// insert request entity
-	objId, err := r.requestRepositories.InsertRequest(&requestEntity)
+	objId, err := r.requestRepositories.InsertRequest(requestEntity)
 	if err != nil {
 		return err
 	}

@@ -10,7 +10,7 @@ import { authURL } from '../../constant/serviceURL';
  * @param {string} password - The password of the user.
  * @return {Promise<any>} - A promise that resolves with the response data from the server.
  */
-export const login = async (loginDTO: LoginDTO) => {
+export const loginService = async (loginDTO: LoginDTO) => {
   try {
     const response = await axios.post(`${authURL}/login`, {
       username: loginDTO.username,

@@ -1,20 +1,26 @@
 import { Text, Flex } from "@chakra-ui/react";
 import { useState } from "react";
-import { InformModal } from "../../modal";
+import { InformModal, BaseModal } from "../../modal";
+import { RatingForm } from "../../rating";
 
 function Footer() {
-  const [modalBody, setModalBody] = useState("");
+  const [selectInformModal, setSelectInformModal] = useState(false);
+  const [modalBody, setModalBody] = useState<React.ReactNode | string>();
   const [openModal, setopenModal] = useState(false);
-  const onOpenModal = (state: string) => {
+
+  const onOpenModal = (state: "develop" | "about" | "recommend") => {
     if (state == "develop") {
       setModalBody(
         "ขณะนี้ระบบกำลังอยู่ระหว่างการพัฒนาอาจมีข้อผิดพลาดเกี่ยวกับการสะกดคำหรือปัญหาอื่น ๆ ที่เกิดขึ้นได้"
       );
-    } else {
+    } else if (state == "about") {
       setModalBody(
-        "จัดทำโดย นายวาริส หลักทอง 6334460723 ภาควิชาคณิตศาสตร์และวิทยาการคอมพิวเตอร์ คณะวิทยาศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย"
+        "ระบบการค้นหาคำถาม คำตอบ จัดทำโดย นายวาริส หลักทอง 6334460723 ภาควิชาคณิตศาสตร์และวิทยาการคอมพิวเตอร์ คณะวิทยาศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย"
       );
+    } else if (state == "recommend") {
+      setModalBody(<RatingForm closeModal={() => setopenModal(false)} />);
     }
+    setSelectInformModal(state == "recommend" ? false : true);
     setopenModal(true);
   };
 
@@ -29,21 +35,29 @@ function Footer() {
       px="4"
       gap={4}
     >
-      <Text onClick={() => onOpenModal("about")} cursor={"pointer"}>
-        เกี่ยวกับ
+      <Text onClick={() => onOpenModal("recommend")} cursor={"pointer"}>
+        ข้อเสนอแนะ
       </Text>
-      <Text onClick={() => onOpenModal("develop")} cursor={"pointer"}>
+      <Text onClick={() => onOpenModal("about")} cursor={"pointer"}>
         ค้นธรรม ณ ธรรมนาวา (v0.2)
       </Text>
       <Text onClick={() => onOpenModal("develop")} cursor={"pointer"}>
         อยู่ระหว่างการพัฒนา
       </Text>
-      <InformModal
-        modalBody={modalBody}
-        modalButtonText="รับทราบ"
-        openModal={openModal}
-        closeModal={() => setopenModal(false)}
-      />
+      {selectInformModal ? (
+        <InformModal
+          modalBody={modalBody}
+          modalButtonText="รับทราบ"
+          openModal={openModal}
+          closeModal={() => setopenModal(false)}
+        />
+      ) : (
+        <BaseModal
+          modalBody={modalBody}
+          openModal={openModal}
+          closeModal={() => setopenModal(false)}
+        /> // Replace this with the component you want to render when selectInformModal is false
+      )}
     </Flex>
   );
 }

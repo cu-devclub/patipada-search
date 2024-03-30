@@ -27,25 +27,25 @@ services:
     networks:
       - dhammanava_network
 
-  ml-service:
-    container_name: ml-container
-    image: ${DOCKERHUB_USERNAME}/dhammanava-ml-image
-    build:
-      context: ./ml-service
-    environment:
-      - FLASK_APP=run.py
-      - FLASK_ENV=development
-      - FLASK_RUN_HOST=0.0.0.0
-      - FLASK_RUN_PORT=8084
-    restart: always
-    ports:
-      - 8084:8084
-    labels:
-      logging: "promtail"
-      loggin_jobname: "containerlogs"
-    networks:
-      - dhammanava_network
-    command: ["python", "-m", "flask", "run"]
+  # ml-service:
+  #   container_name: ml-container
+  #   image: ${DOCKERHUB_USERNAME}/dhammanava-ml-image
+  #   build:
+  #     context: ./ml-service
+  #   environment:
+  #     - FLASK_APP=run.py
+  #     - FLASK_ENV=development
+  #     - FLASK_RUN_HOST=0.0.0.0
+  #     - FLASK_RUN_PORT=8084
+  #   restart: always
+  #   ports:
+  #     - 8084:8084
+  #   labels:
+  #     logging: "promtail"
+  #     loggin_jobname: "containerlogs"
+  #   networks:
+  #     - dhammanava_network
+  #   command: ["python", "-m", "flask", "run"]
 
   elastic-db:
     container_name: elastic-container
@@ -70,6 +70,8 @@ services:
     container_name: frontend-container
     build:
       context: ./frontend
+    environment:
+      - DHAMMANAVA_EVALUATION_FORM_URL=${EVALUATION_FORM_URL}
     ports:
       - 5173:8080
     restart: always
@@ -207,7 +209,7 @@ services:
       - dhammanava_network
 
   promtail:
-    image: grafana/promtail:latest
+    image: grafana/promtail:2.8.11
     container_name: promtail
     volumes:
       - ./monitoring/promtail.yaml:/etc/promtail/docker-config.yaml
@@ -220,12 +222,13 @@ services:
       - dhammanava_network
 
   grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
+    image: grafana/grafana:10.3.5
     ports:
       - 3000:3000
     volumes:
-      - ./monitoring/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./monitoring/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./monitoring/grafana/main-dashboard.json:/var/lib/grafana/dashboards/dashboard.json
+      - ./monitoring/grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/main.yml
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
@@ -236,7 +239,7 @@ services:
       - dhammanava_network
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v2.51.0
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml

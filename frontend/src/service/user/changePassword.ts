@@ -3,7 +3,7 @@ import { ERR_Messages, ToastStatus } from "../../constant";
 import { CreateCustomError, ReturnError } from "../error";
 import { authURL } from "../../constant/serviceURL";
 import { getCookie } from "typescript-cookie";
-export const changePassword = async (
+export const changePasswordService = async (
   token: string,
   oldPassword: string,
   newPassword: string

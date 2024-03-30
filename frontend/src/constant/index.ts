@@ -53,3 +53,8 @@ export const ERR_Messages_MAP: { [key: string]: string } = {
     "มีผู้ใช้งานชื่อผู้ใช้นี้แล้ว",
   [SERVER_ERROR_MESSAGE.EMAIL_ALREADY_EXISTS]: "มีผู้ใช้งานอีเมลนี้แล้ว",
 };
+
+export const REQUEST_STATUS = {
+  PENDING: "pending",
+  REVIEWED: "reviewed",
+};

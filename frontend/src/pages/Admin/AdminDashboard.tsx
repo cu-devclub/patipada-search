@@ -3,14 +3,18 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Role, ToastStatus } from "../../constant";
 import { AdminBasePage } from "./AdminBasePage";
-import { StatGroup } from "@chakra-ui/react";
-import { RecordStat, RequestStat, Userstat } from "../../components/stat";
+import { Box, StatGroup } from "@chakra-ui/react";
+import { RatingStat, RecordStat, RequestStat, Userstat } from "../../components/stat";
 import { AuthSummary, User } from "../../models/user";
-import { getAllUsers } from "../../service/user/getUser";
+import { getAllUsersService } from "../../service/user";
 import { MessageToast } from "../../components";
-import { getDataSummary } from "../../service/data/getRequest";
 import { RecordSummary } from "../../models/qa";
 import { RequestSummary } from "../../models/request";
+import { RatingSummary } from "../../models/ratings";
+import {
+  getAverageRatingsService,
+  getDataSummaryService,
+} from "../../service/data";
 function AdminDashboard() {
   const navigate = useNavigate();
   const { addToast } = MessageToast();
@@ -32,6 +36,11 @@ function AdminDashboard() {
     pendingAmount: 0,
   });
 
+  const [averageRating, setAverageRating] = useState<RatingSummary>({
+    average_stars: 0,
+    total_ratings: 0,
+  });
+
   useEffect(() => {
     (async () => {
       const isAuthorize = await AuthorizeAdmin(Role.ADMIN);
@@ -41,7 +50,7 @@ function AdminDashboard() {
     })();
 
     const getUsers = async () => {
-      await getAllUsers()
+      await getAllUsersService()
         .then((res: User[]) => {
           const totalUser = res.filter(
             (user) => user.role === Role.USER
@@ -69,7 +78,7 @@ function AdminDashboard() {
     getUsers();
 
     const getDataSum = async () => {
-      await getDataSummary()
+      await getDataSummaryService()
         .then((res) => {
           if (res.recordSummary) {
             const recSum: RecordSummary = {
@@ -97,11 +106,32 @@ function AdminDashboard() {
     };
     getDataSum();
 
+    const getAverageRatingFunc = async () => {
+      await getAverageRatingsService()
+        .then((res) => {
+          setAverageRating(res);
+        })
+        .catch(() => {
+          addToast({
+            description: "เกิดข้อผิดพลาดขณะทำการดึงข้อมูล",
+            status: ToastStatus.ERROR,
+          });
+        });
+    };
+    getAverageRatingFunc();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <AdminBasePage activePage="Dashboard">
+      <Box mt={8}>
+        <RatingStat
+          label="คะแนนเฉลี่ย"
+          value={averageRating.average_stars}
+          helper={`จำนวนคะแนนทั้งหมด ${averageRating.total_ratings} คะแนน`}
+        />
+      </Box>
       <StatGroup pt={8}>
         <Userstat authSummary={authSummary} />
         <RecordStat recordSummary={recordSummary} />
