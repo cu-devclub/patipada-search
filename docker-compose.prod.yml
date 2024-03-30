@@ -22,6 +22,7 @@ services:
     restart: always
     depends_on:
       - elastic-db
+      - rabbitmq
     networks:
       - dhammanava_network
 
@@ -57,6 +58,9 @@ services:
     ports:
       - 9200:9200
     restart: always
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
     mem_limit: 1g
     networks:
       - dhammanava_network
@@ -141,6 +145,9 @@ services:
     restart: always
     depends_on:
       - data-db
+      - rabbitmq
+      - auth-service
+      - search-service
     labels:
       logging: "promtail"
       loggin_jobname: "containerlogs"
@@ -164,6 +171,7 @@ services:
 
   rabbitmq:
     image: "rabbitmq:3-alpine"
+    container_name: rabbitmq-container
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
@@ -208,6 +216,8 @@ services:
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./volumes/monitoring/loki:/loki
     networks:
       - dhammanava_network
 
@@ -226,6 +236,7 @@ services:
 
   grafana:
     image: grafana/grafana:10.3.5
+    container_name: grafana
     ports:
       - 3000:3000
     volumes:
@@ -234,9 +245,7 @@ services:
       - ./monitoring/grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/main.yml
       - ./monitoring/grafana/grafana.ini.prod:/etc/grafana/grafana.ini
     environment:
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_AUTH_DISABLE_LOGIN_FORM=false
       - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     networks:
@@ -247,6 +256,7 @@ services:
     container_name: prometheus
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./volumes/monitoring/prometheus:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
     networks:

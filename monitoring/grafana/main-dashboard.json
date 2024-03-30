@@ -18,9 +18,116 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
   "links": [],
+  "liveNow": false,
   "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 6,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.5",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "search_confirm_counter{job=\"search-analysis\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "search_draft_counter{job=\"search-analysis\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "B",
+          "useBackend": false
+        }
+      ],
+      "title": "Total Search",
+      "transformations": [
+        {
+          "id": "calculateField",
+          "options": {
+            "binary": {
+              "left": "{__name__=\"search_confirm_counter\", instance=\"search-service:8081\", job=\"search-analysis\"}",
+              "right": "{__name__=\"search_draft_counter\", instance=\"search-service:8081\", job=\"search-analysis\"}"
+            },
+            "mode": "binary",
+            "reduce": {
+              "reducer": "sum"
+            },
+            "replaceFields": true
+          }
+        }
+      ],
+      "type": "stat"
+    },
     {
       "datasource": {
         "type": "prometheus",
@@ -76,7 +183,8 @@
                 "value": 80
               }
             ]
-          }
+          },
+          "unitScale": true
         },
         "overrides": []
       },
@@ -84,7 +192,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 8
       },
       "id": 5,
       "options": {
@@ -99,6 +207,7 @@
           "sort": "none"
         }
       },
+      "pluginVersion": "10.3.5",
       "targets": [
         {
           "datasource": {
@@ -107,13 +216,30 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "search_counter{job=\"search-analysis\"}",
+          "expr": "search_confirm_counter{job=\"search-analysis\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "key": "Q-299fc1dd-904b-48d5-8c4e-37be4a9fe269-0",
           "legendFormat": "__auto",
           "range": true,
-          "refId": "A",
+          "refId": "Confirm search",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "search_draft_counter{job=\"search-analysis\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "Draft search",
           "useBackend": false
         }
       ],
@@ -129,7 +255,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 11
+        "y": 19
       },
       "id": 2,
       "options": {
@@ -166,7 +292,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 11
+        "y": 19
       },
       "id": 3,
       "options": {
@@ -203,7 +329,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 19
+        "y": 27
       },
       "id": 1,
       "options": {
@@ -240,7 +366,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 19
+        "y": 27
       },
       "id": 4,
       "options": {
@@ -269,6 +395,7 @@
       "type": "logs"
     }
   ],
+  "refresh": "",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
@@ -278,10 +405,11 @@
     "from": "now-1h",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {},
   "timezone": "browser",
   "title": "Main Dashboard",
   "uid": "fdgi2aql57ocga",
-  "version": 5,
+  "version": 1,
   "weekStart": ""
 }

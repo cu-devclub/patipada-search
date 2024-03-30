@@ -58,3 +58,14 @@ export const REQUEST_STATUS = {
   PENDING: "pending",
   REVIEWED: "reviewed",
 };
+
+export const SEARCH_STATUS = {
+  DRAFT : "draft",
+  CONFIRM : "confirm",
+  DEFAULT : "draft"
+}
+
+export const SEARCH_TYPE = {
+  TF_IDF: "tf_idf",
+  DEFAULT: "tf_idf"
+}

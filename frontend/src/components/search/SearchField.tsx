@@ -17,6 +17,7 @@ import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { searchService } from "../../service/search";
 import { SearchResultInterface } from "../../models/qa";
+import { SEARCH_STATUS, SEARCH_TYPE } from "../../constant";
 
 interface SearchOptions {
   key: string;
@@ -121,7 +122,7 @@ function SearchField({
     if (q) {
       query = q.question;
     }
-    const response = await searchService(query);
+    const response = await searchService(query,SEARCH_TYPE.DEFAULT,SEARCH_STATUS.CONFIRM);
 
     const tokens = [query, ...response.tokens];
 
@@ -151,6 +152,12 @@ function SearchField({
           </InputLeftElement>
           <AutoCompleteInput
             onChange={onChangeInputHandler}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onKeyDown={(e: any) => {
+              if (e.key === "Enter") {
+                onSelectInputHandle(e);
+              }
+            }}
             variant="search_bar"
             value={searchParam || ""}
             placeholder="ค้นหาเลย"

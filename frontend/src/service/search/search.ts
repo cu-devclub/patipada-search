@@ -2,20 +2,23 @@ import axios from "../axiosInstance";
 import { CreateCustomError } from "../error";
 import { DataItem, SearchResultInterface } from "../../models/qa";
 import { searchURL } from "../../constant/serviceURL";
+import { SEARCH_STATUS, SEARCH_TYPE } from "../../constant";
 /**
  * Performs a search query using the specified query string.
  *
  * @param {string} query - The search query string.
  * @param {string} searchType - Optional. The search type to use. Defaults to "tf_idf".
+ * @param {string} searchStatus - Optional. The search status to use. Defaults to "draft".
  * @return {Promise<SearchResultInterface>} - A promise that resolves with the search results.
  */
 export const searchService = async (
   query: string,
-  searchType: string = "tf_idf"
+  searchType: string = SEARCH_TYPE.DEFAULT,
+  searchStatus: string = SEARCH_STATUS.DEFAULT
 ): Promise<SearchResultInterface> => {
   try {
     const response = await axios.get(
-      `${searchURL}/search?query=${query}&searchType=${searchType}`
+      `${searchURL}/search?query=${query}&searchType=${searchType}&searchStatus=${searchStatus}`
     );
 
     const records: DataItem[] = response.data.results.map((item: DataItem) => {
