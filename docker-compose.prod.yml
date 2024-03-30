@@ -51,11 +51,13 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     volumes:
       - ./volumes/database/elastic:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     restart: always
+    mem_limit: 1g
     networks:
       - dhammanava_network
 
