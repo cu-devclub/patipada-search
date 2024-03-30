@@ -21,6 +21,7 @@ services:
       - 8081:8081
     depends_on:
       - elastic-db
+      - rabbitmq
     labels:
       logging: "promtail"
       loggin_jobname: "containerlogs"
@@ -153,6 +154,9 @@ services:
       loggin_jobname: "containerlogs"
     depends_on:
       - data-db
+      - rabbitmq
+      - auth-service
+      - search-service
     networks:
       - dhammanava_network
 

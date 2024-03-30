@@ -22,6 +22,7 @@ services:
     restart: always
     depends_on:
       - elastic-db
+      - rabbitmq
     networks:
       - dhammanava_network
 
@@ -141,6 +142,9 @@ services:
     restart: always
     depends_on:
       - data-db
+      - rabbitmq
+      - auth-service
+      - search-service
     labels:
       logging: "promtail"
       loggin_jobname: "containerlogs"
