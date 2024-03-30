@@ -229,6 +229,7 @@ services:
       - ./monitoring/grafana/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
       - ./monitoring/grafana/main-dashboard.json:/var/lib/grafana/dashboards/dashboard.json
       - ./monitoring/grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/main.yml
+      - ./monitoring/grafana/grafana.ini:/etc/grafana/grafana.ini
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
