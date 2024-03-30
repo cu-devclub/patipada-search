@@ -21,6 +21,7 @@ func (r Response) LogValue() slog.Value {
 
 type SearchRecordLogResponse struct {
 	Length int
+	Status string
 }
 
 type RecordIndexLogResponse struct {

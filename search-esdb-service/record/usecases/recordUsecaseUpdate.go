@@ -7,6 +7,7 @@ import (
 )
 
 func (r *recordUsecaseImpl) UpdateRecord(record *models.UpdateRecord) error {
+	//TODO : We have to generate new vector for each record if its update
 	updateRecordEntity := helper.UpdateRecordModelToEntity(record)
 	if err := r.recordRepository.UpdateRecord(updateRecordEntity); err != nil {
 		slog.Error("Failed to update record",

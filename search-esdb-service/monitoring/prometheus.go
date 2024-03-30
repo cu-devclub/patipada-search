@@ -8,17 +8,36 @@ import (
 //* passed to the usecase but right now we only count the search requests
 //* so we make it simple and just use a global variable
 
-var searchCounter prometheus.Counter
-
-func NewMonitoring() {
-	searchCounter = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "search_counter",
-		Help: "The total number of searche requests",
-	})
-
-	prometheus.MustRegister(searchCounter)
+var searchCounter struct {
+	draftCounter   prometheus.Counter
+	confirmCounter prometheus.Counter
 }
 
-func GetSearchCounter() prometheus.Counter {
-	return searchCounter
+func NewMonitoring() {
+
+	searchDraftCounter := prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "search_draft_counter",
+		Help: "The total number of search requests with status draft",
+	})
+
+	searchConfirmCounter := prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "search_confirm_counter",
+		Help: "The total number of search requests with status confirm",
+	})
+
+	prometheus.MustRegister(searchDraftCounter)
+
+	prometheus.MustRegister(searchConfirmCounter)
+
+	searchCounter.draftCounter = searchDraftCounter
+	searchCounter.confirmCounter = searchConfirmCounter
+}
+
+func MonitoringSearch(searchStatus string) {
+	switch searchStatus {
+	case "draft":
+		searchCounter.draftCounter.Inc()
+	case "confirm":
+		searchCounter.confirmCounter.Inc()
+	}
 }

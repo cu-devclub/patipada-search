@@ -14,9 +14,6 @@ import (
 )
 
 func (r *recordHttpHandler) Search(c *gin.Context) {
-	searchCounter := monitoring.GetSearchCounter()
-	searchCounter.Inc()
-
 	handlerOpts := NewHandlerOpts(c)
 	handlerOpts.Params = c.Request.URL.Query()
 
@@ -29,9 +26,6 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		return
 	}
 
-	cfg := config.GetConfig()
-	logging.WriteLogsToFile(cfg.Static.LogsPath, cfg.Static.SearchLogsPath, "Search: "+query)
-	
 	// retrieve amount
 	sAmount := c.Query("amount")
 	amount := 50 // default to 50 results
@@ -52,6 +46,23 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		searchType = constant.SEARCH_BY_DEFAULT
 	}
 
+	// retreive search status
+	searchStatus := c.Query("searchStatus")
+	if searchStatus == "" {
+		searchStatus = constant.SEARCH_STATUS_DRAFTING
+	}
+
+	cfg := config.GetConfig()
+	searchLogsPath := cfg.Static.SearchLogsDraftPath
+	if searchStatus == constant.SEARCH_STATUS_CONFIRM {
+		searchLogsPath = cfg.Static.SearchLogsConfirmPath
+	}
+
+	logging.WriteLogsToFile(cfg.Static.LogsPath, searchLogsPath, "Search: "+query)
+
+	// monitor search
+	monitoring.MonitoringSearch(searchStatus)
+
 	// search for records
 	records, err := r.recordUsecase.Search("record", query, searchType, amount)
 	if err != nil {
@@ -70,6 +81,7 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		Response: records,
 		OptionalResponse: &SearchRecordLogResponse{
 			Length: len(records.Results),
+			Status: searchStatus,
 		},
 	}
 

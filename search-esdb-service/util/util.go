@@ -25,6 +25,11 @@ func RemoveSliceFromArrays(arr []string, slice []string) []string {
 		}
 		result = append(result, a)
 	}
+
+	if len(result) == 0 {
+		return arr
+	}
+	
 	return result
 }
 
