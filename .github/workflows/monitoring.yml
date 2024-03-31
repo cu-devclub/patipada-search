@@ -1,28 +1,12 @@
-name: -Service- Monitoring (Grafana Loki Promtail)
+name: -Service- Monitoring (Grafana Loki Promtail Prometheus)
 on: workflow_dispatch
 jobs:
-  build-and-deploy-auth-service:
+  deploy-monitoring-service:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.LINUX_PRIVATE_KEY_BASE64 }}" | base64 -d > ~/.ssh/id_rsa
-          chmod 700 ~/.ssh
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -t rsa ${{ secrets.LINUX_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Remove directory on server
-        run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }} "rm -rf ~/dhammanava-search/monitoring"
-
-      - name: Copy monitoring directory to server
-        run: |
-          scp -r -i ~/.ssh/id_rsa ./monitoring ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
 
       - name: Deploy to Ubuntu server
         uses: appleboy/ssh-action@master
