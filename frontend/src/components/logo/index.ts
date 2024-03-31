@@ -1,2 +1,3 @@
 import Logo from "./Logo";
-export { Logo };
+import WordCloud from "./WordCloud";
+export { Logo, WordCloud };

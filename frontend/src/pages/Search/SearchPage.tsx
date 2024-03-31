@@ -1,8 +1,9 @@
-import { Flex, Center, VStack } from "@chakra-ui/react";
+import { Flex, VStack, AspectRatio } from "@chakra-ui/react";
 import { SearchField } from "../../components/search";
-import { Header, Footer, Logo } from "../../components";
+import { Header, Footer } from "../../components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { WordCloud } from "../../components/logo";
 
 /**
  * Renders a search page with a search field.
@@ -45,10 +46,14 @@ const SearchPage = () => {
       <VStack w="full" spacing={[4, 16]}>
         <Header />
 
-        <VStack w="full">
-          <Center>
+        <VStack w="full" spacing={8}>
+          {/* <Center bg="red">
             <Logo size={["6xs", "4xs"]} />
-          </Center>
+           </Center>  */}
+          <AspectRatio w={{ base: "60%", md: "50%", lg: "35%" }} ratio={16 / 9}>
+            <WordCloud />
+          </AspectRatio>
+
           <SearchField
             searchParam={searchParam}
             setSearchParams={setSearchParams}
