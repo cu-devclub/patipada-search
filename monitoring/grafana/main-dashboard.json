@@ -90,42 +90,10 @@
           "range": true,
           "refId": "A",
           "useBackend": false
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "search_draft_counter{job=\"search-analysis\"}",
-          "fullMetaSearch": false,
-          "hide": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "B",
-          "useBackend": false
         }
       ],
       "title": "Total Search",
-      "transformations": [
-        {
-          "id": "calculateField",
-          "options": {
-            "binary": {
-              "left": "{__name__=\"search_confirm_counter\", instance=\"search-service:8081\", job=\"search-analysis\"}",
-              "right": "{__name__=\"search_draft_counter\", instance=\"search-service:8081\", job=\"search-analysis\"}"
-            },
-            "mode": "binary",
-            "reduce": {
-              "reducer": "sum"
-            },
-            "replaceFields": true
-          }
-        }
-      ],
+      "transformations": [],
       "type": "stat"
     },
     {
@@ -395,7 +363,7 @@
       "type": "logs"
     }
   ],
-  "refresh": "",
+  "refresh": "1d",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
