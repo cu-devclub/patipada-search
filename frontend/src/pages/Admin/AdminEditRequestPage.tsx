@@ -47,13 +47,13 @@ function AdminEditRequestPage() {
       return;
     }
 
-    data.approved_by = getCookie("username") || "";
+    data.approvedBy = getCookie("username") || "";
     data = createEncodeRequest(data);
 
     await updateRequestService(data)
       .then(() => {
         addToast({
-          description: "ส่งคำขอแก้ไขสำเร็จ",
+          description: "อัพเดทคำขอแก้ไขสำเร็จ",
           status: ToastStatus.SUCCESS,
         });
         navigate(-1);

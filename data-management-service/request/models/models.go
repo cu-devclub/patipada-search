@@ -11,19 +11,18 @@ type (
 
 	Request struct {
 		ID         string    `json:"id,omitempty"`
-		RequestID  string    `json:"request_id"`
+		RequestID  string    `json:"requestID"`
 		Index      string    `json:"index" binding:"required" validate:"required"`
 		YoutubeURL string    `json:"youtubeURL" binding:"required" validate:"required"`
 		Question   string    `json:"question" binding:"required" validate:"required"`
 		Answer     string    `json:"answer" binding:"required" validate:"required"`
 		StartTime  string    `json:"startTime" binding:"required" validate:"required"`
 		EndTime    string    `json:"endTime" binding:"required" validate:"required"`
-		CreatedAt  time.Time `json:"created_at,omitempty"`
-		UpdatedAt  time.Time `json:"updated_at,omitempty"`
+		CreatedAt  time.Time `json:"createdAt,omitempty"`
+		UpdatedAt  time.Time `json:"updatedAt,omitempty"`
 		Status     string    `json:"status" validate:"omitempty,oneof=pending reviewed"` // "pending", "reviewed"
 		By         string    `json:"by" binding:"required" validate:"required"`
-		ApprovedBy string    `json:"approved_by,omitempty"`
-		CommentUID string    `json:"comment_uid,omitempty"`
+		ApprovedBy string    `json:"approvedBy,omitempty"`
 	}
 
 	Summary struct {

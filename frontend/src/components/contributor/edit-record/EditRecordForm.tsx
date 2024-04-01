@@ -58,6 +58,7 @@ function EditRecordForm({ data, submit }: EditRecordFormProps) {
       data.endTime = endTime.htmlValue;
       data.question = question.htmlValue;
       data.answer = answer.htmlValue;
+      onClose();
       submit(data);
     } else {
       // navigate back

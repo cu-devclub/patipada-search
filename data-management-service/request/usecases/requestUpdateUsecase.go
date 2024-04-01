@@ -7,6 +7,7 @@ import (
 	"data-management/request/entities"
 	"data-management/request/helper"
 	"data-management/request/models"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -49,10 +50,13 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) error {
 			continue
 		}
 
-		if req.ID == request.ID {
+		log.Println("Request: ", req, "Current Request: ", request)
+		log.Println("verifying", req.Index != request.Index, req.RequestID == request.RequestID, req.Status == constant.REQUEST_STATUS_REVIEWED)
+		if req.Index != request.Index || req.RequestID == request.RequestID || req.Status == constant.REQUEST_STATUS_REVIEWED {
 			continue
 		}
 
+		log.Println("Updating request: ", req.RequestID, " to reviewed")
 		req.Status = constant.REQUEST_STATUS_REVIEWED
 		requestEntitiy := helper.ModelsToEntity(req)
 		requestEntitiy.UpdatedAt = time.Now()
@@ -128,7 +132,7 @@ func (r *requestUsecase) SyncAllRequestRecords() error {
 	filter := &entities.Filter{
 		Status: constant.REQUEST_STATUS_REVIEWED,
 	}
-	bsonFilter,err := filter.ConvertToBsonM()
+	bsonFilter, err := filter.ConvertToBsonM()
 	if err != nil {
 		return err
 	}
@@ -160,8 +164,6 @@ func (r *requestUsecase) SyncAllRequestRecords() error {
 			return err
 		}
 	}
-
-
 
 	return nil
 }

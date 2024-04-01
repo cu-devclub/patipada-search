@@ -69,3 +69,5 @@ export const SEARCH_TYPE = {
   TF_IDF: "tf_idf",
   DEFAULT: "tf_idf"
 }
+
+export const RequestNotFoundMessage = "NOT FOUND"
