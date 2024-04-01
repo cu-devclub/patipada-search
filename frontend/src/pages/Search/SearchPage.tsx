@@ -42,15 +42,16 @@ const SearchPage = () => {
       align="center"
       w="full"
       minH="100svh"
+      gap={16}
     >
-      <VStack w="full" spacing={[4, 16]}>
+      <VStack w="full" spacing={[4, 12]}>
         <Header />
 
         <VStack w="full" spacing={8}>
           {/* <Center bg="red">
             <Logo size={["6xs", "4xs"]} />
            </Center>  */}
-          <AspectRatio w={{ base: "60%", md: "50%", lg: "35%" }} ratio={16 / 9}>
+          <AspectRatio w={{ base: "60%", md: "50%", lg: "30%" }} ratio={16 / 9}>
             <WordCloud />
           </AspectRatio>
 
