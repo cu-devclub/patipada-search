@@ -17,7 +17,7 @@ class TokenizeService:
         Returns:
             List[str]: A list of tokens (words) from the text.
         """
-        tokens = word_tokenize(text)
+        tokens = word_tokenize(text, engine='newmm')
         # Remove any ' ' (space) tokens
         tokens = list(filter(lambda x: x != ' ', tokens))
         return tokens

@@ -1,9 +1,18 @@
 from typing import List
 from gensim import corpora, models
+from app.services.stopWords_service import StopWordsService
+from app.services.tokenize_service import TokenizeService
+# from tokenize_service import TokenizeService
+# from stopWords_service import StopWordsService
+import pickle
 
 class LDAServerice:
+    id2word = pickle.load(open(f'test\id2word.pkl', 'rb'))
+    lda_model = pickle.load(open(f'test\LDA_model.pkl', 'rb'))
+
     @staticmethod
-    def perform_lda(documents: List[str],num_topics: int) -> List[float]:
+
+    def perform_lda(document: str) -> List[float]:
         """
         Perform LDA on a list of documents.
 
@@ -13,28 +22,25 @@ class LDAServerice:
         Returns:
             List[float]: The LDA vector for the documents.
         """
-        if len(documents) == 0:
+        if len(document) == 0:
             print("No data provided")
             return []
         # Tokenize the documents
-        texts = [[word for word in document.lower().split()] for document in documents]
+        text = StopWordsService.remove_stop_words_from_list(TokenizeService.tokenize_from_string(document))
 
-        # Create a dictionary from the texts
-        dictionary = corpora.Dictionary(texts)
-
-        # Create a corpus from the dictionary
-        corpus = [dictionary.doc2bow(text) for text in texts]
+        # word2vec
+        vector = LDAServerice.id2word.doc2bow(text)
 
         # Perform LDA
-        
-        lda_model = models.LdaModel(corpus, num_topics=num_topics, id2word=dictionary, passes=15)
-
-        # Get the LDA vector for the first document
-        sparse_lda_vector = lda_model[corpus[0]]
+        sparse_lda_vector = LDAServerice.lda_model.get_document_topics(vector)
 
         # Convert the sparse LDA vector to a dense vector
-        dense_lda_vector = [0.0] * num_topics
+        dense_lda_vector = [0.0] * 30
         for index, value in sparse_lda_vector:
             dense_lda_vector[index] = value
 
         return dense_lda_vector
+    
+# dense_lda_vector = LDAServerice.perform_lda(['พระโพธิสัตว์ต้องเป็นนักบวชตลอดทุกภพทุกชาติใช่ไหมครับ'])
+# print(type(dense_lda_vector))
+# print(dense_lda_vector)
