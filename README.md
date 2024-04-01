@@ -38,6 +38,9 @@ as store in [stopwords](./data/stopword/)
 In [.github/workflows](./.github/workflows/) directiory contians workflow for each container and each workflow will run on `workflow_dispatch`, means you need to press a `run` button in github actions page.
 for more information please visit [.github/workflows](./.github/workflows/)
 
+### Important
+If using CI/CD to deploy the [env file](./.github/workflows/env.yml), please check the variables carefully. Since there are some variables which manually deploy (not from secret)
+
 ## Development Process (Run locally)
 
 ### Prerequisites
@@ -75,9 +78,9 @@ for more information please visit [.github/workflows](./.github/workflows/)
 By default you should use github workflow and deploy to produciton by trigger each jobs you want. However if you want something more you can use docker-compose.prod.yml and Makefile to set the service as you want.
 | These 2 files already have ci action to savely deploy to server
 
-- docker-compose.prod.yml ; manipulate through docker compose
+- [docker-compose.prod.yml](./.github/workflows/docker.yml) ; manipulate through docker compose
 
-- Makefile is the collection of commands I prebuilt which you can run using `make <command>` all the details for each command provided in the comment section in Makefile
+- [Makefile](./.github/workflows/makefile.yml) is the collection of commands I prebuilt which you can run using `make <command>` all the details for each command provided in the comment section in Makefile
 
 ## Environment Variables
 
@@ -128,6 +131,8 @@ To run this project, you will need to add the following environment variables to
 `GRAFANA_USERNAME` : username for login to grafana dashboard
 
 `GRAFANA_PASSWORD` : password for login to grafana dashboard
+
+`EVALUATION_FORM_URL` : evaluation form for user to evaluate website, display in frontend
 
 > _<u>Note</u>_ if you run each project without docker e.g. `go run main.go` you do not need to assign the .env variables each service has default env variables in app.env except `SENDER_PASSWORD`, which you are required to assign in `app.env`
 

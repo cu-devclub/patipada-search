@@ -30,10 +30,13 @@ function Footer() {
       h="100%"
       bg="brand_gray.400"
       direction="row"
-      justify={{ lg: "space-between", md: "center", base: "center" }}
+      justify={{ md: "space-between",  base: "center" }}
       align="center"
       px="4"
+      pb={{base: 2, md:0}}
       gap={4}
+      fontSize={{ md: "lg", base: "sm" }}
+      flexWrap={"wrap"}
     >
       <Text onClick={() => onOpenModal("recommend")} cursor={"pointer"}>
         ข้อเสนอแนะ

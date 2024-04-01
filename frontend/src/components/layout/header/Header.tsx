@@ -1,15 +1,27 @@
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { SignInButton, UserAvatar } from "../../user";
 import { getCookie } from "typescript-cookie";
+import { Logo } from "../..";
 function Header() {
   const token = getCookie("token");
   const username = getCookie("username");
   return (
-    <Flex pr={4} justify="flex-end" alignItems="center" w="100%" h="8xs">
+    <Flex
+      pr={4}
+      justify="space-between"
+      // alignItems="center"
+      w="100%"
+      h="6xs"
+      px={2}
+    >
+      <Box w={{ base: "20%", lg: "20%" }} h="full">
+        <Logo size={{base:"8xs", lg: "7xs" }} />
+      </Box>
+
       {token && username ? (
         <UserAvatar username={username} />
       ) : (
-        <SignInButton />
+        <SignInButton marginTop="4" />
       )}
     </Flex>
   );

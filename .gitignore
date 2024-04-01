@@ -5,5 +5,3 @@
 volumes
 todo
 logs
-# Demo purpose for gateway service
-ml-service 
