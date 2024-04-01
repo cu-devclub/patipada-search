@@ -2,13 +2,11 @@ from typing import List
 from gensim import corpora, models
 from app.services.stopWords_service import StopWordsService
 from app.services.tokenize_service import TokenizeService
-# from tokenize_service import TokenizeService
-# from stopWords_service import StopWordsService
 import pickle
 
 class LDAServerice:
-    id2word = pickle.load(open(f'test\id2word.pkl', 'rb'))
-    lda_model = pickle.load(open(f'test\LDA_model.pkl', 'rb'))
+    id2word = pickle.load(open(f'model\id2word.pkl', 'rb'))
+    lda_model = pickle.load(open(f'model\LDA_model.pkl', 'rb'))
 
     @staticmethod
 
@@ -41,6 +39,3 @@ class LDAServerice:
 
         return dense_lda_vector
     
-# dense_lda_vector = LDAServerice.perform_lda(['พระโพธิสัตว์ต้องเป็นนักบวชตลอดทุกภพทุกชาติใช่ไหมครับ'])
-# print(type(dense_lda_vector))
-# print(dense_lda_vector)
