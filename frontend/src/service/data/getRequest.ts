@@ -13,26 +13,7 @@ export const getRequestByRecordIndexService = async (
       `${dataURL}/request/latestRecord?index=${id}`
     );
 
-    if (response.data.data == null) {
-      const emptyRequest: Request = {
-        id: "",
-        requestID: "NOT FOUND",
-        index: "",
-        question: "",
-        answer: "",
-        startTime: "",
-        endTime: "",
-        youtubeURL: "",
-        status: "",
-        createdAt: "",
-        updatedAt: "",
-        by: "",
-        approved_by: "",
-      };
-      return emptyRequest;
-    }
-
-    const res = mapResponseToRequest(response.data.data);
+    const res = mapResponseToRequest(response.data);
     return res;
   } catch (error: unknown) {
     const requestError = CreateCustomError(error);
