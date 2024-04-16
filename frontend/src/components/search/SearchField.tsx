@@ -17,7 +17,7 @@ import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { searchService } from "../../service/search";
 import { SearchResultInterface } from "../../models/qa";
-import { SEARCH_STATUS, SEARCH_TYPE } from "../../constant";
+import { SEARCH_STATUS, SEARCH_TYPE, SearchResultItemsPerPage } from "../../constant";
 import { MessageToast } from "../toast";
 interface SearchOptions {
   key: string;
@@ -70,7 +70,7 @@ function SearchField({
   setSearchParams,
   performSearch,
   offset = 0,
-  amount = 8,
+  amount = SearchResultItemsPerPage,
 }: SearchFieldProps) {
   const { addToast } = MessageToast();
   const [isLoading, setIsLoading] = useState(false);

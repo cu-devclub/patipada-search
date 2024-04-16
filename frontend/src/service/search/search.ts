@@ -2,7 +2,7 @@ import axios from "../axiosInstance";
 import { CreateCustomError } from "../error";
 import { DataItem, SearchResultInterface } from "../../models/qa";
 import { searchURL } from "../../constant/serviceURL";
-import { SEARCH_STATUS, SEARCH_TYPE } from "../../constant";
+import { SEARCH_STATUS, SEARCH_TYPE, SearchResultItemsPerPage } from "../../constant";
 /**
  * Performs a search query using the specified query string.
  *
@@ -18,7 +18,7 @@ export const searchService = async (
   searchType: string = SEARCH_TYPE.DEFAULT,
   searchStatus: string = SEARCH_STATUS.DEFAULT,
   offset: number = 0,
-  amount: number = 8
+  amount: number = SearchResultItemsPerPage
 ): Promise<SearchResultInterface> => {
   try {
     const response = await axios.get(
