@@ -3,6 +3,7 @@ package server
 import (
 	"auth-service/auth_proto"
 	"auth-service/config"
+	"auth-service/errors"
 	"auth-service/jwt"
 	usersRepositories "auth-service/users/repositories"
 	usersUsecases "auth-service/users/usecases"
@@ -39,7 +40,10 @@ func GRPCListen(server Server, cfg *config.Config) {
 
 }
 
-func (a *GRPCServer) Authorization(ctx context.Context, req *auth_proto.AuthorizationRequest) (*auth_proto.AuthorizationResponse, error) {
+func (a *GRPCServer) Authorization(
+	ctx context.Context,
+	req *auth_proto.AuthorizationRequest,
+) (*auth_proto.AuthorizationResponse, error) {
 	slog.Info("Recieving gRPC connection for authorization....")
 	// Extract the token and requiredRole from the request
 	token := req.GetToken()
@@ -50,9 +54,12 @@ func (a *GRPCServer) Authorization(ctx context.Context, req *auth_proto.Authoriz
 		slog.Error("Error while validating and extracting token: ",
 			slog.Any("error", err),
 		)
-		if err.StatusCode == 401 {
-			return &auth_proto.AuthorizationResponse{IsAuthorized: false}, nil
+		if er, ok := err.(*errors.RequestError); ok {
+			if er.StatusCode == 401 {
+				return &auth_proto.AuthorizationResponse{IsAuthorized: false}, nil
+			}
 		}
+
 		return nil, err
 	}
 
