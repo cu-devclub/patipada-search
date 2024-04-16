@@ -27,7 +27,7 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		return
 	}
 
-	// retrieve offset 
+	// retrieve offset
 	sOffSet := c.Query("offset")
 	offset := 0 // default to 0
 	if sOffSet != "" {
@@ -40,7 +40,6 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 			return
 		}
 	}
-
 
 	// retrieve amount
 	sAmount := c.Query("amount")
@@ -68,18 +67,20 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		searchStatus = constant.SEARCH_STATUS_DRAFTING
 	}
 
+	countNeeded := c.Query("countNeeded") == "true"
+
 	cfg := config.GetConfig()
 
 	if searchStatus == constant.SEARCH_STATUS_CONFIRM {
 		searchLogsPath := cfg.Static.SearchLogsConfirmPath
-		logging.WriteLogsToFile(cfg.Static.LogsPath, searchLogsPath, helper.SearchLogsMessage(handlerOpts.Time, query))
+		logging.WriteLogsToFile(cfg.Static.LogsPath, searchLogsPath, helper.SearchLogsMessage(handlerOpts.Time, query, offset, amount))
 	}
 
 	// monitor search
 	monitoring.MonitoringSearch(searchStatus)
 
 	// search for records
-	records, err := r.recordUsecase.Search("record", query, searchType, offset, amount)
+	records, err := r.recordUsecase.Search("record", query, searchType, offset, amount, countNeeded)
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
 			r.errorResponse(c, handlerOpts, er.StatusCode, er.Message, er.Error())
@@ -96,6 +97,7 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		Response: records,
 		OptionalResponse: &SearchRecordLogResponse{
 			Length: len(records.Results),
+			Amount: records.Amount,
 			Status: searchStatus,
 		},
 	}

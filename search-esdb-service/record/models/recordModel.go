@@ -25,6 +25,7 @@ type (
 	SearchRecordStruct struct {
 		Results []*Record `json:"results"`
 		Tokens  []string  `json:"tokens"`
+		Amount  int       `json:"amount"`
 	}
 )
 

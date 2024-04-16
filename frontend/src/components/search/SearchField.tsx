@@ -141,6 +141,7 @@ function SearchField({
           data: response.data,
           query: query,
           tokens: tokens,
+          numPages: response.numPages,
         };
 
         sessionStorage.setItem("response", JSON.stringify(searchResults));

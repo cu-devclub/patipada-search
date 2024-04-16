@@ -23,6 +23,7 @@ export interface SearchResultInterface {
   data: DataItem[];
   query: string;
   tokens: string[];
+  numPages: number;
 }
 
 export const mapResponseToDataItem = (data: any): DataItem => {

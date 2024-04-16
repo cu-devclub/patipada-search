@@ -23,7 +23,7 @@ func NewRecordUsecase(
 }
 
 func (r *recordUsecaseImpl) GetAllRecords(indexName string) ([]*models.Record, error) {
-	records, err := r.recordRepository.GetAllRecords(indexName)
+	records, _, err := r.recordRepository.GetAllRecords(indexName)
 	if err != nil {
 		return nil, err
 	}
