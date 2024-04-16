@@ -9,7 +9,6 @@ import {
   SEARCH_STATUS,
   SEARCH_TYPE,
   SearchResultItemsPerPage,
-  SearchResultPageNumbers,
   ToastStatus,
 } from "../../constant";
 import { searchService } from "../../service/search";
@@ -27,7 +26,7 @@ function SearchResultPage() {
   const [queryMessage, SetQueryMessage] = useState("");
   const [data, SetData] = useState<DataItem[]>([]);
   const [tokens, SetTokens] = useState<string[]>([]);
-
+  const [pageNums, SetPageNums] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchParams] = useSearchParams();
   const query = searchParams.get("search");
@@ -39,10 +38,15 @@ function SearchResultPage() {
       setCurrentPage(1);
       const responseData = sessionStorage.getItem("response");
       if (responseData != null) {
-        const { data, tokens }: Pick<SearchResultInterface, "data" | "tokens"> =
+        const {
+          data,
+          tokens,
+          numPages,
+        }: Pick<SearchResultInterface, "data" | "tokens" | "numPages"> =
           JSON.parse(responseData);
         SetData(data);
         SetTokens(tokens);
+        SetPageNums(numPages);
       }
     }
   }, [query]);
@@ -69,11 +73,13 @@ function SearchResultPage() {
         SEARCH_TYPE.DEFAULT,
         SEARCH_STATUS.CONFIRM,
         offset,
-        SearchResultItemsPerPage
+        SearchResultItemsPerPage,
+        false,
+        pageNums
       )
         .then((response: SearchResultInterface) => {
           SetData(response.data);
-          SetTokens(response.tokens);
+          window.scrollTo(0, 0);
         })
         .catch(() => {
           addToast({
@@ -117,7 +123,7 @@ function SearchResultPage() {
               <Pagination
                 current={currentPage}
                 pageSize={SearchResultItemsPerPage}
-                total={SearchResultPageNumbers * SearchResultItemsPerPage}
+                total={pageNums * SearchResultItemsPerPage}
                 onChange={(current) => changePage(current)}
                 paginationProps={{
                   display: "flex",
