@@ -9,16 +9,20 @@ import { SEARCH_STATUS, SEARCH_TYPE } from "../../constant";
  * @param {string} query - The search query string.
  * @param {string} searchType - Optional. The search type to use. Defaults to "tf_idf".
  * @param {string} searchStatus - Optional. The search status to use. Defaults to "draft".
+ * @param {number} offset - Optional. The offset of the search results. Defaults to 0.
+ * @param {number} amount - Optional. The limit of the search results. Defaults to 8.
  * @return {Promise<SearchResultInterface>} - A promise that resolves with the search results.
  */
 export const searchService = async (
   query: string,
   searchType: string = SEARCH_TYPE.DEFAULT,
-  searchStatus: string = SEARCH_STATUS.DEFAULT
+  searchStatus: string = SEARCH_STATUS.DEFAULT,
+  offset: number = 0,
+  amount: number = 8
 ): Promise<SearchResultInterface> => {
   try {
     const response = await axios.get(
-      `${searchURL}/search?query=${query}&searchType=${searchType}&searchStatus=${searchStatus}`
+      `${searchURL}/search?query=${query}&searchType=${searchType}&searchStatus=${searchStatus}&offset=${offset}&amount=${amount}`
     );
 
     const records: DataItem[] = response.data.results.map((item: DataItem) => {

@@ -18,7 +18,7 @@ import { useState } from "react";
 import { searchService } from "../../service/search";
 import { SearchResultInterface } from "../../models/qa";
 import { SEARCH_STATUS, SEARCH_TYPE } from "../../constant";
-
+import { MessageToast } from "../toast";
 interface SearchOptions {
   key: string;
   question: string;
@@ -62,12 +62,17 @@ interface SearchFieldProps {
   searchParam: string | null; // Define the searchParam prop
   setSearchParams: (searchParameter: string) => void;
   performSearch: (searchParameter: string) => void;
+  offset?: number;
+  amount?: number;
 }
 function SearchField({
   searchParam,
   setSearchParams,
   performSearch,
+  offset = 0,
+  amount = 8,
 }: SearchFieldProps) {
+  const { addToast } = MessageToast();
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState<SearchOptions[]>();
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
@@ -122,23 +127,32 @@ function SearchField({
     if (q) {
       query = q.question;
     }
-    const response = await searchService(
+
+    await searchService(
       query,
       SEARCH_TYPE.DEFAULT,
-      SEARCH_STATUS.CONFIRM
-    );
+      SEARCH_STATUS.CONFIRM,
+      offset,
+      amount
+    )
+      .then((response) => {
+        const tokens = [query, ...response.tokens];
+        const searchResults: SearchResultInterface = {
+          data: response.data,
+          query: query,
+          tokens: tokens,
+        };
 
-    const tokens = [query, ...response.tokens];
+        sessionStorage.setItem("response", JSON.stringify(searchResults));
 
-    const searchResults: SearchResultInterface = {
-      data: response.data,
-      query: query,
-      tokens: tokens,
-    };
-
-    sessionStorage.setItem("response", JSON.stringify(searchResults));
-
-    performSearch(query);
+        performSearch(query);
+      })
+      .catch(() => {
+        addToast({
+          description: "เกิดข้อผิดพลาดขณะทำการค้นหา",
+          status: "error",
+        });
+      });
   }
 
   return (

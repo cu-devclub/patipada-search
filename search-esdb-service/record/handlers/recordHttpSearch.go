@@ -27,9 +27,24 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		return
 	}
 
+	// retrieve offset 
+	sOffSet := c.Query("offset")
+	offset := 0 // default to 0
+	if sOffSet != "" {
+		var err error
+		offset, err = strconv.Atoi(sOffSet)
+		if err != nil {
+			r.errorResponse(c, handlerOpts, http.StatusBadRequest,
+				messages.BAD_REQUEST, messages.OFFSET_INSUFFICENT,
+			)
+			return
+		}
+	}
+
+
 	// retrieve amount
 	sAmount := c.Query("amount")
-	amount := 50 // default to 50 results
+	amount := 8 // default to 8 results (per page)
 	if sAmount != "" {
 		var err error
 		amount, err = strconv.Atoi(sAmount)
@@ -64,7 +79,7 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 	monitoring.MonitoringSearch(searchStatus)
 
 	// search for records
-	records, err := r.recordUsecase.Search("record", query, searchType, amount)
+	records, err := r.recordUsecase.Search("record", query, searchType, offset, amount)
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
 			r.errorResponse(c, handlerOpts, er.StatusCode, er.Message, er.Error())

@@ -43,37 +43,37 @@ func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) 
 }
 
 func (r *RecordESRepository) GetAllRecords(indexName string) ([]*entities.Record, error) {
-	return r.performSearch(indexName, 0, elasticQuery.BuildMatchAllQuery, nil)
+	return r.performSearch(indexName, 0, 0, elasticQuery.BuildMatchAllQuery, nil)
 }
 
-func (r *RecordESRepository) Search(indexName string, query interface{}, amount int) ([]*entities.Record, error) {
-	return r.performSearch(indexName, amount, elasticQuery.BuildElasticsearchQuery, query)
+func (r *RecordESRepository) Search(indexName string, query interface{}, offset, amount int) ([]*entities.Record, error) {
+	return r.performSearch(indexName, offset, amount, elasticQuery.BuildElasticsearchQuery, query)
 }
 
-func (r *RecordESRepository) VectorSearch(indexName string, query interface{}, amount int) ([]*entities.Record, error) {
-	return r.performSearch(indexName, amount, elasticQuery.BuildKNNQuery, query)
+func (r *RecordESRepository) VectorSearch(indexName string, query interface{}, offset, amount int) ([]*entities.Record, error) {
+	return r.performSearch(indexName, offset, amount, elasticQuery.BuildKNNQuery, query)
 }
 
-func (r *RecordESRepository) performSearch(indexName string, amount int, buildQueryFunc interface{}, query interface{}) ([]*entities.Record, error) {
+func (r *RecordESRepository) performSearch(indexName string, offset, amount int, buildQueryFunc interface{}, query interface{}) ([]*entities.Record, error) {
 	client := r.es
 
 	var queryJSON string
 	var err error
 
 	switch q := query.(type) {
-	case string:
-		queryFunc, ok := buildQueryFunc.(func(string) (string, error))
+	case string: // For keyword search
+		queryFunc, ok := buildQueryFunc.(func(string, int, int) (string, error))
 		if !ok {
 			return nil, errors.CreateError(500, "Invalid query builder function")
 		}
-		queryJSON, err = queryFunc(q)
-	case []float64:
-		queryFunc, ok := buildQueryFunc.(func([]float64, string) (string, error))
+		queryJSON, err = queryFunc(q, offset, amount)
+	case []float64: // For vector search
+		queryFunc, ok := buildQueryFunc.(func([]float64, string, int, int) (string, error))
 		if !ok {
 			return nil, errors.CreateError(500, "Invalid query builder function")
 		}
-		queryJSON, err = queryFunc(q, "question_lda")
-	case nil:
+		queryJSON, err = queryFunc(q, "question_lda", offset, amount)
+	case nil: // For match all query
 		queryFunc, ok := buildQueryFunc.(func() (string, error))
 		if !ok {
 			return nil, errors.CreateError(500, "Invalid query builder function")
@@ -92,7 +92,7 @@ func (r *RecordESRepository) performSearch(indexName string, amount int, buildQu
 		client.Search.WithContext(context.Background()),
 		client.Search.WithIndex(indexName),
 		client.Search.WithBody(strings.NewReader(string(queryJSON))),
-		client.Search.WithSize(amount),
+		// client.Search.WithSize(amount),
 	)
 	if err != nil {
 		return nil, errors.CreateError(500, fmt.Sprintf("Error getting response: %s", err))
