@@ -71,3 +71,7 @@ export const SEARCH_TYPE = {
 }
 
 export const RequestNotFoundMessage = "NOT FOUND"
+
+export const SearchResultPageNumbers = 20
+
+export const SearchResultItemsPerPage = 8

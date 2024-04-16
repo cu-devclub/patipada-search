@@ -5,6 +5,15 @@ import { SearchResultInterface, DataItem } from "../../models/qa";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Pagination from "@choc-ui/paginator";
+import {
+  SEARCH_STATUS,
+  SEARCH_TYPE,
+  SearchResultItemsPerPage,
+  SearchResultPageNumbers,
+  ToastStatus,
+} from "../../constant";
+import { searchService } from "../../service/search";
+import { MessageToast } from "../../components";
 
 /**
  * Render the search result page.
@@ -13,12 +22,13 @@ import Pagination from "@choc-ui/paginator";
  */
 function SearchResultPage() {
   const navigate = useNavigate();
+  const { addToast } = MessageToast();
+
   const [queryMessage, SetQueryMessage] = useState("");
   const [data, SetData] = useState<DataItem[]>([]);
   const [tokens, SetTokens] = useState<string[]>([]);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8; // Set the number of items per page here
   const [searchParams] = useSearchParams();
   const query = searchParams.get("search");
 
@@ -49,22 +59,30 @@ function SearchResultPage() {
   // --------------------------------------------
 
   // ------- Pagination  ----------------------
-  const changePage = (current: number | undefined) => {
+  const changePage = async (current: number | undefined) => {
     if (current) {
       setCurrentPage(current);
+      // fetch search service with new page
+      const offset = (current - 1) * SearchResultItemsPerPage;
+      await searchService(
+        query || "",
+        SEARCH_TYPE.DEFAULT,
+        SEARCH_STATUS.CONFIRM,
+        offset,
+        SearchResultItemsPerPage
+      )
+        .then((response: SearchResultInterface) => {
+          SetData(response.data);
+          SetTokens(response.tokens);
+        })
+        .catch(() => {
+          addToast({
+            description: "เกิดข้อผิดพลาดขณะทำการดึงข้อมูล",
+            status: ToastStatus.ERROR,
+          });
+        });
     }
   };
-
-  // Calculate the start and end index for the current page
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-
-  // Get the data for the current page
-  let currentPageData = data;
-  if (data != null) {
-    currentPageData = data.slice(startIndex, endIndex);
-  }
-  // --------------------------------------------
 
   return (
     <Grid
@@ -76,7 +94,7 @@ function SearchResultPage() {
       w="full"
       h="100svh"
     >
-      <GridItem pl="2" area={"header"} >
+      <GridItem pl="2" area={"header"}>
         {query && (
           <HeaderSearch
             query={query}
@@ -89,11 +107,7 @@ function SearchResultPage() {
       <GridItem pl="2" area={"main"}>
         {data != null && (
           <>
-            <SearchResults
-              data={currentPageData}
-              query={queryMessage}
-              tokens={tokens}
-            />
+            <SearchResults data={data} query={queryMessage} tokens={tokens} />
             <Flex
               w={{ base: "100%", md: "80%", xl: "70%" }}
               justifyContent={"center"}
@@ -102,8 +116,8 @@ function SearchResultPage() {
             >
               <Pagination
                 current={currentPage}
-                total={data.length}
-                pageSize={itemsPerPage}
+                pageSize={SearchResultItemsPerPage}
+                total={SearchResultPageNumbers * SearchResultItemsPerPage}
                 onChange={(current) => changePage(current)}
                 paginationProps={{
                   display: "flex",
@@ -115,12 +129,13 @@ function SearchResultPage() {
                 hoverStyles={{
                   bg: "gray.300",
                 }}
+                pageNeighbours={2}
               />
             </Flex>
           </>
         )}
       </GridItem>
-      <GridItem  area={"footer"} h="8xs" >
+      <GridItem area={"footer"} h="8xs">
         <Footer />
       </GridItem>
     </Grid>

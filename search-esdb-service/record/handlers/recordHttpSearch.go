@@ -8,6 +8,7 @@ import (
 	"search-esdb-service/logging"
 	"search-esdb-service/messages"
 	"search-esdb-service/monitoring"
+	"search-esdb-service/record/helper"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -26,9 +27,24 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 		return
 	}
 
+	// retrieve offset 
+	sOffSet := c.Query("offset")
+	offset := 0 // default to 0
+	if sOffSet != "" {
+		var err error
+		offset, err = strconv.Atoi(sOffSet)
+		if err != nil {
+			r.errorResponse(c, handlerOpts, http.StatusBadRequest,
+				messages.BAD_REQUEST, messages.OFFSET_INSUFFICENT,
+			)
+			return
+		}
+	}
+
+
 	// retrieve amount
 	sAmount := c.Query("amount")
-	amount := 50 // default to 50 results
+	amount := 8 // default to 8 results (per page)
 	if sAmount != "" {
 		var err error
 		amount, err = strconv.Atoi(sAmount)
@@ -53,18 +69,17 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 	}
 
 	cfg := config.GetConfig()
-	searchLogsPath := cfg.Static.SearchLogsDraftPath
-	if searchStatus == constant.SEARCH_STATUS_CONFIRM {
-		searchLogsPath = cfg.Static.SearchLogsConfirmPath
-	}
 
-	logging.WriteLogsToFile(cfg.Static.LogsPath, searchLogsPath, "Search: "+query)
+	if searchStatus == constant.SEARCH_STATUS_CONFIRM {
+		searchLogsPath := cfg.Static.SearchLogsConfirmPath
+		logging.WriteLogsToFile(cfg.Static.LogsPath, searchLogsPath, helper.SearchLogsMessage(handlerOpts.Time, query))
+	}
 
 	// monitor search
 	monitoring.MonitoringSearch(searchStatus)
 
 	// search for records
-	records, err := r.recordUsecase.Search("record", query, searchType, amount)
+	records, err := r.recordUsecase.Search("record", query, searchType, offset, amount)
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
 			r.errorResponse(c, handlerOpts, er.StatusCode, er.Message, er.Error())

@@ -1,4 +1,5 @@
-import { Text, Flex } from "@chakra-ui/react";
+import { Text, Flex, Link } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useState } from "react";
 import { InformModal, BaseModal } from "../../modal";
 import { RatingForm } from "../../rating";
@@ -15,7 +16,35 @@ function Footer() {
       );
     } else if (state == "about") {
       setModalBody(
-        "ระบบการค้นหาคำถาม คำตอบ จัดทำโดย นายวาริส หลักทอง 6334460723 ภาควิชาคณิตศาสตร์และวิทยาการคอมพิวเตอร์ คณะวิทยาศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย"
+        <Flex w="full" h="full" direction="column" gap={4}>
+          <Text>
+            ระบบการค้นหาคำถาม คำตอบจากคลิปวิดีโอใน{" "}
+            <Link
+              href="https://youtube.com/@DHAMMANAVA"
+              isExternal
+              color="blue"
+            >
+              <Text as="u">
+                Dhammanava Youtube Channel <ExternalLinkIcon mx="2px" />
+              </Text>
+            </Link>{" "}
+            จัดทำโดย นายวาริส หลักทอง 6334460723
+            ภาควิชาคณิตศาสตร์และวิทยาการคอมพิวเตอร์ คณะวิทยาศาสตร์
+            จุฬาลงกรณ์มหาวิทยาลัย
+          </Text>
+          <Text>
+            ศึกษาธรรมเพิ่มเติมได้ที่{" "}
+            <Link
+              href="https://youtube.com/@DHAMMANAVA"
+              isExternal
+              color="blue"
+            >
+              <Text as="u">
+                Dhammanava Youtube Channel <ExternalLinkIcon mx="2px" />
+              </Text>
+            </Link>
+          </Text>
+        </Flex>
       );
     } else if (state == "recommend") {
       setModalBody(<RatingForm closeModal={() => setopenModal(false)} />);
@@ -30,10 +59,10 @@ function Footer() {
       h="100%"
       bg="brand_gray.400"
       direction="row"
-      justify={{ md: "space-between",  base: "center" }}
+      justify={{ md: "space-between", base: "center" }}
       align="center"
       px="4"
-      pb={{base: 2, md:0}}
+      pb={{ base: 2, md: 0 }}
       gap={4}
       fontSize={{ md: "lg", base: "sm" }}
       flexWrap={"wrap"}

@@ -24,9 +24,9 @@ type RecordRepository interface {
 	// Returns:
 	// - []*entities.Record: A slice of records found in the index that match the query.
 	// - error: An error if any occurred during the search operation.
-	Search(indexName string, query interface{}, amount int) ([]*entities.Record, error)
+	Search(indexName string, query interface{}, offset, amount int) ([]*entities.Record, error)
 
-	VectorSearch(indexName string, query interface{}, amount int) ([]*entities.Record, error)
+	VectorSearch(indexName string, query interface{}, offset, amount int) ([]*entities.Record, error)
 
 	Tokenize(query string) ([]string, error)
 
