@@ -82,6 +82,12 @@ down_search:
 	docker compose -f docker-compose.dev.yml down search-service
 	@echo "Search service stopped!"
 
+## search_dev_environments: start search service dependencies services
+search_dev_environments:
+	@echo "Starting search service dependencies services..."
+	docker compose -f docker-compose.dev.yml up -d elastic-db rabbitmq
+	@echo "Search service dependencies services started!"
+
 ## empty_elastic: stops elastic-db (if running), remove volumes, starts elastic-db
 ## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
 empty_elastic:

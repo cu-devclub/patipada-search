@@ -35,7 +35,6 @@ type (
 		LDAPath               string
 		StopwordPath          string
 		LogsPath              string
-		SearchLogsDraftPath   string
 		SearchLogsConfirmPath string
 	}
 )
@@ -75,8 +74,7 @@ func ReadConfig() {
 			LDAPath:               viper.GetString("LDA_DATA_PATH"),
 			StopwordPath:          viper.GetString("STOPWORD_PATH"),
 			LogsPath:              viper.GetString("LOGS_PATH"),
-			SearchLogsDraftPath:   viper.GetString("SEARCH_LOG_DRAFT_PATH"),
-			SearchLogsConfirmPath: viper.GetString("SEARCH_LOG_CONFIRM_PATH"),
+			SearchLogsConfirmPath: viper.GetString("SEARCH_LOG_CONFIRM_PATH_V2"),
 		},
 	}
 }

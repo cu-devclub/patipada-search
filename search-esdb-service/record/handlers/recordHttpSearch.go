@@ -8,6 +8,7 @@ import (
 	"search-esdb-service/logging"
 	"search-esdb-service/messages"
 	"search-esdb-service/monitoring"
+	"search-esdb-service/record/helper"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -53,12 +54,11 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 	}
 
 	cfg := config.GetConfig()
-	searchLogsPath := cfg.Static.SearchLogsDraftPath
-	if searchStatus == constant.SEARCH_STATUS_CONFIRM {
-		searchLogsPath = cfg.Static.SearchLogsConfirmPath
-	}
 
-	logging.WriteLogsToFile(cfg.Static.LogsPath, searchLogsPath, "Search: "+query)
+	if searchStatus == constant.SEARCH_STATUS_CONFIRM {
+		searchLogsPath := cfg.Static.SearchLogsConfirmPath
+		logging.WriteLogsToFile(cfg.Static.LogsPath, searchLogsPath, helper.SearchLogsMessage(handlerOpts.Time, query))
+	}
 
 	// monitor search
 	monitoring.MonitoringSearch(searchStatus)
