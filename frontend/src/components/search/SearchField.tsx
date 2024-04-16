@@ -30,7 +30,7 @@ interface SearchOptions {
  * @param {any} term - The term to filter the results.
  * @return {Promise<SearchOptions[]>} The filtered results.
  */
-async function filterResults(term:string) {
+async function filterResults(term: string) {
   let data: SearchOptions[] = [];
   try {
     const response = await searchService(term);
@@ -110,7 +110,7 @@ function SearchField({
    * @return {Promise<void>} A promise that resolves when the function completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function onSelectInputHandle(evt:any) {
+  async function onSelectInputHandle(evt: any) {
     let query = evt.item.value;
 
     // Check if the query is an option key (user selected from options)
@@ -122,7 +122,11 @@ function SearchField({
     if (q) {
       query = q.question;
     }
-    const response = await searchService(query,SEARCH_TYPE.DEFAULT,SEARCH_STATUS.CONFIRM);
+    const response = await searchService(
+      query,
+      SEARCH_TYPE.DEFAULT,
+      SEARCH_STATUS.CONFIRM
+    );
 
     const tokens = [query, ...response.tokens];
 
@@ -138,7 +142,7 @@ function SearchField({
   }
 
   return (
-    <FormControl w={{ base: "90%", lg: "50%" }} fontWeight="light">
+    <FormControl w={{ base: "70%", lg: "50%" }} fontWeight="light">
       <AutoComplete
         emptyState={<Text textAlign="center">ค้นหาเลย</Text>}
         openOnFocus
@@ -185,6 +189,7 @@ function SearchField({
               textTransform="capitalize"
               h={["50", "70", "90"]}
               fontSize={["md", "lg", "xl"]}
+              w={{ base: "80%", lg: "90%" }}
             >
               <Flex alignItems="center">
                 <SearchIcon color="gray.500" boxSize={6} mr={4} />
@@ -209,6 +214,7 @@ function SearchField({
                   textTransform="capitalize"
                   h={["50", "70", "90"]}
                   fontSize={["md", "lg", "xl"]}
+                  w="80%"
                 >
                   <Flex alignItems="center">
                     <SearchIcon color="gray.500" boxSize={6} mr={4} />
