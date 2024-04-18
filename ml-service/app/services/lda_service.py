@@ -5,8 +5,8 @@ from app.services.tokenize_service import TokenizeService
 import pickle
 
 class LDAServerice:
-    id2word = pickle.load(open(f'model\id2word.pkl', 'rb'))
-    lda_model = pickle.load(open(f'model\LDA_model.pkl', 'rb'))
+    id2word = pickle.load(open(f'model/id2word.pkl', 'rb'))
+    lda_model = pickle.load(open(f'model/LDA_model.pkl', 'rb'))
 
     @staticmethod
 
