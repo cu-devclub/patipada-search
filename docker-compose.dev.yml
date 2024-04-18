@@ -27,6 +27,22 @@ services:
       loggin_jobname: "containerlogs"
     networks:
       - dhammanava_network
+  
+  ml-gateway-service:
+    container_name: ml-gateway-container
+    image: ${DOCKERHUB_USERNAME}/dhammanava-ml-gateway-image
+    build:
+      context: ./ml-gateway-service
+    restart: always
+    ports:
+      - 8085:8085
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
+    volumes:
+      - ./ml-data:/app/ml-data
+    networks:
+      - dhammanava_network
 
   # ml-service:
   #   container_name: ml-container

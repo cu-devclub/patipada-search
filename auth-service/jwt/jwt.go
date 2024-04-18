@@ -36,7 +36,9 @@ func CreateToken(username, role string) (string, error) {
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
 		},
 	}
-	secretKey := config.GetConfig().App.JWTKey
+
+	cfg := config.GetConfig()
+	secretKey := cfg.App.JWTKey
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(secretKey))
@@ -44,7 +46,7 @@ func CreateToken(username, role string) (string, error) {
 
 // ValidateAndExtractClaims validates the JWT token in the Authorization header
 // and extracts the claims.
-func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, *errors.RequestError) {
+func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, error) {
 	tokenString := c.Request().Header.Get("Authorization")
 	if tokenString == "" {
 		return nil, errors.CreateError(http.StatusBadRequest, messages.MISSING_AUTHORIZATION)
@@ -58,7 +60,7 @@ func ValidateAndExtractClaims(c echo.Context) (*CustomClaims, *errors.RequestErr
 	return claims, nil
 }
 
-func ValidateAndExtractToken(tokenString string) (*CustomClaims, *errors.RequestError) {
+func ValidateAndExtractToken(tokenString string) (*CustomClaims, error) {
 	secretKey := config.GetConfig().App.JWTKey
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil

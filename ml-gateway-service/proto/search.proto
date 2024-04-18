@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "/proto";
+
+service SearchService {
+    rpc Search(SearchRequest) returns (SearchResponse);
+}
+
+message SearchRequest {
+    string text = 1;
+}
+
+message Result {
+    string name = 1;
+    repeated float value = 2;
+    float score = 3;
+}
+
+message SearchResponse {
+    repeated Result results = 2;
+}
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative search.proto

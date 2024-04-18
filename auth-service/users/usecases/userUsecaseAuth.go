@@ -47,7 +47,7 @@ func (u *UsersUsecaseImpl) Authentication(in *models.LoginDto) (string, string, 
 	return token, user.Role, nil
 }
 
-//* Also called by GRPC
+// * Also called by GRPC
 // Authorize to verify the user authorization
 // Header - Authorization : <token>
 //

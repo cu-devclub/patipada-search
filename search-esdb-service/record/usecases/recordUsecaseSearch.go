@@ -10,19 +10,20 @@ import (
 	"strings"
 )
 
-func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount int) (*models.SearchRecordStruct, error) {
+func (r *recordUsecaseImpl) Search(indexName, query, searchType string, offset, amount int, countNeeded bool) (*models.SearchRecordStruct, error) {
 
 	var records []*entities.Record
 	var tokens []string
+	var count int
 	var err error
 
 	switch searchType {
 	case constant.SEARCH_BY_TF_IDF:
-		records, tokens, err = r.internalSearch(indexName, query, amount)
+		records, tokens, count, err = r.internalSearch(indexName, query, offset, amount, countNeeded)
 	case constant.SEARCH_BY_LDA:
-		records, tokens, err = r.externalSearch(indexName, query, amount)
+		records, tokens, err = r.externalSearch(indexName, query, offset, amount)
 	default:
-		records, tokens, err = r.internalSearch(indexName, query, amount)
+		records, tokens, count, err = r.internalSearch(indexName, query, offset, amount, countNeeded)
 	}
 
 	if err != nil {
@@ -38,29 +39,30 @@ func (r *recordUsecaseImpl) Search(indexName, query, searchType string, amount i
 	response := &models.SearchRecordStruct{
 		Results: responseRecords,
 		Tokens:  tokens,
+		Amount:  count,
 	}
 	return response, nil
 }
 
-func (r *recordUsecaseImpl) internalSearch(indexName, query string, amount int) ([]*entities.Record, []string, error) {
+func (r *recordUsecaseImpl) internalSearch(indexName, query string, offset, amount int, countNeeded bool) ([]*entities.Record, []string, int, error) {
 	// working (tokenize, tf-idf) with only elastic
 	tokens, err := r.recordRepository.Tokenize(query)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, 0, err
 	}
 
 	pureTokens := util.RemoveSliceFromArrays(tokens, data.GetStopWord())
 	searchQuery := strings.Join(pureTokens, "")
 
-	records, err := r.recordRepository.Search(indexName, searchQuery, amount)
+	records, count, err := r.recordRepository.Search(indexName, searchQuery, offset, amount, countNeeded)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, 0, err
 	}
 
-	return records, pureTokens, nil
+	return records, pureTokens, count, nil
 }
 
-func (r *recordUsecaseImpl) externalSearch(indexName, query string, amount int) ([]*entities.Record, []string, error) {
+func (r *recordUsecaseImpl) externalSearch(indexName, query string, offset, amount int) ([]*entities.Record, []string, error) {
 	// working (tokenize, lda,...) with external service
 	// TODO : make 1 service call for all tokenize, remove keyword and lda
 	tokens, err := r.mlRepository.TokenizeQuery(query)
@@ -69,13 +71,14 @@ func (r *recordUsecaseImpl) externalSearch(indexName, query string, amount int) 
 	}
 
 	pureTokens := util.RemoveSliceFromArrays(tokens, data.GetStopWord())
-	
+
 	searchQuery, err := r.mlRepository.PerformLDATopicModelling(pureTokens)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	records, err := r.recordRepository.VectorSearch(indexName, searchQuery, amount)
+	// TODO : Update this when implementing vector search
+	records, _, err := r.recordRepository.VectorSearch(indexName, searchQuery, offset, amount, false)
 	if err != nil {
 		return nil, nil, err
 	}
