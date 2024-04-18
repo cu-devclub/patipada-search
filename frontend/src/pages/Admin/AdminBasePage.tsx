@@ -35,7 +35,7 @@ export const AdminBasePage: React.FC<AdminBasePageProps> = ({
       <GridItem area={"nav"}>
         <AdminSidebar activePage={activePage} />
       </GridItem>
-      <GridItem pl="2" area={"main"}>
+      <GridItem area={"main"}>
         {children}
       </GridItem>
       <GridItem area={"footer"}>

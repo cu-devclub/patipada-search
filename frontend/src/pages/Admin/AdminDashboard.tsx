@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Role, ToastStatus } from "../../constant";
 import { AdminBasePage } from "./AdminBasePage";
-import { Box, StatGroup } from "@chakra-ui/react";
+import { Grid, GridItem } from "@chakra-ui/react";
 import { RatingStat, RecordStat, RequestStat, Userstat } from "../../components/stat";
 import { AuthSummary, User } from "../../models/user";
 import { getAllUsersService } from "../../service/user";
@@ -125,18 +125,35 @@ function AdminDashboard() {
 
   return (
     <AdminBasePage activePage="Dashboard">
-      <Box mt={8}>
-        <RatingStat
-          label="คะแนนเฉลี่ย"
-          value={averageRating.average_stars}
-          helper={`จำนวนคะแนนทั้งหมด ${averageRating.total_ratings} คะแนน`}
-        />
-      </Box>
-      <StatGroup pt={8}>
-        <Userstat authSummary={authSummary} />
-        <RecordStat recordSummary={recordSummary} />
-        <RequestStat requestSummary={requestSummary} />
-      </StatGroup>
+      <Grid
+        templateAreas={`'user rating rating'
+                        'user record request'`}
+        gridTemplateRows={'1fr 1fr'}
+        gridTemplateColumns={'3fr 2fr 2fr'}
+        h='full'
+        w='full'
+        gap={8}
+        paddingTop={4}
+        paddingLeft={16}
+        paddingRight={16}
+        paddingBottom={16}>
+        <GridItem area={'user'}>
+          <Userstat authSummary={authSummary} />
+        </GridItem>
+        <GridItem area={'rating'}>
+          <RatingStat
+            label="คะแนนเฉลี่ย"
+            value={averageRating.average_stars}
+            helper={`จำนวนผู้ลงคะแนนทั้งหมด ${averageRating.total_ratings} คน`}
+          />
+        </GridItem>
+        <GridItem area={'record'}>
+          <RecordStat recordSummary={recordSummary} />
+        </GridItem>
+        <GridItem area={'request'}>
+          <RequestStat requestSummary={requestSummary} />
+        </GridItem>
+      </Grid>
     </AdminBasePage>
   );
 }

@@ -1,17 +1,19 @@
 import { RecordSummary } from "../../models/qa";
 import BaseStat from "./BaseStat";
-import { HStack, Text } from "@chakra-ui/react";
+import { Box, HStack, Text } from "@chakra-ui/react";
 interface RecordStatProps {
   recordSummary: RecordSummary;
 }
 function RecordStat({ recordSummary }: RecordStatProps) {
   return (
-    <BaseStat label={"Total Record"} value={recordSummary.recordAmount}>
-      <HStack>
-        <Text>#Youtube Clip</Text>
-        <Text> {recordSummary.youtubeClipAmount}</Text>
-      </HStack>
-    </BaseStat>
+    <Box bg='#D9D9D9' p={5} h="full" >
+      <BaseStat label={"Total Record"} value={recordSummary.recordAmount}>
+        <HStack justify="center" p={2}>
+          <Text>#Youtube Clip</Text>
+          <Text> {recordSummary.youtubeClipAmount}</Text>
+        </HStack>
+      </BaseStat>
+    </Box>
   );
 }
 
