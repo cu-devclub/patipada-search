@@ -13,7 +13,7 @@ export interface Request {
   createdAt: string;
   updatedAt: string;
   by: string;
-  approved_by: string;
+  approvedBy: string;
 }
 
 export interface InsertRequestModels {
@@ -24,6 +24,12 @@ export interface InsertRequestModels {
   endTime: string;
   youtubeURL: string;
   by: string;
+}
+
+export interface RequestSummary {
+  requestAmount: number;
+  pendingAmount: number;
+  reviewedAmount: number;
 }
 
 export const mapRequestToInsertRequestModels = (
@@ -64,7 +70,7 @@ export const mapDataItemToRequest = (data: DataItem): Request => {
     createdAt: "",
     updatedAt: "",
     by: "",
-    approved_by: "",
+    approvedBy: "",
   };
 };
 
@@ -72,7 +78,7 @@ export const mapDataItemToRequest = (data: DataItem): Request => {
 export const mapResponseToRequest = (data: any): Request => {
   return {
     id: data.id,
-    requestID: data.request_id,
+    requestID: data.requestID,
     index: data.index,
     question: decodeHTMLText(data.question),
     answer: decodeHTMLText(data.answer),
@@ -80,10 +86,10 @@ export const mapResponseToRequest = (data: any): Request => {
     endTime: decodeHTMLText(data.endTime),
     youtubeURL: data.youtubeURL,
     status: data.status,
-    createdAt: data.created_at,
-    updatedAt: data.updated_at,
+    createdAt: data.createdAt,
+    updatedAt: data.updatedAt,
     by: data.by,
-    approved_by: data.approved_by,
+    approvedBy: data.approvedBy,
   };
 };
 
@@ -101,5 +107,5 @@ export const mockData: Request = {
   createdAt: "2021-06-01T00:00:00.000Z",
   updatedAt: "2021-06-01T00:00:00.000Z",
   by: "1",
-  approved_by: "1",
+  approvedBy: "1",
 };

@@ -6,7 +6,7 @@ import (
 	"data-management/event"
 	"encoding/json"
 	"fmt"
-	"log"
+	"log/slog"
 	"math"
 	"time"
 
@@ -19,6 +19,14 @@ type RabbitMQStruct struct {
 	rabbitconfig *config.RabbitMQ
 }
 
+func MockRabbitMQ() *RabbitMQStruct {
+	return &RabbitMQStruct{
+		Conn:         nil,
+		Emitter:      nil,
+		rabbitconfig: nil,
+	}
+}
+
 func ConnectToRabbitMQ(cfg *config.Config) (*RabbitMQStruct, error) {
 	var counts int64
 	var backOff = 1 * time.Second
@@ -28,12 +36,11 @@ func ConnectToRabbitMQ(cfg *config.Config) (*RabbitMQStruct, error) {
 		cfg.RabbitMQ.Password,
 		cfg.RabbitMQ.URL,
 	)
-	log.Println("Rabbit MQ connection URL:", connectionURL)
 	// don't continue until we have a connection
 	for {
 		c, err := amqp.Dial(connectionURL)
 		if err != nil {
-			fmt.Println("Rabbit MQ is not ready yet....")
+			slog.Warn("Rabbit MQ is not ready yet....")
 			counts++
 		} else {
 			connection = c
@@ -41,8 +48,8 @@ func ConnectToRabbitMQ(cfg *config.Config) (*RabbitMQStruct, error) {
 		}
 
 		if counts > 5 {
-			fmt.Println("Rabbit MQ is not ready, giving up....", err)
-			return nil, err
+			slog.Warn("Rabbit MQ is not ready, giving up....", err)
+			return nil, nil
 		}
 
 		backOff = time.Duration(math.Pow(float64(counts), 2)) * time.Second
@@ -68,7 +75,6 @@ type RabbitMQPayload struct {
 }
 
 func (c *CommunicationImpl) PublishUpdateRecordsToRabbitMQ(payloadName string, message interface{}) error {
-	log.Println("Emitting to RabbitMQ with message", message)
 	// convert message to payload json string
 	payload := RabbitMQPayload{
 		Name: payloadName,
@@ -79,6 +85,5 @@ func (c *CommunicationImpl) PublishUpdateRecordsToRabbitMQ(payloadName string, m
 	if err != nil {
 		return err
 	}
-	log.Println("Emitted to RabbitMQ!!!!")
 	return nil
 }

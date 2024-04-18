@@ -16,7 +16,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/esutil"
 )
 
-func (r *RecordESRepository) BulkInsert(qars []*entities.Record) *errors.RequestError {
+func (r *RecordESRepository) BulkInsert(qars []*entities.Record) error {
 	es := r.es
 	var countSuccessful uint64
 	bi, err := esutil.NewBulkIndexer(esutil.BulkIndexerConfig{
@@ -85,7 +85,7 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) *errors.Request
 
 	// Report the results: number of indexed docs, number of errors, duration, indexing rate
 	//
-	log.Println(strings.Repeat("▔", 65))
+	fmt.Println(strings.Repeat("▔", 65))
 
 	dur := time.Since(start)
 

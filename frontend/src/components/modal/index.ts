@@ -1,3 +1,5 @@
 import InformModal from "./InformModal";
 import ActionModal from "./ActionModal";
-export { InformModal, ActionModal };
+import AddUserModal from "./AddUserModal";
+import BaseModal from "./BaseModal";
+export { InformModal, ActionModal, AddUserModal, BaseModal };

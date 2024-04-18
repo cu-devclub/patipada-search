@@ -1,16 +1,24 @@
-import {login} from "./login.ts";
-import {register} from "./register.ts";
-import { forgetPassword } from "./forgetPassword.ts";
-import { verifyResetPasswordToken,resetPassword } from "./resetPassword.ts";
-import { changePassword } from "./changePassword.ts";
-import { verifyToken, authorize } from "./token.ts";
+import { loginService } from "./login.ts";
+import { registerService } from "./register.ts";
+import { forgetPasswordService } from "./forgetPassword.ts";
+import {
+  verifyResetPasswordTokenService,
+  resetPasswordService,
+} from "./resetPassword.ts";
+import { changePasswordService } from "./changePassword.ts";
+import { verifyTokenService, authorizeService } from "./token.ts";
+import { removeUserService } from "./removeUser.ts";
+import { getAllUsersService } from "./getUser.ts";
+
 export {
-  login,
-  register,
-  forgetPassword,
-  verifyResetPasswordToken,
-  resetPassword,
-  changePassword,
-  verifyToken,
-  authorize,
+  loginService,
+  registerService,
+  forgetPasswordService,
+  verifyResetPasswordTokenService,
+  resetPasswordService,
+  changePasswordService,
+  verifyTokenService,
+  authorizeService,
+  removeUserService,
+  getAllUsersService,
 };

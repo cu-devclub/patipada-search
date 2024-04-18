@@ -75,7 +75,6 @@ export default function RegisterForm({
 
   const passwordErrorMessage = "รหัสผ่านต้องมีความยาวมากกว่า 8 ตัวอักษร";
 
-
   const submitForm = () => {
     SetsubmitCount(submitCount + 1);
     if (

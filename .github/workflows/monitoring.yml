@@ -1,0 +1,19 @@
+name: -Service- Monitoring (Grafana Loki Promtail Prometheus)
+on: workflow_dispatch
+jobs:
+  deploy-monitoring-service:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to Ubuntu server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{secrets.LINUX_HOST}}
+          username: ${{secrets.LINUX_USERNAME}}
+          key: ${{ secrets.LINUX_PRIVATE_KEY }}
+          script: |
+            cd dhammanava-search
+            docker compose -f docker-compose.prod.yml up -d loki promtail grafana prometheus

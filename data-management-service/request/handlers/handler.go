@@ -1,6 +1,46 @@
 package handlers
 
-import "github.com/gin-gonic/gin"
+import (
+	"log/slog"
+	"time"
+
+	"github.com/gin-gonic/gin"
+)
+
+type HandlerOpts struct {
+	Name      string `json:"name"`
+	Method    string `json:"method"`
+	Params    any    `json:"params"`
+	Time      string `json:"time"`
+	RemoteIP  string `json:"remote_ip"`
+	Host      string `json:"host"`
+	UserAgent string `json:"user_agent"`
+}
+
+func NewHandlerOpts(c *gin.Context) *HandlerOpts {
+	start := time.Now()
+	return &HandlerOpts{
+		Name:      c.Request.URL.Path,
+		Method:    c.Request.Method,
+		Params:    nil,
+		Time:      start.Format(time.RFC3339Nano),
+		RemoteIP:  c.Request.RemoteAddr,
+		Host:      c.Request.Host,
+		UserAgent: c.Request.UserAgent(),
+	}
+}
+
+func (h HandlerOpts) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("name", h.Name),
+		slog.String("method", h.Method),
+		slog.Any("params", h.Params),
+		slog.String("time", h.Time),
+		slog.String("remote_ip", h.RemoteIP),
+		slog.String("host", h.Host),
+		slog.String("user_agent", h.UserAgent),
+	)
+}
 
 type Handlers interface {
 	// InsertRequest is a HTTP handler function that inserts a new Request into the database.
@@ -79,14 +119,20 @@ type Handlers interface {
 	GetRequest(c *gin.Context)
 
 	// GetLastestRequestOfRecord is a handler function for the GET /request/latest endpoint.
-	// Query Parameters: 
+	// Query Parameters:
 	// 	- index: The index of the record.
 	// It retrieves the latest request of a record based on the provided index query parameter.
 	// The function responds with a JSON object that includes the latest request.
 	// If an error occurs during the operation, the function responds with a JSON object that includes the error message and status code.
-	// 
+	//
 	// Possible error status codes are
 	// 		400 (Bad Request) and
 	// 		500 (Internal Server Error).
 	GetLastestRequestOfRecord(c *gin.Context)
+
+	GetSummary(c *gin.Context)
+
+	SyncRequestRecord(c *gin.Context)
+
+	SyncAllRequestRecords(c *gin.Context)
 }

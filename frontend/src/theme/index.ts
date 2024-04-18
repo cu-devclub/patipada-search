@@ -2,13 +2,13 @@ import { extendTheme } from "@chakra-ui/react";
 import component from "./component";
 const font = {
   fonts: {
-    heading: `'Mitr', sans-serif`,
-    body: `'Mitr', sans-serif`,
-    mono: `Mitr`,
+    heading: `'sarabun', sans-serif`,
+    body: `'sarabun', sans-serif`,
+    mono: `sarabun`,
   },
   fontSizes: {
-    "15xl" : "15rem",
-  }
+    "15xl": "15rem",
+  },
 };
 
 const size = {

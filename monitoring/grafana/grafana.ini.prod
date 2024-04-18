@@ -1,0 +1,3 @@
+[server]
+root_url = https://search.dhammanava.net/grafana
+serve_from_sub_path = true

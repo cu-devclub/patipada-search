@@ -15,9 +15,10 @@ import {
 } from "@choc-ui/chakra-autocomplete";
 import { SearchIcon } from "@chakra-ui/icons";
 import { useState } from "react";
-import { search } from "../../service/search";
+import { searchService } from "../../service/search";
 import { SearchResultInterface } from "../../models/qa";
-
+import { SEARCH_STATUS, SEARCH_TYPE, SearchResultItemsPerPage } from "../../constant";
+import { MessageToast } from "../toast";
 interface SearchOptions {
   key: string;
   question: string;
@@ -29,10 +30,10 @@ interface SearchOptions {
  * @param {any} term - The term to filter the results.
  * @return {Promise<SearchOptions[]>} The filtered results.
  */
-async function filterResults(term:string) {
+async function filterResults(term: string) {
   let data: SearchOptions[] = [];
   try {
-    const response = await search(term);
+    const response = await searchService(term);
     if (response) {
       data = response.data.map((item) => ({
         key: item.index,
@@ -61,12 +62,17 @@ interface SearchFieldProps {
   searchParam: string | null; // Define the searchParam prop
   setSearchParams: (searchParameter: string) => void;
   performSearch: (searchParameter: string) => void;
+  offset?: number;
+  amount?: number;
 }
 function SearchField({
   searchParam,
   setSearchParams,
   performSearch,
+  offset = 0,
+  amount = SearchResultItemsPerPage,
 }: SearchFieldProps) {
+  const { addToast } = MessageToast();
   const [isLoading, setIsLoading] = useState(false);
   const [options, setOptions] = useState<SearchOptions[]>();
   const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(
@@ -109,7 +115,7 @@ function SearchField({
    * @return {Promise<void>} A promise that resolves when the function completes.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function onSelectInputHandle(evt:any) {
+  async function onSelectInputHandle(evt: any) {
     let query = evt.item.value;
 
     // Check if the query is an option key (user selected from options)
@@ -121,23 +127,37 @@ function SearchField({
     if (q) {
       query = q.question;
     }
-    const response = await search(query);
 
-    const tokens = [query, ...response.tokens];
+    await searchService(
+      query,
+      SEARCH_TYPE.DEFAULT,
+      SEARCH_STATUS.CONFIRM,
+      offset,
+      amount
+    )
+      .then((response) => {
+        const tokens = [query, ...response.tokens];
+        const searchResults: SearchResultInterface = {
+          data: response.data,
+          query: query,
+          tokens: tokens,
+          numPages: response.numPages,
+        };
 
-    const searchResults: SearchResultInterface = {
-      data: response.data,
-      query: query,
-      tokens: tokens,
-    };
+        sessionStorage.setItem("response", JSON.stringify(searchResults));
 
-    sessionStorage.setItem("response", JSON.stringify(searchResults));
-
-    performSearch(query);
+        performSearch(query);
+      })
+      .catch(() => {
+        addToast({
+          description: "เกิดข้อผิดพลาดขณะทำการค้นหา",
+          status: "error",
+        });
+      });
   }
 
   return (
-    <FormControl w={{ base: "90%", lg: "50%" }} fontWeight="light">
+    <FormControl w={{ base: "70%", lg: "50%" }} fontWeight="light">
       <AutoComplete
         emptyState={<Text textAlign="center">ค้นหาเลย</Text>}
         openOnFocus
@@ -151,6 +171,12 @@ function SearchField({
           </InputLeftElement>
           <AutoCompleteInput
             onChange={onChangeInputHandler}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onKeyDown={(e: any) => {
+              if (e.key === "Enter") {
+                onSelectInputHandle(e);
+              }
+            }}
             variant="search_bar"
             value={searchParam || ""}
             placeholder="ค้นหาเลย"
@@ -178,6 +204,7 @@ function SearchField({
               textTransform="capitalize"
               h={["50", "70", "90"]}
               fontSize={["md", "lg", "xl"]}
+              w={{ base: "80%", lg: "90%" }}
             >
               <Flex alignItems="center">
                 <SearchIcon color="gray.500" boxSize={6} mr={4} />
@@ -202,6 +229,7 @@ function SearchField({
                   textTransform="capitalize"
                   h={["50", "70", "90"]}
                   fontSize={["md", "lg", "xl"]}
+                  w="80%"
                 >
                   <Flex alignItems="center">
                     <SearchIcon color="gray.500" boxSize={6} mr={4} />

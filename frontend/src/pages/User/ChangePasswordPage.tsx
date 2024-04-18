@@ -3,7 +3,7 @@ import { Text, Heading } from "@chakra-ui/react";
 import { MessageToast } from "../../components";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { changePassword } from "../../service/user";
+import { changePasswordService } from "../../service/user";
 import { ReturnError } from "../../service/error";
 import { getCookie } from "typescript-cookie";
 import { UserBasePage } from "./UserBasePage";
@@ -16,7 +16,7 @@ function ChangePasswordPage() {
 
   const submit = async (oldPassword: string, newPassword: string) => {
     if (username == "" || token == "") return;
-    await changePassword(token, oldPassword, newPassword)
+    await changePasswordService(token, oldPassword, newPassword)
       .then(() => {
         addToast({
           description: "เปลี่ยนรหัสผ่านสำเร็จ",

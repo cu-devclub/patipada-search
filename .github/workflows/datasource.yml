@@ -23,5 +23,5 @@ jobs:
                 
             - name: Copy Data source directory to Server
               run: |
-                scp -i ~/.ssh/id_rsa data ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
+                scp -r -i ~/.ssh/id_rsa data ${{ secrets.LINUX_USERNAME }}@${{ secrets.LINUX_HOST }}:~/dhammanava-search
             

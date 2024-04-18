@@ -10,7 +10,7 @@ import (
 // This will generate a unique RequestID for each new record, like "REQ1", "REQ2", etc.
 // using IncrementRecordCounter() from repositories
 func GenerateRequestID(r repositories.Repositories) (string, error) {
-	nextSeq, err := r.IncrementRequestCounter()
+	nextSeq, err := r.GetNextRequestCounter()
 	if err != nil {
 		return "", err
 	}

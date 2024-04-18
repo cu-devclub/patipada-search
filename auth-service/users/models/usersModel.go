@@ -38,10 +38,17 @@ type ForgetPassword struct {
 }
 
 type RemoveUserDto struct {
-	Username string `json:"username"`
+	ID string `json:"id"`
 }
 
 type ChangePassword struct {
 	OldPassword string `json:"oldPassword" validate:"required,min=8,max=50"`
 	NewPassword string `json:"newPassword" validate:"required,min=8,max=50"`
+}
+
+type Users struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
 }

@@ -3,7 +3,6 @@ package event
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"search-esdb-service/config"
 	"search-esdb-service/constant"
 	recordUsecases "search-esdb-service/record/usecases"
@@ -73,10 +72,8 @@ func (consumer *Consumer) Listen(topics []string) error {
 	forever := make(chan bool)
 	go func() {
 		for d := range messages {
-			log.Println("Received a message...")
 			var payload Payload
 			_ = json.Unmarshal(d.Body, &payload)
-			log.Println("Received a message:", payload)
 			go consumer.handlePayload(payload)
 		}
 	}()

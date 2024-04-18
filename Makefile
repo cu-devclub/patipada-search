@@ -1,5 +1,6 @@
 AUTH_BINARY = authApp
 SEARCH_BINARY = searchApp
+ML_GATEWAY_BINARY = mlGateWayApp
 DATA_BINARY = dataApp
 ## up: starts all containers in the background without forcing build
 up:
@@ -13,6 +14,13 @@ up_build:  build_auth build_search build_data build_frontend
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
 	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq
+	@echo "Docker images built and started!"
+
+up_build_full_service:  build_auth build_search build_data build_frontend 
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq loki promtail grafana prometheus
 	@echo "Docker images built and started!"
 
 up_build_backend: build_auth build_search build_data
@@ -75,6 +83,12 @@ down_search:
 	docker compose -f docker-compose.dev.yml down search-service
 	@echo "Search service stopped!"
 
+## search_dev_environments: start search service dependencies services
+search_dev_environments:
+	@echo "Starting search service dependencies services..."
+	docker compose -f docker-compose.dev.yml up -d elastic-db rabbitmq
+	@echo "Search service dependencies services started!"
+
 ## empty_elastic: stops elastic-db (if running), remove volumes, starts elastic-db
 ## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
 empty_elastic:
@@ -98,6 +112,31 @@ up_dev_search:
 
 #################################
 
+##### ML Gateway Service #####
+## up_build_ml_gateway: stops docker compose (if running), builds projects and starts docker compose
+up_build_ml_gateway: build_ml_gateway
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.dev.yml down ml-gateway-service
+	@echo "Building (when required) and starting docker images..."
+	docker compose -f docker-compose.dev.yml up --build -d ml-gateway-service
+	@echo "Docker images built and started!"
+
+## down_ml_gateway: stops the ml-gateway service
+down_ml_gateway:
+	@echo "Stopping ml-gateway service..."
+	docker compose -f docker-compose.dev.yml down ml-gateway-service
+	@echo "ML Gateway service stopped!"
+
+## build_ml_gateway: builds the ml-gateway binary as a linux executable
+build_ml_gateway:
+	@echo "Building ml-gateway binary..."
+	cd ml-gateway-service && env GOOS=linux CGO_ENABLED=0 go build -o ${ML_GATEWAY_BINARY} .
+	@echo "Done!"
+
+
+#################################
+
+
 ###### Data Management Service ######
 ## up_build_data: stops docker compose (if running), builds projects and starts docker compose
 up_build_data: build_data
@@ -119,6 +158,17 @@ down_data:
 	@echo "Stopping data service..."
 	docker compose -f docker-compose.dev.yml down data-service
 	@echo "Data service stopped!"
+
+## empty_data_db: stops data-db (if running), removes volumes and starts data-db
+## !!! BE CAREFUL WITH THIS COMMAND CUZ IT WILL REMOVE ALL THE EXISITING DATA!!!
+empty_data_db:
+	@echo "Stopping data-db (if running...)"
+	docker compose -f docker-compose.dev.yml down data-db
+	@echo "Remove volumes..."
+	rm -rf ./volumes/database/mongo-data
+	@echo "starting data-db containers..."
+	docker compose -f docker-compose.dev.yml up --build -d data-db
+	@echo "Data-db started!"
 
 ## up_dev_data: stops db container and rebuild and start go server
 up_dev_data:
@@ -177,3 +227,15 @@ down:
 	@echo "Stopping Docker images..."
 	docker compose -f docker-compose.dev.yml down
 	@echo "Docker images stopped!"
+
+
+## monitoring service
+up_monitoring:
+	@echo "Starting monitoring service..."
+	docker compose -f docker-compose.dev.yml up -d loki promtail grafana prometheus
+	@echo "Monitoring service started!"
+
+down_monitoring:
+	@echo "Stopping monitoring service..."
+	docker compose -f docker-compose.dev.yml down loki promtail grafana prometheus
+	@echo "Monitoring service stopped!"

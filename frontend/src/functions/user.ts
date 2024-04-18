@@ -1,5 +1,6 @@
 import { getCookie, removeCookie } from "typescript-cookie";
-import { verifyToken, authorize } from "../service/user";
+import { verifyTokenService, authorizeService } from "../service/user";
+import { RoleMapValue } from "../constant";
 export const SignOut = () => {
   removeCookie("token");
   removeCookie("username");
@@ -16,7 +17,7 @@ export const ValidateToken = async () => {
   const token = getCookie("token");
   let ch = false;
   if (token) {
-    ch = await verifyToken(token)
+    ch = await verifyTokenService(token)
       .then((res) => {
         if (res == true) {
           return true;
@@ -37,7 +38,7 @@ export const AuthorizeAdmin = async (requireRole: string) => {
   const token = getCookie("token");
   let ch = false;
   if (token) {
-    ch = await authorize(token, requireRole)
+    ch = await authorizeService(token, requireRole)
       .then((res) => {
         if (res == true) {
           return true;
@@ -52,4 +53,16 @@ export const AuthorizeAdmin = async (requireRole: string) => {
       });
   }
   return ch;
+};
+
+export const CheckRoleDisplayDeleteButton = (
+  role: string,
+  displayRole: string
+) => {
+  const roleValue = RoleMapValue[role];
+  const displayRoleValue = RoleMapValue[displayRole];
+  if (roleValue > displayRoleValue) {
+    return true;
+  }
+  return false;
 };

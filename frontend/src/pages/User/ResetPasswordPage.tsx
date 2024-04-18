@@ -3,7 +3,10 @@ import {  Text, Heading } from "@chakra-ui/react";
 import {  MessageToast } from "../../components";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { verifyResetPasswordToken, resetPassword } from "../../service/user";
+import {
+  verifyResetPasswordTokenService,
+  resetPasswordService,
+} from "../../service/user";
 import { ReturnError } from "../../service/error";
 import { UserBasePage } from "./UserBasePage";
 function ResetPasswordPage() {
@@ -13,7 +16,7 @@ function ResetPasswordPage() {
   const [formError, setformError] = useState(false);
   useEffect(() => {
     const verifyToken = async (token: string) => {
-      await verifyResetPasswordToken(token)
+      await verifyResetPasswordTokenService(token)
         .then((res) => {
           if (res.result == false) {
             alert("url หมดอายุ หากต้องการเปลี่ยนรหัสผ่าน กรุณาขอ url ใหม่");
@@ -34,7 +37,7 @@ function ResetPasswordPage() {
 
   const submit = async (password: string) => {
     if (!token) return;
-    await resetPassword(token, password)
+    await resetPasswordService(token, password)
       .then(() => {
         setformError(false);
         addToast({

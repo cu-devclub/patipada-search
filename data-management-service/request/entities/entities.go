@@ -1,6 +1,7 @@
 package entities
 
 import (
+	"data-management/constant"
 	"data-management/util"
 	"time"
 
@@ -48,6 +49,11 @@ type (
 		Question   string `json:"question"`
 		Answer     string `json:"answer"`
 	}
+
+	RecordCounter struct {
+		RecordAmount      int `bson:"recordAmount"`
+		YoutubeClipAmount int `bson:"youtubeClipAmount"`
+	}
 )
 
 func (r *Request) MockData() {
@@ -59,7 +65,7 @@ func (r *Request) MockData() {
 	r.EndTime = "00:00:10"
 	r.CreatedAt = time.Now()
 	r.UpdatedAt = time.Now()
-	r.Status = "pending"
+	r.Status = constant.REQUEST_STATUS_PENDING
 	r.By = "user1"
 }
 

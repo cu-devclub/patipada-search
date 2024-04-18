@@ -1,9 +1,20 @@
+# FROM golang:1.21 AS builder
+
+# WORKDIR /app
+
+# COPY go.mod go.sum ./
+# RUN go mod download
+
+# COPY . .
+# RUN CGO_ENABLED=0 GOOS=linux go build -o searchApp
+
 FROM alpine:latest
 
 RUN mkdir /app
 
 WORKDIR /app
 
+# COPY --from=builder /app/searchApp /app
 COPY searchApp /app
 COPY app.env /app
 

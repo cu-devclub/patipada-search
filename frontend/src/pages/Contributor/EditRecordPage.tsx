@@ -1,6 +1,9 @@
 import { useParams } from "react-router-dom";
-import { searchRecordIndex } from "../../service/search";
-import { getRequestByRecordIndex, insertRequest } from "../../service/data";
+import { searchRecordIndexService } from "../../service/search";
+import {
+  getRequestByRecordIndexService,
+  insertRequestService,
+} from "../../service/data";
 import { useEffect, useState } from "react";
 import { EditRecordForm } from "../../components/contributor/edit-record";
 import { Grid, GridItem } from "@chakra-ui/react";
@@ -24,12 +27,12 @@ function EditRecordPage() {
     // 1. Try getting data from request first
     // 2. If not found, try searching
     const getRecord = async (recordID: string) => {
-      await getRequestByRecordIndex(recordID)
+      await getRequestByRecordIndexService(recordID)
         .then(async (res) => {
           if (res.requestID == "") {
             try {
               // Perform search when status is 404
-              const searchResult = await searchRecordIndex(recordID);
+              const searchResult = await searchRecordIndexService(recordID);
               if (searchResult.index == "") {
                 navigate("404");
               }
@@ -67,7 +70,7 @@ function EditRecordPage() {
   const submit = async (data: Request) => {
     data.by = getCookie("username") || "";
     const insertRequestData = mapRequestToInsertRequestModels(data);
-    await insertRequest(insertRequestData)
+    await insertRequestService(insertRequestData)
       .then(() => {
         addToast({
           description: "ส่งคำขอแก้ไขสำเร็จ",

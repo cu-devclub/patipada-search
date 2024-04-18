@@ -6,13 +6,14 @@ interface AdminSidebarProps {
 function AdminSidebar({ activePage }: AdminSidebarProps) {
   const navigate = useNavigate();
 
-  const pages = ["Dashboard", "Request", "Data", "Users"];
+  const pages = ["Dashboard", "Request", "Users","Ratings"];
 
   return (
     <Box w="full" h="full" bg="brand_orange.400" pl={2}>
       <VStack align="start" pt={8}>
-        {pages.map((page) => (
+        {pages.map((page,key) => (
           <Heading
+            key={key}
             fontWeight={page === activePage ? "bold" : "normal"}
             onClick={() => navigate(`/admin/${page.toLowerCase()}`)}
             cursor="pointer"

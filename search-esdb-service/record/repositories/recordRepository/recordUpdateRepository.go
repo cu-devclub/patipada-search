@@ -10,7 +10,7 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 )
 
-func (r *RecordESRepository) UpdateRecord(record *entities.UpdateRecord) *errors.RequestError {
+func (r *RecordESRepository) UpdateRecord(record *entities.UpdateRecord) error {
 	// The partial document to update.
 	doc := fmt.Sprintf(`{
 		"doc": {

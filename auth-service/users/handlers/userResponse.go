@@ -1,70 +1,43 @@
 package handlers
 
 import (
-	"log"
+	"log/slog"
 
 	"github.com/labstack/echo/v4"
 )
 
-type baseResponseStruct struct {
-	Message string `json:"message"`
+func (handler *usersHttpHandler) successResponse(c echo.Context, handlerOpts *HandlerOpts, responseCode int, resp ResponseOptions) error {
+	var body interface{}
+	if resp.LogResponseOptional == nil {
+		body = resp.Response
+	} else {
+		body = resp.LogResponseOptional
+	}
+
+	logRes := &Response{
+		Code: responseCode,
+		Body: body,
+	}
+	slog.Info(
+		"Success Request",
+		slog.Any("Handler", handlerOpts),
+		slog.Any("Response", logRes),
+	)
+	return c.JSON(responseCode, resp.Response)
 }
 
-type loginResponseStruct struct {
-	Token   string `json:"token"`
-	Role    string `json:"role"`
-	Message string `json:"message"`
-}
-type registerResponseStruct struct {
-	Message string `json:"message"`
-	UserID  string `json:"user_id"`
-}
+func (handler *usersHttpHandler) errorResponse(c echo.Context, handlerOpts *HandlerOpts, responseCode int, errMessage string) error {
+	res := &Response{
+		Code: responseCode,
+		Body: errMessage,
+	}
+	slog.Error(
+		"Error Request",
+		slog.Any("Handler", handlerOpts),
+		slog.Any("Response", res),
+	)
 
-type verifyTokenStruct struct {
-	Message string `json:"message"`
-	Result  bool   `json:"result"`
-}
-
-type forgetPasswordStruct struct {
-	Message string `json:"message"`
-	Token   string `json:"token"`
-}
-
-func baseResponse(c echo.Context, responseCode int, message string) error {
-	return c.JSON(responseCode, &baseResponseStruct{
-		Message: message,
-	})
-}
-
-func loginResponse(c echo.Context, responseCode int, message string, token string, role string) error {
-	log.Println("Login Logs ; Status Code :", responseCode, "Message:", message)
-	return c.JSON(responseCode, &loginResponseStruct{
-		Token:   token,
-		Role:    role,
-		Message: message,
-	})
-}
-
-func registerResponse(c echo.Context, responseCode int, message string, userID string) error {
-	log.Println("Register Logs ; Status Code :", responseCode, "Message:", message)
-	return c.JSON(responseCode, &registerResponseStruct{
-		Message: message,
-		UserID:  userID,
-	})
-}
-
-func verifyTokenResponse(c echo.Context, responseCode int, message string, valid bool) error {
-	log.Println("Verify Token Logs ; Status Code :", responseCode, "Message:", message)
-	return c.JSON(responseCode, &verifyTokenStruct{
-		Message: message,
-		Result:  valid,
-	})
-}
-
-func forgetPasswordResponse(c echo.Context, responseCode int, message string, token string) error {
-	log.Println("Forget Password Logs ; Status Code :", responseCode, "Message:", message)
-	return c.JSON(responseCode, &forgetPasswordStruct{
-		Message: message,
-		Token:   token,
+	return c.JSON(responseCode, &errorResponseStruct{
+		ErrMessage: errMessage,
 	})
 }

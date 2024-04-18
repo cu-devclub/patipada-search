@@ -1,11 +1,9 @@
-// generate async function register that takes username, password, email, and role as parameters
-
 import axios from '../axiosInstance';
 import { CreateCustomError, ReturnError } from "../error";
 import { RegisterDTO } from "../../models/user";
 import { ERR_Messages, ToastStatus } from "../../constant";
 import { authURL } from '../../constant/serviceURL';
-export const register = async (registerDTO: RegisterDTO) => {
+export const registerService = async (registerDTO: RegisterDTO) => {
   try {
     const response = await axios.post(`${authURL}/register`, {
       username: registerDTO.username,
@@ -32,7 +30,7 @@ export const register = async (registerDTO: RegisterDTO) => {
     } else if (requestError.status === 409) {
       returnError = {
         message: ERR_Messages.NO_PERMISSION_REGISTER,
-        status: 401,
+        status: 409,
         toastStatus: ToastStatus.ERROR,
       };
     } else {

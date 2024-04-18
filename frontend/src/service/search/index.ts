@@ -1,3 +1,3 @@
-import { search, searchRecordIndex } from "./search";
+import { searchService, searchRecordIndexService } from "./search";
 
-export { search, searchRecordIndex };
+export { searchService, searchRecordIndexService };

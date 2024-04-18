@@ -3,7 +3,7 @@ import BaseModal from "./BaseModal";
 
 interface ActionModalProps {
   modalTitle?: string;
-  modalBody: string;
+  modalBody: string | React.ReactNode;
   openModal: boolean;
   closeModal: () => void;
   confirm: () => void;

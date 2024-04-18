@@ -24,28 +24,24 @@ docker compose -f docker-compose.dev.yml up -d data-db
 ```
 
 #### Steps
+There are 2 ways to run the service 
+  1. Using golang 
+      ``` bash
+      cd <your-path>/search-esdb-service
+      ```
+      ```bash
+      go get ./...
+      go mod vendor
+      go run main.go 
+      ```
+  2. Using docker
+    - uncomment every line in [Dockerfile](./Dockerfile)
+    - Navigate to root directory
+    - Run
+      ```bash
+      docker compose -f docker-compose.dev.yml up -d data-service 
+      ```
 
-1. Open your terminal
-
-2. Naviage to this directory
-
-```bash
-cd <your-path>/data-management-service
-```
-
-3. Run
-
-```bash
-go get ./...
-```
-
-```bash
-go mod vendor
-```
-
-```bash
-go run main.go
-```
 
 ## API Reference
 

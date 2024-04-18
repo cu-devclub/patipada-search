@@ -1,23 +1,27 @@
-import axios from '../axiosInstance';
+import axios from "../axiosInstance";
 import { ERR_Messages, ToastStatus } from "../../constant";
 import { CreateCustomError, ReturnError } from "../error";
-import { authURL } from '../../constant/serviceURL';
-
-export const changePassword = async (
+import { authURL } from "../../constant/serviceURL";
+import { getCookie } from "typescript-cookie";
+export const changePasswordService = async (
   token: string,
   oldPassword: string,
   newPassword: string
 ) => {
   try {
-    
-    const response = await axios.post(`${authURL}/change-password`, {
-      oldPassword: oldPassword,
-      newPassword: newPassword,
-    },{
+    axios.defaults.headers.common["Authorization"] = getCookie("token");
+    const response = await axios.post(
+      `${authURL}/change-password`,
+      {
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      },
+      {
         headers: {
-            Authorization: token,
+          Authorization: token,
         },
-    });
+      }
+    );
     return response.data;
   } catch (error: unknown) {
     const requestError = CreateCustomError(error);

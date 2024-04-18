@@ -25,6 +25,7 @@ func (e *Emitter) setup() error {
 }
 
 func NewEmitter(conn *amqp.Connection, cfg *config.Config) (*Emitter, error) {
+	log.Println("Creating new emitter.....")
 	emitter := &Emitter{
 		conn: conn,
 	}
@@ -34,12 +35,12 @@ func NewEmitter(conn *amqp.Connection, cfg *config.Config) (*Emitter, error) {
 		return &Emitter{}, err
 	}
 
+	log.Println("Success creating new emitter.....")
 	return emitter, nil
 }
 
 func (e *Emitter) Emit(message string, key string) error {
 	// key == topics in RabbitMQ
-	log.Println("Emitting.....")
 	channel, err := e.conn.Channel()
 	if err != nil {
 		return err
@@ -63,6 +64,5 @@ func (e *Emitter) Emit(message string, key string) error {
 		return err
 	}
 
-	log.Println("Success Emitting.....")
 	return nil
 }

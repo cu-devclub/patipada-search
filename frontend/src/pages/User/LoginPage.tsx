@@ -1,7 +1,7 @@
 import { AuthenForm } from "../../components/user/forms";
 import { MessageToast } from "../../components";
 import { Heading, Text, HStack, Button } from "@chakra-ui/react";
-import { login } from "../../service/user";
+import { loginService } from "../../service/user";
 import { Role, ToastStatus } from "../../constant";
 import { setCookie } from "typescript-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -31,7 +31,7 @@ const LoginPage = () => {
       password: password,
     };
 
-    await login(loginDTO)
+    await loginService(loginDTO)
       .then((response) => {
         setformError(false);
         addToast({

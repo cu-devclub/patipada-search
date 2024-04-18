@@ -5,7 +5,7 @@ import (
 	"auth-service/database"
 	"auth-service/users/entities"
 	"auth-service/users/helper"
-	"log"
+	"log/slog"
 
 	"gorm.io/gorm"
 )
@@ -42,18 +42,19 @@ func UsersMigrate(db database.Database) error {
 }
 
 func migrateUserEntities(user *config.UserCredential, users []*entities.Users, db database.Database) error {
-	log.Println("Migrating user entities role", user.Role)
 	if foundUser := helper.GetUserFromUserLists(users, user.Username); foundUser != nil {
-		log.Println(user.Role,"already exists")
+		slog.Warn("Migrating user, user already exsits", slog.String("role", user.Role))
 		return nil
 	}
 
 	uuid, err := helper.GenerateUUID()
 	if err != nil {
+		slog.Error("Failed to generate UUID", slog.String("error", err.Error()))
 		return err
 	}
 	password, salt, err := helper.GenerateHashedSaltedPassword(user.Password)
 	if err != nil {
+		slog.Error("Failed to generate hashed salted password", slog.String("error", err.Error()))
 		return err
 	}
 
@@ -68,10 +69,11 @@ func migrateUserEntities(user *config.UserCredential, users []*entities.Users, d
 	}
 
 	if err = insertUser(db.GetDb(), u); err != nil {
+		slog.Error("Failed to insert user", slog.String("error", err.Error()))
 		return err
 	}
 
-	log.Println("Success migrate user entities role", user.Role)
+	slog.Info("Success ; Migrating user", slog.String("role", user.Role))
 	return nil
 }
 

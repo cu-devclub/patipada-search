@@ -1,9 +1,10 @@
 import { Button } from "@chakra-ui/react";
 import BaseModal from "./BaseModal";
+import React from "react";
 
 interface InformModalProps {
   modalTitle?: string;
-  modalBody: string;
+  modalBody: string | React.ReactNode;
   modalButtonText?: string;
   openModal: boolean;
   closeModal: () => void;

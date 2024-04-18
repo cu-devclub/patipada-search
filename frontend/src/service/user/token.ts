@@ -3,9 +3,8 @@ import { CreateCustomError, ReturnError } from "../error";
 import { ERR_Messages, ToastStatus } from "../../constant";
 import { authURL } from '../../constant/serviceURL';
 // use in contributor to verify their token
-export const verifyToken = async (token: string) => {
+export const verifyTokenService = async (token: string) => {
   try {
-
     const response = await axios.get(`${authURL}/verify-token`, {
       headers: {
         Authorization: token,
@@ -39,7 +38,7 @@ export const verifyToken = async (token: string) => {
 };
 
 // use in admin task to verify their token and role
-export const authorize = async (token: string, requireRole: string) => {
+export const authorizeService = async (token: string, requireRole: string) => {
   try {
     const response = await axios.get(
       `${authURL}/authorize?requiredRole=${requireRole}`,

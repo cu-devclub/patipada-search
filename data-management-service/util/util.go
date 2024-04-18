@@ -4,6 +4,7 @@ import (
 	"html"
 
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/google/uuid"
 )
 
 func Contains(s string, arr []string) bool {
@@ -26,4 +27,8 @@ func ExtractRawStringFromHTMLTags(s string) string {
 	// then sanitize
 	p := bluemonday.StrictPolicy()
 	return p.Sanitize(s)
+}
+
+func GenerateUUID() string {
+	return uuid.New().String()
 }
