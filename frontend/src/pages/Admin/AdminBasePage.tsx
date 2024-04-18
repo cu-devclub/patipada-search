@@ -20,11 +20,11 @@ export const AdminBasePage: React.FC<AdminBasePageProps> = ({
   return (
     <Grid
       templateAreas={`"nav header"
-                        "nav main"
-                        "nav footer"`}
-      gridTemplateRows={"0.2fr 2fr 0.2fr"}
+                    "nav main"
+                    "nav footer"`}
+      gridTemplateRows={"0.2fr auto 0.2fr"}
       gridTemplateColumns={"0.2fr 1fr"}
-      h="100svh"
+      h="100vh"
       w="full"
       color="blackAlpha.700"
       fontWeight="bold"
@@ -35,7 +35,7 @@ export const AdminBasePage: React.FC<AdminBasePageProps> = ({
       <GridItem area={"nav"}>
         <AdminSidebar activePage={activePage} />
       </GridItem>
-      <GridItem area={"main"}>
+      <GridItem area={"main"} >
         {children}
       </GridItem>
       <GridItem area={"footer"}>

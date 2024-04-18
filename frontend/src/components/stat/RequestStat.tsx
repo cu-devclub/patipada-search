@@ -6,8 +6,8 @@ interface RequestStatProps {
 }
 function RequestStat({ requestSummary }: RequestStatProps) {
   return (
-    <Box bg='#D9D9D9' p={4} h="full">
-        <BaseStat label={"Total Request"} value={requestSummary.requestAmount}>
+    <Box bg="gray.450" p={4} h="full">
+        <BaseStat label="Total Request" value={requestSummary.requestAmount}>
           <HStack justify="center" spacing='4%'>
             <VStack
               w='40%'
