@@ -6,8 +6,8 @@ interface RecordStatProps {
 }
 function RecordStat({ recordSummary }: RecordStatProps) {
   return (
-    <Box bg='#D9D9D9' p={5} h="full" >
-      <BaseStat label={"Total Record"} value={recordSummary.recordAmount}>
+    <Box bg="gray.450" p={5} h="full">
+      <BaseStat label="Total Record" value={recordSummary.recordAmount}>
         <HStack justify="center" p={2}>
           <Text>#Youtube Clip</Text>
           <Text> {recordSummary.youtubeClipAmount}</Text>

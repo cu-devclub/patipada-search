@@ -61,8 +61,7 @@ function Footer() {
       direction="row"
       justify={{ md: "space-between", base: "center" }}
       align="center"
-      px="4"
-      pb={{ base: 2, md: 0 }}
+      p={4}
       gap={4}
       fontSize={{ md: "lg", base: "sm" }}
       flexWrap={"wrap"}

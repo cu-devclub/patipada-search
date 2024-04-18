@@ -3,8 +3,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Role, ToastStatus } from "../../constant";
 import { AdminBasePage } from "./AdminBasePage";
-import { Grid, GridItem } from "@chakra-ui/react";
-import { RatingStat, RecordStat, RequestStat, Userstat } from "../../components/stat";
+import { Flex, Grid, GridItem } from "@chakra-ui/react";
+import {
+  RatingStat,
+  RecordStat,
+  RequestStat,
+  Userstat,
+} from "../../components/stat";
 import { AuthSummary, User } from "../../models/user";
 import { getAllUsersService } from "../../service/user";
 import { MessageToast } from "../../components";
@@ -125,35 +130,36 @@ function AdminDashboard() {
 
   return (
     <AdminBasePage activePage="Dashboard">
-      <Grid
-        templateAreas={`'user rating rating'
+      <Flex w="100%" h="90%">
+        <Grid
+          templateAreas={`'user rating rating'
                         'user record request'`}
-        gridTemplateRows={'1fr 1fr'}
-        gridTemplateColumns={'3fr 2fr 2fr'}
-        h='full'
-        w='full'
-        gap={8}
-        paddingTop={4}
-        paddingLeft={16}
-        paddingRight={16}
-        paddingBottom={16}>
-        <GridItem area={'user'}>
-          <Userstat authSummary={authSummary} />
-        </GridItem>
-        <GridItem area={'rating'}>
-          <RatingStat
-            label="คะแนนเฉลี่ย"
-            value={averageRating.average_stars}
-            helper={`จำนวนผู้ลงคะแนนทั้งหมด ${averageRating.total_ratings} คน`}
-          />
-        </GridItem>
-        <GridItem area={'record'}>
-          <RecordStat recordSummary={recordSummary} />
-        </GridItem>
-        <GridItem area={'request'}>
-          <RequestStat requestSummary={requestSummary} />
-        </GridItem>
-      </Grid>
+          gridTemplateRows={"1fr 1fr"}
+          gridTemplateColumns={"3fr 2fr 2fr"}
+          h="full"
+          w="full"
+          gap={8}
+          px={16}
+          pt={8}
+        >
+          <GridItem area={"user"}>
+            <Userstat authSummary={authSummary} />
+          </GridItem>
+          <GridItem area={"rating"}>
+            <RatingStat
+              label="คะแนนเฉลี่ย"
+              value={averageRating.average_stars}
+              helper={`จำนวนผู้ลงคะแนนทั้งหมด ${averageRating.total_ratings} คน`}
+            />
+          </GridItem>
+          <GridItem area={"record"}>
+            <RecordStat recordSummary={recordSummary} />
+          </GridItem>
+          <GridItem area={"request"}>
+            <RequestStat requestSummary={requestSummary} />
+          </GridItem>
+        </Grid>
+      </Flex>
     </AdminBasePage>
   );
 }
