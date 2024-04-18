@@ -130,7 +130,7 @@ function AdminDashboard() {
 
   return (
     <AdminBasePage activePage="Dashboard">
-      <Flex w="100%" h="90%"  >
+      <Flex w="100%" h="90%">
         <Grid
           templateAreas={`'user rating rating'
                         'user record request'`}
@@ -142,7 +142,7 @@ function AdminDashboard() {
           px={16}
           pt={8}
         >
-          <GridItem area={"user"} bg="green">
+          <GridItem area={"user"}>
             <Userstat authSummary={authSummary} />
           </GridItem>
           <GridItem area={"rating"}>

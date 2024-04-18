@@ -35,7 +35,7 @@ function RatingStat({ value, helper }: RatingStatProps) {
         <GridItem rowSpan={4} px={4}>
           <HStack gap={8} h="full">
             <CircularProgress
-              value={value * 20}
+              value={valuePercentage}
               color={color}
               size="5xs"
               thickness="15"
