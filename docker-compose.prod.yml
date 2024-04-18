@@ -40,23 +40,23 @@ services:
     networks:
       - dhammanava_network
 
-  # ml-service:
-  #   container_name: ml-container
-  #   image: ${DOCKERHUB_USERNAME}/dhammanava-ml-image
-  #   environment:
-  #     - FLASK_APP=run.py
-  #     - FLASK_ENV=production
-  #     - FLASK_RUN_HOST=0.0.0.0
-  #     - FLASK_RUN_PORT=8084
-  #   restart: always
-  #   ports:
-  #     - 8084:8084
-  #   labels:
-  #     logging: "promtail"
-  #     loggin_jobname: "containerlogs"
-  #   command: ["gunicorn", "-b", "0.0.0.0:8084", "run:app"]
-  #   networks:
-  #     - dhammanava_network
+  ml-service:
+    container_name: ml-container
+    image: ${DOCKERHUB_USERNAME}/dhammanava-ml-image:latest
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV=production
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=8084
+    restart: always
+    ports:
+      - 8084:8084
+    labels:
+      logging: "promtail"
+      loggin_jobname: "containerlogs"
+    command: ["gunicorn", "-b", "0.0.0.0:8084", "run:app"]
+    networks:
+      - dhammanava_network
 
   elastic-db:
     container_name: elastic-container

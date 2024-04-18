@@ -1,4 +1,4 @@
-name: -Service- ML Gateway
+name: -Service- External ML
 on: workflow_dispatch
 jobs:
   build-and-deploy-ml-service:
@@ -20,9 +20,9 @@ jobs:
       - name: Build and push docker image
         uses: docker/build-push-action@v2
         with:
-          context: ./ml-gateway-service
+          context: ./ml-service
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-ml-gateway-image:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-ml-image:latest
 
       - name: Deploy to Ubuntu server
         uses: appleboy/ssh-action@master
@@ -31,9 +31,9 @@ jobs:
           username: ${{secrets.LINUX_USERNAME}}
           key: ${{ secrets.LINUX_PRIVATE_KEY }}
           script: |
-            docker stop ml-gateway-container || true
-            docker rm  ml-gateway-container || true
-            docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-ml-gateway-image:latest
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-ml-gateway-image:latest
+            docker stop ml-container || true
+            docker rm  ml-container || true
+            docker image rm ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-ml-image:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/dhammanava-ml-image:latest
             cd dhammanava-search
-            docker compose -f docker-compose.prod.yml up -d ml-gateway-service
+            docker compose -f docker-compose.prod.yml up -d ml-service
