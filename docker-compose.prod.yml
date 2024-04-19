@@ -48,6 +48,8 @@ services:
       - FLASK_ENV=production
       - FLASK_RUN_HOST=0.0.0.0
       - FLASK_RUN_PORT=8084
+    volumes:
+      - ./data/stopword:/app/stopWord
     restart: always
     ports:
       - 8084:8084
