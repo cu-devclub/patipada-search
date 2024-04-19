@@ -24,3 +24,5 @@ Thumbs.db
 # IDE related files
 .vscode/
 .idea/
+
+stopword
