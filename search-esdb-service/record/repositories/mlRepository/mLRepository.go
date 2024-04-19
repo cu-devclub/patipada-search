@@ -1,11 +1,7 @@
 package repositories
 
+import "search-esdb-service/record/entities"
+
 type MLRepository interface {
-	RemoveStopWordFromTokensArrays(tokens []string) ([]string, error)
-
-	RemoveStopWordFromQuery(query string) ([]string, error)
-
-	TokenizeQuery(query string) ([]string, error)
-
-	PerformLDATopicModelling(tokens []string) ([]float64, error)
+	Text2VecGateway(text string) ([]*entities.Text2VecResponse, error)
 }

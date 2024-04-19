@@ -1,4 +1,4 @@
-package event
+package rabbitmq
 
 import (
 	"encoding/json"

@@ -9,6 +9,7 @@ import (
 	"search-esdb-service/database"
 	"search-esdb-service/logging"
 	"search-esdb-service/monitoring"
+	"search-esdb-service/rabbitmq"
 	recordMigrator "search-esdb-service/record/migration"
 	"search-esdb-service/server"
 )
@@ -50,19 +51,26 @@ func main() {
 	}
 	slog.Info("Migrate records successfully!")
 
-	s := server.NewGinServer(&cfg, db.GetDB())
+	grpc, err := communication.NewgRPC(&cfg)
+	if err != nil {
+		slog.Error("Failed to connect to gRPC", slog.String("err", err.Error()))
+		return
+	}
+	// grpc := communication.NewMockgRPC()
+	slog.Info("Connect to gRPC successfully!")
+	comm := communication.NewCommunicationImpl(*grpc)
 
-	rabbitMQ, err := communication.ConnectToRabbitMQ(&cfg, db.GetDB(), *s.GetRecordArch())
+	s := server.NewGinServer(&cfg, db.GetDB(), &comm)
+
+	rabbit, err := rabbitmq.ConnectToRabbitMQ(&cfg, db.GetDB(), s.GetRecordArch().Usecase)
 	if err != nil {
 		slog.Error("Failed to connect to RabbitMQ", slog.String("err", err.Error()))
 		return
 	}
 	slog.Info("Connect to RabbitMQ successfully!")
 
-	comm := communication.NewCommunicationImpl(*rabbitMQ)
-
 	go func() {
-		err := comm.Listen([]string{constant.UPDATE_RECORD_TOPIC})
+		err := rabbit.Listen([]string{constant.UPDATE_RECORD_TOPIC})
 		if err != nil {
 			slog.Error("Failed to listen to RabbitMQ", slog.String("err", err.Error()))
 		}

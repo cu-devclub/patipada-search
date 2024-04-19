@@ -13,7 +13,7 @@ import (
 )
 
 type GRPCServer struct {
-	proto.UnimplementedSearchServiceServer
+	proto.UnimplementedMlGatewayServiceServer
 	server Server
 }
 
@@ -26,7 +26,7 @@ func GRPCListen(server *Server, cfg *config.Config) {
 
 	grpcServer := grpc.NewServer()
 
-	proto.RegisterSearchServiceServer(grpcServer, &GRPCServer{server: *server})
+	proto.RegisterMlGatewayServiceServer(grpcServer, &GRPCServer{server: *server})
 
 	slog.Info("gRPC server listening on port:", slog.Int("Port", cfg.App.GRPCPort))
 
@@ -35,7 +35,7 @@ func GRPCListen(server *Server, cfg *config.Config) {
 	}
 }
 
-func (g *GRPCServer) Search(ctx context.Context, req *proto.SearchRequest) (*proto.SearchResponse, error) {
+func (g *GRPCServer) Text2Vec(ctx context.Context, req *proto.Text2VecRequest) (*proto.Text2VecResponse, error) {
 	slog.Info("Received search request", slog.String("Text", req.Text))
 	gatewayArch := g.server.GetGatewayArch()
 
@@ -47,20 +47,20 @@ func (g *GRPCServer) Search(ctx context.Context, req *proto.SearchRequest) (*pro
 
 	if response == nil {
 		slog.Info("No result found")
-		return nil,nil
+		return nil, nil
 	}
 
 	protoRes := []*proto.Result{}
 	for _, res := range response {
 		protoRes = append(protoRes, &proto.Result{
-			Name: 	 res.Name,
-			Value:  res.Embedding,
-			Score:  res.ScoreWeight,
+			Name:      res.Name,
+			Embedding: res.Embedding,
+			Score:     res.ScoreWeight,
 		})
 	}
 
 	slog.Info("Search result", slog.String("Text", req.Text), slog.Int("Results", len(protoRes)))
-	return &proto.SearchResponse{
+	return &proto.Text2VecResponse{
 		Results: protoRes,
 	}, nil
 }

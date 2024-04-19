@@ -1,7 +1,13 @@
 package repositories
 
-type MLServiceRepository struct {}
+import "search-esdb-service/communication"
 
-func NewMLServiceRepository() MLRepository {
-	return &MLServiceRepository{}
+type MLServiceRepository struct {
+	comm communication.Communication
+}
+
+func NewMLServiceRepository(comm *communication.Communication) MLRepository {
+	return &MLServiceRepository{
+		comm: *comm,
+	}
 }
