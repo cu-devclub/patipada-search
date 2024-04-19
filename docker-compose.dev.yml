@@ -13,7 +13,6 @@ services:
       RABBITMQ_USERNAME: ${RABBITMQ_USERNAME}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
       RABBITMQ_URL: rabbitmq
-    restart: always
     volumes:
       - ./data:/app/datasource
       - ./logs:/app/logs
@@ -33,7 +32,6 @@ services:
     image: ${DOCKERHUB_USERNAME}/dhammanava-ml-gateway-image
     build:
       context: ./ml-gateway-service
-    restart: always
     ports:
       - 8085:8085
     labels:
@@ -54,7 +52,8 @@ services:
       - FLASK_ENV=development
       - FLASK_RUN_HOST=0.0.0.0
       - FLASK_RUN_PORT=8084
-    restart: always
+    volumes:
+      - ./data/stopword:/app/stopWord
     ports:
       - 8084:8084
     labels:
@@ -91,7 +90,6 @@ services:
       - DHAMMANAVA_EVALUATION_FORM_URL=${EVALUATION_FORM_URL}
     ports:
       - 5173:8080
-    restart: always
     networks:
       - dhammanava_network
 
@@ -118,7 +116,6 @@ services:
       - USER_EMAIL=${USER_EMAIL}
     ports:
       - 8082:8082
-    restart: always
     depends_on:
       - auth-db
     labels:
@@ -136,7 +133,6 @@ services:
       POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
     ports:
       - 5432:5432
-    restart: always
     volumes:
       - ./auth-db:/docker-entrypoint-initdb.d
       - ./volumes/database/auth:/var/lib/postgresql/data
@@ -164,7 +160,6 @@ services:
       - ./data/record:/app/datasource
     ports:
       - 8083:8083
-    restart: always
     labels:
       logging: "promtail"
       loggin_jobname: "containerlogs"
@@ -185,7 +180,6 @@ services:
       MONGO_INITDB_DATABASE: record
       MONGO_INITDB_ROOT_USERNAME: ${DATA_MNGMNT_DB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${DATA_MNGMNT_DB_PASSWORD}
-    restart: always
     volumes:
       - ./volumes/database/mongo-data:/data/db
     networks:
