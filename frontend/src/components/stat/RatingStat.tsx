@@ -11,6 +11,7 @@ import {
   Heading,
   HStack,
 } from "@chakra-ui/react";
+import { twoDecimal } from "../../functions";
 
 interface RatingStatProps {
   label: string;
@@ -20,7 +21,7 @@ interface RatingStatProps {
 
 function RatingStat({ value, helper }: RatingStatProps) {
   const color = value >= 4 ? "green" : value >= 2 ? "orange" : "red";
-  const valuePercentage = value * 20;
+  const valuePercentage = twoDecimal(value * 20);
 
   return (
     <Flex bg="gray.450" shadow="xl" h="full" w="full" justify="center">
@@ -33,7 +34,7 @@ function RatingStat({ value, helper }: RatingStatProps) {
           </Center>
         </GridItem>
         <GridItem rowSpan={4} px={4}>
-          <HStack gap={8} h="full">
+          <HStack gap={8} h="full" justify='center'>
             <CircularProgress
               value={valuePercentage}
               color={color}
@@ -53,7 +54,7 @@ function RatingStat({ value, helper }: RatingStatProps) {
             >
               <Stat textAlign="center">
                 <StatNumber color="black" fontWeight="bold" p={4}>
-                  {value}
+                  {twoDecimal(value)}
                 </StatNumber>
                 <StatHelpText color="black">{helper}</StatHelpText>
               </Stat>
