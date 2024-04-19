@@ -63,25 +63,7 @@ func (r *recordUsecaseImpl) internalSearch(indexName, query string, offset, amou
 }
 
 func (r *recordUsecaseImpl) externalSearch(indexName, query string, offset, amount int) ([]*entities.Record, []string, error) {
-	// working (tokenize, lda,...) with external service
-	// TODO : make 1 service call for all tokenize, remove keyword and lda
-	tokens, err := r.mlRepository.TokenizeQuery(query)
-	if err != nil {
-		return nil, nil, err
-	}
+	// TODO : implementing calling text 2 vec gateway	
 
-	pureTokens := util.RemoveSliceFromArrays(tokens, data.GetStopWord())
-
-	searchQuery, err := r.mlRepository.PerformLDATopicModelling(pureTokens)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// TODO : Update this when implementing vector search
-	records, _, err := r.recordRepository.VectorSearch(indexName, searchQuery, offset, amount, false)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return records, pureTokens, nil
+	return nil, nil, nil
 }

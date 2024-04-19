@@ -33,6 +33,12 @@ type (
 		Type        string `json:"type"`
 		Position    int    `json:"position"`
 	}
+
+	Text2VecResponse struct {
+		Embedding   []float32 `json:"Embedding"`
+		Name        string    `json:"Name"`
+		ScoreWeight float32   `json:"ScoreWeight"`
+	}
 )
 
 func (r *Record) ToString() string {

@@ -1,12 +1,11 @@
-package communication
+package rabbitmq
 
 import (
 	"fmt"
 	"log/slog"
 	"math"
 	"search-esdb-service/config"
-	"search-esdb-service/event"
-	"search-esdb-service/server"
+	recordUsecase "search-esdb-service/record/usecases"
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v8"
@@ -15,10 +14,10 @@ import (
 
 type RabbitMQStruct struct {
 	Conn     *amqp.Connection
-	Consumer event.Consumer
+	Consumer Consumer
 }
 
-func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client, recordArch server.RecordArch) (*RabbitMQStruct, error) {
+func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client, recordUsecase recordUsecase.RecordUsecase) (*RabbitMQStruct, error) {
 	var counts int64
 	var backOff = 1 * time.Second
 	var connection *amqp.Connection
@@ -47,7 +46,7 @@ func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client, recordArch 
 		time.Sleep(backOff)
 	}
 
-	consumer, err := event.NewConsumer(connection, cfg, recordArch.Usecase)
+	consumer, err := NewConsumer(connection, cfg, recordUsecase)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +58,7 @@ func ConnectToRabbitMQ(cfg *config.Config, db *elasticsearch.Client, recordArch 
 	}, nil
 }
 
-func (c *CommunicationImpl) Listen(topics []string) error {
+func (c *RabbitMQStruct) Listen(topics []string) error {
 	slog.Info("Listening to", slog.Any("topics", topics))
-	return c.RabbitMQ.Consumer.Listen(topics)
+	return c.Consumer.Listen(topics)
 }

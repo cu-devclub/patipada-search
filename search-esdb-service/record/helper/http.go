@@ -2,7 +2,6 @@
 package helper
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"search-esdb-service/errors"
@@ -47,24 +46,4 @@ func MakePOSTRequest(fullUrl string, body io.Reader) ([]byte, error) {
 		return nil, errors.CreateError(http.StatusInternalServerError, err.Error())
 	}
 	return resBody, nil
-}
-
-func UnMarshalStringResponse(body []byte) ([]string, error) {
-	var response StringResponse
-	err := json.Unmarshal(body, &response)
-	if err != nil {
-		return nil, errors.CreateError(http.StatusInternalServerError, err.Error())
-	}
-
-	return response.Result, nil
-}
-
-func UnMarshalFloatResponse(body []byte) ([]float64, error) {
-	var response FloatResponse
-	err := json.Unmarshal(body, &response)
-	if err != nil {
-		return nil, errors.CreateError(http.StatusInternalServerError, err.Error())
-	}
-
-	return response.Result, nil
 }
