@@ -1,12 +1,11 @@
 from typing import List
-from gensim import corpora, models
 from app.services.stopWords_service import StopWordsService
 from app.services.tokenize_service import TokenizeService
 import pickle
 
 class LDAServerice:
-    id2word = pickle.load(open(f'model/id2word.pkl', 'rb'))
-    lda_model = pickle.load(open(f'model/LDA_model.pkl', 'rb'))
+    id2word = pickle.load(open('model/id2word.pkl', 'rb'))
+    lda_model = pickle.load(open('model/LDA_model.pkl', 'rb'))
 
     @staticmethod
 
