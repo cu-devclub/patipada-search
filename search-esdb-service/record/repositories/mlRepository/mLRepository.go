@@ -1,11 +1,20 @@
 package repositories
 
+import (
+	"search-esdb-service/communication"
+	"search-esdb-service/record/entities"
+)
+
 type MLRepository interface {
-	RemoveStopWordFromTokensArrays(tokens []string) ([]string, error)
+	Text2VecGateway(text string) ([]*entities.Text2VecResponse, error)
+}
 
-	RemoveStopWordFromQuery(query string) ([]string, error)
+type MLServiceRepository struct {
+	comm *communication.Communication
+}
 
-	TokenizeQuery(query string) ([]string, error)
-
-	PerformLDATopicModelling(tokens []string) ([]float64, error)
+func NewMLServiceRepository(comm *communication.Communication) MLRepository {
+	return &MLServiceRepository{
+		comm: comm,
+	}
 }

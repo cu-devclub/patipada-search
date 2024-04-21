@@ -4,18 +4,31 @@
 
 package entities
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type (
 	Record struct {
-		Index       string    `json:"index"`
-		YoutubeURL  string    `json:"youtubeURL"`
-		Question    string    `json:"question"`
-		Answer      string    `json:"answer"`
-		StartTime   string    `json:"startTime"`
-		EndTime     string    `json:"endTime"`
-		QuestionLDA []float64 `json:"question_lda,omitempty"`
-		AnswerLDA   []float64 `json:"answer_lda,omitempty"`
+		Index      string           `json:"index"`
+		YoutubeURL string           `json:"youtubeURL"`
+		Question   string           `json:"question"`
+		Answer     string           `json:"answer"`
+		StartTime  string           `json:"startTime"`
+		EndTime    string           `json:"endTime"`
+		Vectors    []*RecordVectors `json:"vectors"`
+	}
+
+	RecordVectors struct {
+		Model   string   `json:"model"`
+		Vectors *Vectors `json:"vectors"`
+	}
+
+	Vectors struct {
+		RecordIndex    string    `json:"recordIndex"`
+		QuestionVector []float32 `json:"question_vector"`
+		AnswerVector   []float32 `json:"answer_vector"`
 	}
 
 	UpdateRecord struct {
@@ -36,5 +49,33 @@ type (
 )
 
 func (r *Record) ToString() string {
-	return fmt.Sprintf("Index: %s, YoutubeURL: %s, Question: %s, Answer: %s, StartTime: %s, EndTime: %s, QuestionLDA: %v, AnswerLDA: %v", r.Index, r.YoutubeURL, r.Question, r.Answer, r.StartTime, r.EndTime, r.QuestionLDA, r.AnswerLDA)
+	return fmt.Sprintf("Index: %s, YoutubeURL: %s, Question: %s, Answer: %s, StartTime: %s, EndTime: %s", r.Index, r.YoutubeURL, r.Question, r.Answer, r.StartTime, r.EndTime)
+}
+
+func (r *Record) BuildJson() ([]byte, error) {
+	// Create a map to hold the JSON fields
+	jsonFields := make(map[string]interface{})
+
+	// Add the static fields to the map
+	jsonFields["index"] = r.Index
+	jsonFields["youtubeURL"] = r.YoutubeURL
+	jsonFields["question"] = r.Question
+	jsonFields["answer"] = r.Answer
+	jsonFields["startTime"] = r.StartTime
+	jsonFields["endTime"] = r.EndTime
+
+	// Add the dynamic fields to the map
+	for _, vector := range r.Vectors {
+		model := vector.Model
+		jsonFields[model+"-question"] = vector.Vectors.QuestionVector
+		jsonFields[model+"-answer"] = vector.Vectors.AnswerVector
+	}
+
+	// Marshal the map to JSON
+	jsonData, err := json.Marshal(jsonFields)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonData, nil
 }

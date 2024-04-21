@@ -142,32 +142,3 @@ func (r *recordHttpHandler) SearchByRecordIndex(c *gin.Context) {
 	}
 	r.successResponse(c, handlerOpts, http.StatusOK, res)
 }
-
-// GetAllRecords retrieves all records from the elastic database
-// and sends a response back to the client.
-//
-// Response:
-// - 200 & A list of all records retrieved from the database.
-// - 500: An internal server error occurred.
-func (r *recordHttpHandler) GetAllRecords(c *gin.Context) {
-	handlerOpts := NewHandlerOpts(c)
-
-	records, err := r.recordUsecase.GetAllRecords("record")
-	if err != nil {
-		if er, ok := err.(*errors.RequestError); ok {
-			r.errorResponse(c, handlerOpts, er.StatusCode, er.Message, er.Error())
-			return
-		} else {
-			r.errorResponse(c, handlerOpts, http.StatusInternalServerError, messages.INTERNAL_SERVER_ERROR, err.Error())
-			return
-		}
-	}
-
-	res := ResponseOptions{
-		Response: records,
-		OptionalResponse: &SearchRecordLogResponse{
-			Length: len(records),
-		},
-	}
-	r.successResponse(c, handlerOpts, http.StatusOK, res)
-}

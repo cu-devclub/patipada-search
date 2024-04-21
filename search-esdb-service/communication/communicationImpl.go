@@ -1,12 +1,11 @@
 package communication
 
 type CommunicationImpl struct {
-	RabbitMQ *RabbitMQStruct
-	
+	GRPC     GRPCStruct
 }
 
-func NewCommunicationImpl(rabbitMQ RabbitMQStruct) Communication {
+func NewCommunicationImpl(GRPC GRPCStruct) Communication {
 	return &CommunicationImpl{
-		RabbitMQ: &rabbitMQ,
+		GRPC:     GRPC,
 	}
 }

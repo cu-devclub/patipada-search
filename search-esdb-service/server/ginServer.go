@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"search-esdb-service/communication"
 	"search-esdb-service/config"
 	recordHandlers "search-esdb-service/record/handlers"
 	mlRepository "search-esdb-service/record/repositories/mlRepository"
@@ -19,6 +20,7 @@ type ginServer struct {
 	app        *gin.Engine
 	db         *elasticsearch.Client
 	cfg        *config.Config
+	comm       communication.Communication
 	recordArch *RecordArch
 }
 
@@ -29,7 +31,7 @@ type RecordArch struct {
 	Handler recordHandlers.RecordHandler
 }
 
-func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
+func NewGinServer(cfg *config.Config, db *elasticsearch.Client, c *communication.Communication) Server {
 	serv := gin.New()
 
 	// Allow CORS from frontend
@@ -39,9 +41,10 @@ func NewGinServer(cfg *config.Config, db *elasticsearch.Client) Server {
 	serv.Use(cors.New(config))
 
 	g := &ginServer{
-		app: serv,
-		db:  db,
-		cfg: cfg,
+		app:  serv,
+		db:   db,
+		cfg:  cfg,
+		comm: *c,
 	}
 
 	g.initializeRecordHttpHandler()
@@ -69,8 +72,8 @@ func (g *ginServer) Start() {
 func (g *ginServer) initializeRecordHttpHandler() {
 
 	recordESRepository := recordRepository.NewRecordESRepository(g.db)
-	mlRepository := mlRepository.NewMLServiceRepository()
-	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository)
+	mlRepository := mlRepository.NewMLServiceRepository(&g.comm)
+	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository, g.cfg)
 
 	recordHttpHandler := recordHandlers.NewRecordHttpHandler(recordUsecase)
 
@@ -80,14 +83,6 @@ func (g *ginServer) initializeRecordHttpHandler() {
 		Usecase: recordUsecase,
 		Handler: recordHttpHandler,
 	}
-
-	// GetAllRecords retrieves all records from the elastic database
-	// and sends a response back to the client.
-	//
-	// Response:
-	// - 200 & A list of all records retrieved from the database.
-	// - 500: An internal server error occurred.
-	g.app.GET("/displayAllRecords", recordHttpHandler.GetAllRecords)
 
 	// Search searches for records based on the provided query.
 	//

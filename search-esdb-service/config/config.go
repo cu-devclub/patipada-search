@@ -8,10 +8,12 @@ var cfg *Config
 
 type (
 	Config struct {
-		App      App
-		ESDB     ESDB
-		RabbitMQ RabbitMQ
-		Static   Static
+		App       App
+		ESDB      ESDB
+		RabbitMQ  RabbitMQ
+		Static    Static
+		MlGateway MLGateway
+		MlConfig  MLConfig
 	}
 
 	App struct {
@@ -36,6 +38,11 @@ type (
 		StopwordPath          string
 		LogsPath              string
 		SearchLogsConfirmPath string
+	}
+
+	MLGateway struct {
+		URL      string
+		GRPCPort int
 	}
 )
 
@@ -75,6 +82,10 @@ func ReadConfig() {
 			StopwordPath:          viper.GetString("STOPWORD_PATH"),
 			LogsPath:              viper.GetString("LOGS_PATH"),
 			SearchLogsConfirmPath: viper.GetString("SEARCH_LOG_CONFIRM_PATH_V2"),
+		},
+		MlGateway: MLGateway{
+			URL:      viper.GetString("ML_GATEWAY_URL"),
+			GRPCPort: viper.GetInt("ML_GATEWAY_GRPC_PORT"),
 		},
 	}
 }

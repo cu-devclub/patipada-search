@@ -13,6 +13,7 @@ import {
   getStartAndEndIndexOfComments,
   removeCommentFromHTML,
 } from "./comment";
+import { twoDecimal } from "./rounding";
 export {
   isValidEmail,
   isValueExist,
@@ -32,4 +33,5 @@ export {
   getStartAndEndIndexOfComments,
   removeCommentFromHTML,
   formatDate,
+  twoDecimal,
 };
