@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/url"
 	"search-esdb-service/errors"
 	"search-esdb-service/record/entities"
@@ -42,103 +43,123 @@ func (r *RecordESRepository) SearchByRecordIndex(indexName, recordIndex string) 
 	return record, true, nil
 }
 
-func (r *RecordESRepository) GetAllRecords(indexName string) ([]*entities.Record, int, error) {
-	return r.performSearch(indexName, 0, 0, elasticQuery.BuildMatchAllQuery, nil, false)
-}
-
-func (r *RecordESRepository) Search(indexName string, query interface{}, offset, amount int, countNeeded bool) ([]*entities.Record, int, error) {
-	return r.performSearch(indexName, offset, amount, elasticQuery.BuildElasticsearchQuery, query, countNeeded)
-}
-
-func (r *RecordESRepository) VectorSearch(indexName string, query interface{}, offset, amount int, countNeeded bool) ([]*entities.Record, int, error) {
-	return r.performSearch(indexName, offset, amount, elasticQuery.BuildKNNQuery, query, countNeeded)
-}
-
-func (r *RecordESRepository) performSearch(indexName string, offset, amount int, buildQueryFunc interface{}, query interface{}, countNeeded bool) ([]*entities.Record, int, error) {
-	client := r.es
-
-	var queryJSON string
-	var countQueryJSON string
-	var err error
-
-	switch q := query.(type) {
-	case string: // For keyword search
-		queryFunc, ok := buildQueryFunc.(func(string, int, int) (string, string, error))
-		if !ok {
-			return nil, 0, errors.CreateError(500, "Invalid query builder function")
-		}
-		queryJSON, countQueryJSON, err = queryFunc(q, offset, amount)
-	case []float64: // For vector search
-		queryFunc, ok := buildQueryFunc.(func([]float64, string, int, int) (string, error))
-		if !ok {
-			return nil, 0, errors.CreateError(500, "Invalid query builder function")
-		}
-		queryJSON, err = queryFunc(q, "question_lda", offset, amount)
-	case nil: // For match all query
-		queryFunc, ok := buildQueryFunc.(func() (string, error))
-		if !ok {
-			return nil, 0, errors.CreateError(500, "Invalid query builder function")
-		}
-		queryJSON, err = queryFunc()
-	default:
-		return nil, 0, errors.CreateError(500, "Invalid query type")
-	}
-
+func (r *RecordESRepository) KeywordSearch(keywordSearchEntity *entities.KeywordSearchStruct) ([]*entities.Record, int, error) {
+	queryString, countQueryString, err := elasticQuery.BuildKeywordSearchQuery(keywordSearchEntity)
 	if err != nil {
-		return nil, 0, errors.CreateError(500, fmt.Sprintf("Error building query: %s", err))
+		return nil, 0, errors.CreateError(500, fmt.Sprintf("Error building keyword search query: %s", err))
 	}
 
-	// Perform the search request
-	res, err := client.Search(
-		client.Search.WithContext(context.Background()),
-		client.Search.WithIndex(indexName),
-		client.Search.WithBody(strings.NewReader(string(queryJSON))),
-	)
+	records, err := r.performSearch(keywordSearchEntity.Config.IndexName, queryString)
 	if err != nil {
-		return nil, 0, errors.CreateError(500, fmt.Sprintf("Error getting response: %s", err))
-	}
-	defer res.Body.Close()
-
-	// Check the response status
-	if res.IsError() {
-		return nil, 0, errors.CreateError(res.StatusCode, fmt.Sprintf("Elasticsearch error: %s", res.Status()))
+		return nil, 0, errors.CreateError(500, fmt.Sprintf("Error performing keyword search: %s", err))
 	}
 
-	// Decode the response
-	var response map[string]interface{}
-	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
-		return nil, 0, errors.CreateError(500, fmt.Sprintf("Error decoding response: %s", err))
-	}
-
-	// Extract and iterate through the hits (documents) in the response
-	hits, found := response["hits"].(map[string]interface{})["hits"].([]interface{})
-	if !found {
-		return nil, 0, errors.CreateError(500, "Invalid response format")
-	}
-
-	var records []*entities.Record
-	for _, hit := range hits {
-		// log.Println("Hit:", hit.(map[string]interface{}))
-		// log.Println("--------------------")
-		doc := hit.(map[string]interface{})["_source"].(map[string]interface{})
-		docID := hit.(map[string]interface{})["_id"].(string)
-		record := helper.UnescapeFieldsAndCreateRecord(doc, docID)
-		records = append(records, record)
-	}
-
-	//* Count
-	recordCount := -1 // Don't count if not needed
-	if countNeeded {
-		recordCount, err = r.countRecordFromQuery(indexName, countQueryJSON)
+	recordCount := 0
+	if keywordSearchEntity.Config.CountNeeded {
+		count, err := r.countRecordFromQuery(keywordSearchEntity.Config.IndexName, countQueryString)
 		if err != nil {
 			return nil, 0, errors.CreateError(500, fmt.Sprintf("Error counting records: %s", err))
 		}
+		recordCount = count
 	}
 
 	return records, recordCount, nil
 }
 
+func (r *RecordESRepository) VectorSearch(vectorSearchEntity *entities.VectorSearchStruct) ([]*entities.Record, int, error) {
+	queryString, countQueryString, err := elasticQuery.BuildKNNQuery(vectorSearchEntity)
+	if err != nil {
+		return nil, 0, errors.CreateError(500, fmt.Sprintf("Error building knn search query: %s", err))
+	}
+
+	records, err := r.performSearch(vectorSearchEntity.Config.IndexName, queryString)
+	if err != nil {
+		return nil, 0, errors.CreateError(500, fmt.Sprintf("Error performing keyword search: %s", err))
+	}
+
+	recordCount := 0
+	if vectorSearchEntity.Config.CountNeeded {
+		count, err := r.countRecordFromQuery(vectorSearchEntity.Config.IndexName, countQueryString)
+		if err != nil {
+			return nil, 0, errors.CreateError(500, fmt.Sprintf("Error counting records: %s", err))
+		}
+		recordCount = count
+	}
+
+	return records, recordCount, nil
+}
+
+func (r *RecordESRepository) HybridSearch(hybridSearchEntity *entities.HybridSearchStruct) ([]*entities.Record, int, error) {
+	queryString, countQueryString, err := elasticQuery.BuildHybridSearchQuery(hybridSearchEntity)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	log.Println("Performing hybrid search query with:", queryString)
+	records, err := r.performSearch(hybridSearchEntity.Config.IndexName, queryString)
+	if err != nil {
+		return nil, 0, errors.CreateError(500, fmt.Sprintf("Error performing keyword search: %s", err))
+	}
+
+	recordCount := 0
+	if hybridSearchEntity.Config.CountNeeded {
+		count, err := r.countRecordFromQuery(hybridSearchEntity.Config.IndexName, countQueryString)
+		if err != nil {
+			return nil, 0, errors.CreateError(500, fmt.Sprintf("Error counting records: %s", err))
+		}
+		recordCount = count
+	}
+
+	return records, recordCount, nil
+
+}
+
+func (r *RecordESRepository) performSearch(indexName string, queryString string) ([]*entities.Record, error) {
+	client := r.es
+
+	// Perform the search request
+	res, err := client.Search(
+		client.Search.WithContext(context.Background()),
+		client.Search.WithIndex(indexName),
+		client.Search.WithBody(strings.NewReader(queryString)),
+	)
+	if err != nil {
+		return nil, errors.CreateError(500, fmt.Sprintf("Error getting response: %s", err))
+	}
+	defer res.Body.Close()
+
+	// Check the response status
+	if res.IsError() {
+		return nil, errors.CreateError(res.StatusCode, fmt.Sprintf("Elasticsearch error: %s", res.Status()))
+	}
+
+	// log.Println("RESPONSE BODY",res.Body)
+	// Decode the response
+	var response map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&response); err != nil {
+		return nil, errors.CreateError(500, fmt.Sprintf("Error decoding response: %s", err))
+	}
+
+	// Extract and iterate through the hits (documents) in the response
+	hits, found := response["hits"].(map[string]interface{})["hits"].([]interface{})
+	if !found {
+		return nil, errors.CreateError(500, "Invalid response format")
+	}
+
+	var records []*entities.Record
+	for _, hit := range hits {
+		doc := hit.(map[string]interface{})["_source"].(map[string]interface{})
+		docID := hit.(map[string]interface{})["_id"].(string)
+		// log.Println("HIT DOC",doc["index"],hit.(map[string]interface{})["_score"],doc["lda-answer"])
+		record := helper.UnescapeFieldsAndCreateRecord(doc, docID)
+		records = append(records, record)
+	}
+
+	return records, nil
+}
+
 func (r *RecordESRepository) countRecordFromQuery(indexName string, query string) (int, error) {
+	log.Println("count with query:", query)
 	client := r.es
 
 	// Perform the count request
@@ -154,6 +175,7 @@ func (r *RecordESRepository) countRecordFromQuery(indexName string, query string
 
 	// Check the count response status
 	if countRes.IsError() {
+		log.Println("error", countRes)
 		return 0, errors.CreateError(countRes.StatusCode, fmt.Sprintf("Elasticsearch count error: %s", countRes.Status()))
 	}
 

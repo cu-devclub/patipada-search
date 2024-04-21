@@ -7,7 +7,8 @@ import (
 
 func (r *MLServiceRepository) Text2VecGateway(text string) ([]*entities.Text2VecResponse, error) {
 	// call grpc method
-	grpcResponse, err := r.comm.Text2Vec(text)
+	com := *r.comm
+	grpcResponse, err := com.Text2Vec(text)
 	if err != nil {
 		return nil, err
 	}

@@ -3,7 +3,6 @@ package repositories
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"search-esdb-service/errors"
@@ -31,7 +30,7 @@ func (r *RecordESRepository) BulkInsert(qars []*entities.Record) error {
 
 	// Loop over the collection
 	for _, a := range qars {
-		data, err := json.Marshal(a)
+		data, err := a.BuildJson()
 		if err != nil {
 			return errors.CreateError(500, fmt.Sprintf("Cannot encode data %v: %s", a.Question, err))
 		}

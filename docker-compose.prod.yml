@@ -19,6 +19,7 @@ services:
       loggin_jobname: "containerlogs"
     volumes:
       - ./data:/app/datasource
+      - ./ml-data:/app/ml-data
       - ./logs:/app/logs
     restart: always
     depends_on:

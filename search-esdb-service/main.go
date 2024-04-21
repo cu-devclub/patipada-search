@@ -27,6 +27,8 @@ func main() {
 	config.ReadConfig()
 	cfg := config.GetConfig()
 
+	cfg.ReadMlConfig()
+
 	// If the usecase is bigger, this one can be an object
 	// right now it used only to set up the prometheus counter
 	monitoring.NewMonitoring()
@@ -43,6 +45,12 @@ func main() {
 		return
 	}
 	slog.Info("Connect to es db successfully!")
+
+	// db,err := database.MockElasticDatabase(&cfg)
+	// if err != nil {
+	// 	slog.Error("Failed to connect to database", slog.String("err", err.Error()))
+	// 	return
+	// }
 
 	err = recordMigrator.MigrateRecords(&cfg, db)
 	if err != nil {

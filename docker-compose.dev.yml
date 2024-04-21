@@ -16,6 +16,7 @@ services:
       ML_GATEWAY_URL: ml-gateway-service
     volumes:
       - ./data:/app/datasource
+      - ./ml-data:/app/ml-data
       - ./logs:/app/logs
     ports:
       - 8081:8081

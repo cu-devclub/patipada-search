@@ -13,6 +13,7 @@ type (
 		RabbitMQ  RabbitMQ
 		Static    Static
 		MlGateway MLGateway
+		MlConfig  MLConfig
 	}
 
 	App struct {

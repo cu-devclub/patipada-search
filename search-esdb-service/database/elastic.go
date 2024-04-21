@@ -68,6 +68,12 @@ func NewElasticDatabase(cfg *config.Config) (Database, error) {
 	}, nil
 }
 
+func MockElasticDatabase(cfg *config.Config) (Database, error) {
+	return &elasticDatabase{
+		Db: nil,
+	}, nil
+}
+
 func (es elasticDatabase) GetDB() *elasticsearch.Client {
 	return es.Db
 }

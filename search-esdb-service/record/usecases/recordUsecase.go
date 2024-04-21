@@ -5,15 +5,6 @@ import (
 )
 
 type RecordUsecase interface {
-	// GetAllRecords retrieves all records from the specified index.
-	//
-	// Parameters:
-	// - indexName: The name of the index to retrieve records from.
-	//
-	// Returns:
-	// - []*models.Record: An array of record objects.
-	// - error: Any error that occurred during the retrieval process.
-	GetAllRecords(indexName string) ([]*models.Record, error)
 
 	// Search searches for records in the specified index using the given query.
 	//

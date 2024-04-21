@@ -1,8 +1,7 @@
 package usecases
 
 import (
-	"search-esdb-service/record/helper"
-	"search-esdb-service/record/models"
+	"search-esdb-service/config"
 	mlRepository "search-esdb-service/record/repositories/mlRepository"
 	recordRepository "search-esdb-service/record/repositories/recordRepository"
 )
@@ -10,28 +9,17 @@ import (
 type recordUsecaseImpl struct {
 	recordRepository recordRepository.RecordRepository
 	mlRepository     mlRepository.MLRepository
+	cfg              *config.Config
 }
 
 func NewRecordUsecase(
 	recordRepository recordRepository.RecordRepository,
 	mlRepository mlRepository.MLRepository,
+	cfg *config.Config,
 ) RecordUsecase {
 	return &recordUsecaseImpl{
 		recordRepository: recordRepository,
 		mlRepository:     mlRepository,
+		cfg:              cfg,
 	}
-}
-
-func (r *recordUsecaseImpl) GetAllRecords(indexName string) ([]*models.Record, error) {
-	records, _, err := r.recordRepository.GetAllRecords(indexName)
-	if err != nil {
-		return nil, err
-	}
-
-	responseRecords := make([]*models.Record, 0)
-	for _, r := range records {
-		responseRecords = append(responseRecords, helper.RecordEntityToModels(r))
-	}
-
-	return responseRecords, nil
 }

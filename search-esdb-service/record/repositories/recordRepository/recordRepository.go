@@ -6,16 +6,7 @@ import (
 
 type RecordRepository interface {
 
-	// GetAllRecords retrieves all records from the specified index in Elasticsearch.
-	//
-	// indexName: The name of the Elasticsearch index.
-	// []*entities.Record: An array of Record objects representing the retrieved documents.
-	// error: An error object if there was an issue retrieving the records.
-	GetAllRecords(indexName string) ([]*entities.Record, int, error)
-
-	// TODO : Tokenize service connection with ML service
-
-	// Search searches for records in the specified Elasticsearch index based on the provided query.
+	// KeywordSearch searches for records in the specified Elasticsearch index based on the provided query.
 	//
 	// Parameters:
 	// - indexName: The name of the Elasticsearch index to search in.
@@ -24,9 +15,11 @@ type RecordRepository interface {
 	// Returns:
 	// - []*entities.Record: A slice of records found in the index that match the query.
 	// - error: An error if any occurred during the search operation.
-	Search(indexName string, query interface{}, offset, amount int, countNeeded bool) ([]*entities.Record, int, error)
+	KeywordSearch(keywordSearchEntity *entities.KeywordSearchStruct) ([]*entities.Record, int, error)
 
-	VectorSearch(indexName string, query interface{}, offset, amount int, countNeeded bool) ([]*entities.Record, int, error)
+	VectorSearch(vectorSearchEntity *entities.VectorSearchStruct) ([]*entities.Record, int, error)
+
+	HybridSearch(hybridSearchEntity *entities.HybridSearchStruct) ([]*entities.Record, int, error)
 
 	Tokenize(query string) ([]string, error)
 

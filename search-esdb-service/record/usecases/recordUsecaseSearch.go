@@ -1,8 +1,10 @@
 package usecases
 
 import (
+	"fmt"
 	"search-esdb-service/constant"
 	"search-esdb-service/data"
+	"search-esdb-service/errors"
 	"search-esdb-service/record/entities"
 	"search-esdb-service/record/helper"
 	"search-esdb-service/record/models"
@@ -13,17 +15,28 @@ import (
 func (r *recordUsecaseImpl) Search(indexName, query, searchType string, offset, amount int, countNeeded bool) (*models.SearchRecordStruct, error) {
 
 	var records []*entities.Record
-	var tokens []string
 	var count int
-	var err error
+
+	tokens, err := r.recordRepository.Tokenize(query)
+	if err != nil {
+		return nil, err
+	}
+	pureTokens := util.RemoveSliceFromArrays(tokens, data.GetStopWord())
+
+	config := &entities.SearchConfig{
+		IndexName:   indexName,
+		Offset:      offset,
+		Amount:      amount,
+		CountNeeded: countNeeded,
+	}
 
 	switch searchType {
 	case constant.SEARCH_BY_TF_IDF:
-		records, tokens, count, err = r.internalSearch(indexName, query, offset, amount, countNeeded)
-	case constant.SEARCH_BY_LDA:
-		records, tokens, err = r.externalSearch(indexName, query, offset, amount)
+		records, count, err = r.keywordSearch(indexName, pureTokens, config)
+	case constant.SEARCH_BY_VECTOR:
+		records, count, err = r.vectorSearch(indexName, query, config)
 	default:
-		records, tokens, count, err = r.internalSearch(indexName, query, offset, amount, countNeeded)
+		records, count, err = r.hybridSearch(indexName, query, pureTokens, config)
 	}
 
 	if err != nil {
@@ -38,32 +51,68 @@ func (r *recordUsecaseImpl) Search(indexName, query, searchType string, offset, 
 
 	response := &models.SearchRecordStruct{
 		Results: responseRecords,
-		Tokens:  tokens,
+		Tokens:  pureTokens,
 		Amount:  count,
 	}
 	return response, nil
 }
 
-func (r *recordUsecaseImpl) internalSearch(indexName, query string, offset, amount int, countNeeded bool) ([]*entities.Record, []string, int, error) {
-	// working (tokenize, tf-idf) with only elastic
-	tokens, err := r.recordRepository.Tokenize(query)
-	if err != nil {
-		return nil, nil, 0, err
+func (r *recordUsecaseImpl) keywordSearch(indexName string, tokens []string, config *entities.SearchConfig) ([]*entities.Record, int, error) {
+	searchQuery := strings.Join(tokens, "")
+
+	keywordSearchStruct := &entities.KeywordSearchStruct{
+		Query:               searchQuery,
+		KeywordSearchFields: []string{"question", "answer"},
+		Config:              config,
 	}
 
-	pureTokens := util.RemoveSliceFromArrays(tokens, data.GetStopWord())
-	searchQuery := strings.Join(pureTokens, "")
-
-	records, count, err := r.recordRepository.Search(indexName, searchQuery, offset, amount, countNeeded)
+	records, count, err := r.recordRepository.KeywordSearch(keywordSearchStruct)
 	if err != nil {
-		return nil, nil, 0, err
+		return nil, 0, err
 	}
 
-	return records, pureTokens, count, nil
+	return records, count, nil
 }
 
-func (r *recordUsecaseImpl) externalSearch(indexName, query string, offset, amount int) ([]*entities.Record, []string, error) {
-	// TODO : implementing calling text 2 vec gateway	
+func (r *recordUsecaseImpl) vectorSearch(indexName, query string, config *entities.SearchConfig) ([]*entities.Record, int, error) {
+	vectorResponses, err := r.mlRepository.Text2VecGateway(query)
+	if err != nil {
+		return nil, 0, err
+	}
 
-	return nil, nil, nil
+	vectorSearchStruct := &entities.VectorSearchStruct{
+		VectorFields: vectorResponses,
+		Config:       config,
+	}
+
+	records, count, err := r.recordRepository.VectorSearch(vectorSearchStruct)
+	if err != nil {
+		return nil, 0, errors.CreateError(500, fmt.Sprintf("Error performing vector search: %v", err))
+	}
+
+	return records, count, nil
+}
+
+func (r *recordUsecaseImpl) hybridSearch(indexName, query string, tokens []string, config *entities.SearchConfig) ([]*entities.Record, int, error) {
+	keywordSearchQuery := strings.Join(tokens, "")
+
+	vectorResponses, err := r.mlRepository.Text2VecGateway(query)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	hybridSearchStruct := &entities.HybridSearchStruct{
+		Query:                    keywordSearchQuery,
+		KeywordSearchFields:      []string{"question", "answer"},
+		KeywordSearchScoreWeight: r.cfg.MlConfig.TfIDFScoreWeight,
+		VectorFields:             vectorResponses,
+		Config:                   config,
+	}
+
+	records, count, err := r.recordRepository.HybridSearch(hybridSearchStruct)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return records, count, nil
 }

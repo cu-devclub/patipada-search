@@ -73,7 +73,7 @@ func (g *ginServer) initializeRecordHttpHandler() {
 
 	recordESRepository := recordRepository.NewRecordESRepository(g.db)
 	mlRepository := mlRepository.NewMLServiceRepository(&g.comm)
-	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository)
+	recordUsecase := recordUsecases.NewRecordUsecase(recordESRepository, mlRepository, g.cfg)
 
 	recordHttpHandler := recordHandlers.NewRecordHttpHandler(recordUsecase)
 
@@ -83,14 +83,6 @@ func (g *ginServer) initializeRecordHttpHandler() {
 		Usecase: recordUsecase,
 		Handler: recordHttpHandler,
 	}
-
-	// GetAllRecords retrieves all records from the elastic database
-	// and sends a response back to the client.
-	//
-	// Response:
-	// - 200 & A list of all records retrieved from the database.
-	// - 500: An internal server error occurred.
-	g.app.GET("/displayAllRecords", recordHttpHandler.GetAllRecords)
 
 	// Search searches for records based on the provided query.
 	//

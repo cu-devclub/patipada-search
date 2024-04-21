@@ -43,13 +43,6 @@ func (h HandlerOpts) LogValue() slog.Value {
 }
 
 type RecordHandler interface {
-	// GetAllRecords retrieves all records from the elastic database
-	// and sends a response back to the client.
-	//
-	// Response:
-	// - 200 & A list of all records retrieved from the database.
-	// - 500: An internal server error occurred.
-	GetAllRecords(c *gin.Context)
 
 	// Search searches for records based on the provided query.
 	//

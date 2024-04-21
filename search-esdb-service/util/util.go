@@ -29,25 +29,25 @@ func RemoveSliceFromArrays(arr []string, slice []string) []string {
 	if len(result) == 0 {
 		return arr
 	}
-	
+
 	return result
 }
 
-func ConvertStringToFloat64Arrays(arr string) ([]float64, error) {
+func ConvertStringToFloat32Arrays(arr string) ([]float32, error) {
 	if arr == "[]" {
 		// Empty array case
 		return nil, nil
 	}
-	var result []float64
+	var result []float32
 	values := strings.Split(arr, ",")
 	for _, v := range values {
 		trimmedV := strings.TrimSpace(v)
 		trimmedV = strings.Trim(trimmedV, "[]")
-		floatV, err := strconv.ParseFloat(trimmedV, 64)
+		floatV, err := strconv.ParseFloat(trimmedV, 32)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, floatV)
+		result = append(result, float32(floatV))
 	}
 
 	return result, nil
