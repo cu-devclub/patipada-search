@@ -29,6 +29,7 @@ function QA_Vdo({ data, query, tokens }: QAProps) {
   const vdoRef = useRef<VdoRef | null>(null);
 
   useEffect(() => {
+    SetisQueryTheQuestion(false);
     if (query == data.question) {
       // For Highlighting the question
       SetisQueryTheQuestion(true);
