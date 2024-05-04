@@ -1,3 +1,4 @@
+SHELL=cmd.exe
 AUTH_BINARY = authApp
 SEARCH_BINARY = searchApp
 ML_GATEWAY_BINARY = mlGateWayApp
@@ -13,21 +14,21 @@ up_build:  build_auth build_search build_data build_frontend build_ml_gateway
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service ml-gatewqay-service frontend nginx rabbitmq 
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service ml-gateway-service frontend nginx rabbitmq 
 	@echo "Docker images built and started!"
 
 up_build_full_service:  build_auth build_search build_data build_frontend build_ml_gateway
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service ml-gatewqay-service frontend nginx rabbitmq loki promtail grafana prometheus
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service ml-gateway-service frontend nginx rabbitmq loki promtail grafana prometheus
 	@echo "Docker images built and started!"
 
-up_build_backend: build_auth build_search build_data
+up_build_backend: build_auth build_search build_data build_ml_gateway
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service data-service rabbitmq ml-gateway-service
+	docker compose -f docker-compose.dev.yml up --build -d auth-service search-service ml-gateway-service data-service rabbitmq
 	@echo "Docker images built and started!"
 
 ####### AUTH SERVICE #######
@@ -42,7 +43,7 @@ up_build_auth: build_auth
 ## build_auth: builds the auth binary as a linux executable
 build_auth:
 	@echo "Building auth binary..."
-	cd auth-service && env GOOS=linux CGO_ENABLED=0 go build -o ${AUTH_BINARY} .
+	cd auth-service && set GOOS=linux&& set GOARCH=amd64&& set CGO_ENABLED=0 && go build -o ${AUTH_BINARY} .
 	@echo "Done!"
 
 ## down_auth: stops the auth service
@@ -74,7 +75,7 @@ up_build_search: build_search
 ## build_search: builds the search binary as a linux executable
 build_search:
 	@echo "Building search binary..."
-	cd search-esdb-service && env GOOS=linux CGO_ENABLED=0 go build -o ${SEARCH_BINARY} .
+	cd search-esdb-service && set GOOS=linux&& set GOARCH=amd64&& set CGO_ENABLED=0 && go build -o ${SEARCH_BINARY} .
 	@echo "Done!"
 
 ## down_search: stops the search service
@@ -130,7 +131,7 @@ down_ml_gateway:
 ## build_ml_gateway: builds the ml-gateway binary as a linux executable
 build_ml_gateway:
 	@echo "Building ml-gateway binary..."
-	cd ml-gateway-service && env GOOS=linux CGO_ENABLED=0 go build -o ${ML_GATEWAY_BINARY} .
+	cd ml-gateway-service && set GOOS=linux&& set GOARCH=amd64&& set CGO_ENABLED=0 && go build -o ${ML_GATEWAY_BINARY} .
 	@echo "Done!"
 
 
@@ -149,7 +150,7 @@ up_build_data: build_data
 ## build_data: builds the data binary as a linux executable
 build_data:
 	@echo "Building data binary..."
-	cd data-management-service && env GOOS=linux CGO_ENABLED=0 go build -o ${DATA_BINARY} .
+	cd data-management-service && set GOOS=linux&& set GOARCH=amd64&& set CGO_ENABLED=0 && go build -o ${DATA_BINARY} .
 	@echo "Done!"
 
 

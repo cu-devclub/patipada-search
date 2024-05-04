@@ -25,6 +25,7 @@ services:
     depends_on:
       - elastic-db
       - rabbitmq
+      - ml-gateway-service
     networks:
       - dhammanava_network
   
