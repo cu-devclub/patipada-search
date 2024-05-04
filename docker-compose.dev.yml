@@ -23,6 +23,7 @@ services:
     depends_on:
       - elastic-db
       - rabbitmq
+      - ml-gateway-service
     labels:
       logging: "promtail"
       loggin_jobname: "containerlogs"

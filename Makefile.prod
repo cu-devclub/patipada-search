@@ -9,20 +9,20 @@ up_containers:
 	@echo "Stopping docker containers (if running...)"
 	docker compose -f docker-compose.prod.yml down
 	@echo "Starting docker container..."
-	docker compose -f docker-compose.prod.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq
+	docker compose -f docker-compose.prod.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq ml-gateway-service
 	@echo "Docker container built and started!"
 
 up_build_full_service:
 	@echo "Stopping docker images (if running...)"
 	docker compose -f docker-compose.dev.yml down
 	@echo "Building (when required) and starting docker images..."
-	docker compose -f docker-compose.prod.yml up --build -d auth-service search-service data-service frontend nginx rabbitmq loki promtail grafana prometheus
+	docker compose -f docker-compose.prod.yml up --build -d auth-service search-service ml-gateway-service data-service frontend nginx rabbitmq loki promtail grafana prometheus
 	@echo "Docker images built and started!"
 
 ## up_backend: starts backend containers ; auth, search and data
 up_backend: 
 	@echo "Starting docker containers..."
-	docker compose -f docker-compose.prod.yml up -d auth-service search-service data-service rabbitmq
+	docker compose -f docker-compose.prod.yml up -d auth-service search-service ml-gateway-service data-service rabbitmq
 	@echo "Docker container built and started!"
 
 ####### AUTH SERVICE #######
@@ -126,6 +126,21 @@ fresh_elastic:
 	@echo "Search service restarted!"
 
 #################################
+
+###### Ml Gateway Service ######
+## up_ml_gateway: stops docker compose (if running),and starts docker compose
+up_ml_gateway: 
+	@echo "Stopping docker images (if running...)"
+	docker compose -f docker-compose.prod.yml down ml-gateway-service
+	@echo "starting docker images..."
+	docker compose -f docker-compose.prod.yml up -d ml-gateway-service
+	@echo "Docker images started!"
+
+## down_ml_gateway: stops the ml-gateway service
+down_ml_gateway:
+	@echo "Stopping ml-gateway service..."
+	docker compose -f docker-compose.prod.yml down ml-gateway-service
+	@echo "ML Gateway service stopped!"
 
 ###### Data Management Service ######
 ## up_data: stops data container, starts data docker compose
