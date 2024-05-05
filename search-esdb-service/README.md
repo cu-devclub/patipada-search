@@ -11,7 +11,6 @@ This service use to search the data. The mechanism to search is combining both k
 
 
 ## Run locally 
-If you do not want to run using docker you can run using golang
 
 #### Prerequisite 
 
@@ -24,24 +23,35 @@ cd <your-path>/<project-root(where docker compose is)>
 ``` bash
 docker compose -f docker-compose.dev.yml up -d elastic-db
 ```
+4. Copy [data folder](../data/) to this directory and rename to `datasource`
+5. Copy [ml data folder](../ml-data/) to this directory and rename to `ml-data`
 
 #### Steps
-There are 2 ways to run the service 
-  1. Using golang 
+There are 3 ways to run the service 
+  1. Using golang (Recommend for isolate service development)
       ``` bash
       cd <your-path>/search-esdb-service
       ```
       ```bash
-      go get ./...
+      go mod tidy
       go mod vendor
-      go run main.go 
+      go run mock/isolate.go 
       ```
   2. Using docker
     - uncomment every line in [Dockerfile](./Dockerfile)
     - Navigate to root directory
     - Run
       ```bash
-      docker compose -f docker-compose.dev.yml up -d search-service 
+      docker compose -f docker-compose.dev.yml up --build -d search-service 
+      ```
+  3. Using make (spin up all dependencies service) (recommend for final testing / testing with another services)
+    - Install make
+    - run
+     ``` bash
+      cd <your-path>/patipada-search
+      ```
+      ```bash
+      make up_build_search
       ```
       
 ## API Reference
@@ -94,6 +104,7 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
     ├── util      
     ├── data                    # data reader function
     ├── database 
+    ├── mock                    # mock external services
     ├── datasource              # will be ignore from git (folked, used in dev) 
     ├── proto                   # gRPC   
       |- search_proto           # gRPC protocol between data mngt&search                  

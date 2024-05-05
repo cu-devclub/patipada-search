@@ -13,11 +13,15 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+type GRPCInterface interface {
+	Text2Vec(text string) (*ml_gateway_proto.Text2VecResponse, error)
+}
+
 type GRPCStruct struct {
 	MlGatewayClient ml_gateway_proto.MlGatewayServiceClient
 }
 
-func NewMockgRPC() *GRPCStruct {
+func NewMockgRPC() GRPCInterface {
 	return &GRPCStruct{
 		MlGatewayClient: nil,
 	}
@@ -37,11 +41,11 @@ func NewgRPC(cfg *config.Config) (*GRPCStruct, error) {
 
 }
 
-func (g *CommunicationImpl) Text2Vec(text string) (*ml_gateway_proto.Text2VecResponse, error) {
+func (g *GRPCStruct) Text2Vec(text string) (*ml_gateway_proto.Text2VecResponse, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	result, err := g.GRPC.MlGatewayClient.Text2Vec(ctx, &ml_gateway_proto.Text2VecRequest{Text: text})
+	result, err := g.MlGatewayClient.Text2Vec(ctx, &ml_gateway_proto.Text2VecRequest{Text: text})
 	if err != nil {
 		return nil, errors.CreateError(http.StatusInternalServerError,
 			fmt.Sprintf("Error calling ml gateway service via gRPC %v", err),
