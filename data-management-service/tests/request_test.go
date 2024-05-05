@@ -30,7 +30,7 @@ func setUpTestEnvironment() handlers.Handlers {
 		return nil
 	}
 
-	comm := communication.NewCommunicationImpl(*grpc, *rabbit)
+	comm := communication.NewCommunicationImpl(grpc, rabbit)
 
 	requestRepositories := repositories.NewRequestRepositories(db.GetDb(), &comm)
 

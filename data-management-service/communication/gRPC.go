@@ -15,19 +15,18 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+type GRPCInterface interface {
+	Authorization(token string, requiredRole string) (bool, error)
+	VerifyUsername(username string) (bool, error)
+	SearchRecord(recordID string) (bool, error)
+}
+
 type GRPCStruct struct {
 	AuthClient   auth_proto.AuthServiceClient
 	SearchClient search_proto.SearchServiceClient
 }
 
-func NewMockgRPC() *GRPCStruct {
-	return &GRPCStruct{
-		AuthClient:   nil,
-		SearchClient: nil,
-	}
-}
-
-func NewgRPC(cfg *config.Config) (*GRPCStruct, error) {
+func NewgRPC(cfg *config.Config) (GRPCInterface, error) {
 	authConn, err := grpc.Dial(fmt.Sprintf("%s:%d", cfg.App.AuthService, cfg.App.AuthGRPCPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		return nil, errors.CreateError(500, "Error connecting to auth service via gRPC "+err.Error())
@@ -47,11 +46,11 @@ func NewgRPC(cfg *config.Config) (*GRPCStruct, error) {
 	}, nil
 }
 
-func (g *CommunicationImpl) Authorization(token string, requiredRole string) (bool, error) {
+func (g *GRPCStruct) Authorization(token string, requiredRole string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	result, err := g.GRPC.AuthClient.Authorization(ctx, &auth_proto.AuthorizationRequest{Token: token, RequiredRole: requiredRole})
+	result, err := g.AuthClient.Authorization(ctx, &auth_proto.AuthorizationRequest{Token: token, RequiredRole: requiredRole})
 	if err != nil {
 		return false, errors.CreateError(http.StatusInternalServerError,
 			fmt.Sprintf("Error calling auth service via gRPC %v", err),
@@ -65,11 +64,11 @@ func (g *CommunicationImpl) Authorization(token string, requiredRole string) (bo
 	return true, nil
 }
 
-func (g *CommunicationImpl) VerifyUsername(username string) (bool, error) {
+func (g *GRPCStruct) VerifyUsername(username string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	result, err := g.GRPC.AuthClient.VerifyUsername(ctx, &auth_proto.VerifyUsernameRequest{Username: username})
+	result, err := g.AuthClient.VerifyUsername(ctx, &auth_proto.VerifyUsernameRequest{Username: username})
 	if err != nil {
 		return false, errors.CreateError(http.StatusInternalServerError,
 			fmt.Sprintf("Error calling auth service via gRPC %v", err),
@@ -83,11 +82,11 @@ func (g *CommunicationImpl) VerifyUsername(username string) (bool, error) {
 	return true, nil
 }
 
-func (g *CommunicationImpl) SearchRecord(recordID string) (bool, error) {
+func (g *GRPCStruct) SearchRecord(recordID string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	result, err := g.GRPC.SearchClient.SearchRecord(ctx, &search_proto.SearchRequest{Query: recordID})
+	result, err := g.SearchClient.SearchRecord(ctx, &search_proto.SearchRequest{Query: recordID})
 	if err != nil && err.Error() != messages.ELASTIC_METHOD_NOT_ALLOW {
 		return false, errors.CreateError(http.StatusInternalServerError,
 			fmt.Sprintf("Error calling search service via gRPC %v", err),

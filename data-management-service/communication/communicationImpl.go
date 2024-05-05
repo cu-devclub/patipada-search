@@ -1,14 +1,30 @@
 package communication
 
 type CommunicationImpl struct {
-	GRPC GRPCStruct
-	RabbitMQ RabbitMQStruct
+	GRPC GRPCInterface
+	RabbitMQ RabbitMQInterface
 	
 }
 
-func NewCommunicationImpl(GRPC GRPCStruct,rabbitMQ RabbitMQStruct) Communication {
+func NewCommunicationImpl(GRPC GRPCInterface,rabbitMQ RabbitMQInterface) Communication {
 	return &CommunicationImpl{
 		GRPC: GRPC,
 		RabbitMQ: rabbitMQ,
 	}
+}
+
+func (c *CommunicationImpl) Authorization(token string, requiredRole string) (bool, error) {
+	return c.GRPC.Authorization(token, requiredRole)
+}
+
+func (c *CommunicationImpl) VerifyUsername(username string) (bool, error) {
+	return c.GRPC.VerifyUsername(username)
+}
+
+func (c *CommunicationImpl) SearchRecord(recordID string) (bool, error) {
+	return c.GRPC.SearchRecord(recordID)
+}
+
+func (c *CommunicationImpl) PublishUpdateRecordsToRabbitMQ(payloadName string, message interface{}) error {
+	return c.RabbitMQ.PublishUpdateRecordsToRabbitMQ(payloadName, message)
 }

@@ -10,36 +10,45 @@ This service use to store managed data
 
 ## Run locally
 
-If you do not want to run using docker you can run using golang
-
 #### Prerequisite
 
 1. Install golang
-2. Start data management db
+2. Install docker / make
+3. Start data management db
 ``` bash
 cd <your-path>/<project-root(where docker compose is)>
 ```
 ``` bash
 docker compose -f docker-compose.dev.yml up -d data-db
 ```
+4. Copy [data folder](../data/) to this directory and rename to `datasource`
 
 #### Steps
-There are 2 ways to run the service 
-  1. Using golang 
+There are 3 ways to run the service 
+  1. Using golang (Recommend for isolate service development)
       ``` bash
-      cd <your-path>/search-esdb-service
+      cd <your-path>/data-managment-service
       ```
       ```bash
-      go get ./...
+      go mod tidy
       go mod vendor
-      go run main.go 
+      go run mock/isolate.go 
       ```
   2. Using docker
     - uncomment every line in [Dockerfile](./Dockerfile)
     - Navigate to root directory
     - Run
       ```bash
-      docker compose -f docker-compose.dev.yml up -d data-service 
+      docker compose -f docker-compose.dev.yml up --build -d data-service 
+      ```
+  3. Using make (spin up all dependencies service) (recommend for final testing / testing with another services)
+    - Install make
+    - run
+     ``` bash
+      cd <your-path>/patipada-search
+      ```
+      ```bash
+      make up_build_data
       ```
 
 
@@ -66,6 +75,7 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
         ├── search_proto 
     ├── config
     ├── database
+    ├── mock                    # mock external services
     ├── errors                  # Custom errors
     ├── messages                # Response Message
     ├── server
