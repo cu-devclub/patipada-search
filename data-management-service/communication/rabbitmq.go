@@ -13,21 +13,18 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+type RabbitMQInterface interface {
+	PublishUpdateRecordsToRabbitMQ(payloadName string, message interface{}) error
+	CloseConnection()
+}
+
 type RabbitMQStruct struct {
 	Conn         *amqp.Connection
 	Emitter      *event.Emitter
-	rabbitconfig *config.RabbitMQ
+	Rabbitconfig *config.RabbitMQ
 }
 
-func MockRabbitMQ() *RabbitMQStruct {
-	return &RabbitMQStruct{
-		Conn:         nil,
-		Emitter:      nil,
-		rabbitconfig: nil,
-	}
-}
-
-func ConnectToRabbitMQ(cfg *config.Config) (*RabbitMQStruct, error) {
+func ConnectToRabbitMQ(cfg *config.Config) (RabbitMQInterface, error) {
 	var counts int64
 	var backOff = 1 * time.Second
 	var connection *amqp.Connection
@@ -65,7 +62,7 @@ func ConnectToRabbitMQ(cfg *config.Config) (*RabbitMQStruct, error) {
 	return &RabbitMQStruct{
 		Conn:         connection,
 		Emitter:      emitter,
-		rabbitconfig: &cfg.RabbitMQ,
+		Rabbitconfig: &cfg.RabbitMQ,
 	}, nil
 }
 
@@ -74,16 +71,23 @@ type RabbitMQPayload struct {
 	Data interface{} `json:"data"`
 }
 
-func (c *CommunicationImpl) PublishUpdateRecordsToRabbitMQ(payloadName string, message interface{}) error {
+func (c *RabbitMQStruct) PublishUpdateRecordsToRabbitMQ(payloadName string, message interface{}) error {
 	// convert message to payload json string
 	payload := RabbitMQPayload{
 		Name: payloadName,
 		Data: message,
 	}
 	j, _ := json.Marshal(payload)
-	err := c.RabbitMQ.Emitter.Emit(string(j), constant.UPDATE_RECORD_TOPIC)
+	err := c.Emitter.Emit(string(j), constant.UPDATE_RECORD_TOPIC)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+
+func (c *RabbitMQStruct) CloseConnection() {
+	if c.Conn != nil {
+		c.Conn.Close()
+	}
 }

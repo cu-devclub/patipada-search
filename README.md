@@ -13,6 +13,7 @@ To deploy / develop each service or each database please check README.md for eac
 3. [Authentication Service](./auth-service/)
 4. [Data Management Service](./data-management-service/)
 5. [Machine learning Service](./ml-service/)
+6. [Ml Gateway Service](./ml-gateway-service/)
 
 ## Data Source
 

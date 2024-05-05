@@ -3,6 +3,50 @@ AUTH_BINARY = authApp
 SEARCH_BINARY = searchApp
 ML_GATEWAY_BINARY = mlGateWayApp
 DATA_BINARY = dataApp
+
+## install_all_dependencies : installs all the dependencies for all the services
+install_all_dependencies:
+	@echo "Installing all dependencies..."
+	cd auth-service && go mod tidy
+	cd search-esdb-service && go mod tidy
+	cd data-management-service && go mod tidy
+	cd ml-gateway-service && go mod tidy
+	cd frontend && yarn install
+	@echo "Done!"
+
+## install_auth_dependencies : installs all the dependencies for auth service
+install_auth_dependencies:
+	@echo "Installing auth service dependencies..."
+	cd auth-service && go mod tidy
+	@echo "Done!"
+
+## install_search_dependencies : installs all the dependencies for search service
+install_search_dependencies:
+	@echo "Installing search service dependencies..."
+	cd search-esdb-service && go mod tidy
+	@echo "Done!"
+
+## install_ml_gateway_dependencies : installs all the dependencies for ml-gateway service
+install_ml_gateway_dependencies:
+	@echo "Installing ml-gateway service dependencies..."
+	cd ml-gateway-service && go mod tidy
+	@echo "Done!"
+
+## install_data_dependencies : installs all the dependencies for data service
+install_data_dependencies:
+	@echo "Installing data service dependencies..."
+	cd data-management-service && go mod tidy
+	@echo "Done!"
+
+## install_frontend_dependencies : installs all the dependencies for frontend service
+install_frontend_dependencies:
+	@echo "Installing frontend service dependencies..."
+	cd frontend && yarn install
+	@echo "Done!"
+
+## install backend dependencies for all services
+install_backend_dependencies: install_auth_dependencies install_search_dependencies install_ml_gateway_dependencies install_data_dependencies
+
 ## up: starts all containers in the background without forcing build
 up:
 	@echo "Starting Docker images..."

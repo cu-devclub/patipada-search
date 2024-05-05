@@ -1,3 +1,7 @@
+//! This file is used for testing purposes only. It is used to isolate the service from the actual gRPC and RabbitMQ services.
+//! The actual service is implemented in the communication package.
+//! By mocking the gRPC and RabbitMQ services, we can test the service without having to rely on the actual services.
+
 package main
 
 import (
@@ -5,6 +9,7 @@ import (
 	"data-management/config"
 	"data-management/database"
 	"data-management/logging"
+	mock "data-management/mock/communication"
 	"data-management/request/migration"
 	"data-management/server"
 	validator "data-management/structValidator"
@@ -32,19 +37,10 @@ func main() {
 
 	validate := validator.NewValidator()
 
-	grpc, err := communication.NewgRPC(&cfg)
-	if err != nil {
-		slog.Error("Failed to connect to gRPC", slog.String("err", err.Error()))
-		return
-	}
+	grpc := mock.NewMockgRPC()
 	slog.Info("Connect to gRPC successfully!")
 
-	rabbit, err := communication.ConnectToRabbitMQ(&cfg)
-	if err != nil {
-		slog.Error("Failed to connect to RabbitMQ", slog.String("err", err.Error()))
-		return
-	}
-	defer rabbit.CloseConnection()
+	rabbit := mock.MockRabbitMQ()
 	slog.Info("Connect to RabbitMQ successfully!")
 
 	comm := communication.NewCommunicationImpl(grpc, rabbit)
