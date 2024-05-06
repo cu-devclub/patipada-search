@@ -5,7 +5,7 @@ import (
 	"data-management/request/entities"
 )
 
-func (r *requestRepositories) UpdateRecord(record *entities.Record) error {
+func (r *repositoryImpl) UpdateRecord(record *entities.Record) error {
 	entity := &entities.UpdateRecord{
 		DocumentID: record.Index,
 		Question:   record.Question,

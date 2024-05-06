@@ -3,8 +3,8 @@ package util
 import (
 	"html"
 
-	"github.com/microcosm-cc/bluemonday"
 	"github.com/google/uuid"
+	"github.com/microcosm-cc/bluemonday"
 )
 
 func Contains(s string, arr []string) bool {

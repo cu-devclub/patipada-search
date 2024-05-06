@@ -1,10 +1,10 @@
-package event
+package rabbitmq
 
 import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-func declareExchange(ch *amqp.Channel, exchangeName string) error {
+func DeclareExchange(ch *amqp.Channel, exchangeName string) error {
 	return ch.ExchangeDeclare(
 		exchangeName, // name
 		"topic",     // type

@@ -1,14 +1,15 @@
 package communication
 
+import "data-management/rabbitmq"
+
 type CommunicationImpl struct {
-	GRPC GRPCInterface
-	RabbitMQ RabbitMQInterface
-	
+	GRPC     GRPCInterface
+	RabbitMQ rabbitmq.RabbitMQInterface
 }
 
-func NewCommunicationImpl(GRPC GRPCInterface,rabbitMQ RabbitMQInterface) Communication {
+func NewCommunicationImpl(GRPC GRPCInterface, rabbitMQ rabbitmq.RabbitMQInterface) Communication {
 	return &CommunicationImpl{
-		GRPC: GRPC,
+		GRPC:     GRPC,
 		RabbitMQ: rabbitMQ,
 	}
 }

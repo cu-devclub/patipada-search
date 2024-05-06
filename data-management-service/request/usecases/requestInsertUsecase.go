@@ -27,11 +27,12 @@ func (r *requestUsecase) InsertRequest(request *models.Request) error {
 	}
 
 	// populate request entity
-	requestID, err := helper.GenerateRequestID(r.requestRepositories)
+	nextSeq, err := r.requestRepositories.GetNextRequestCounter()
 	if err != nil {
-		return errors.CreateError(500, messages.INTERNAL_SERVER_ERROR)
+		return  err
 	}
-
+	requestID := helper.GenerateRequestID(nextSeq)
+	
 	requestEntity := &entities.Request{
 		RequestID:  requestID,
 		Index:      request.Index,

@@ -1,4 +1,4 @@
-package mock
+package mock_communication
 
 import (
 	"context"
@@ -20,9 +20,15 @@ func NewMockAuthServiceClient() MockAuthServiceClientInterface {
 	return &MockAuthServiceClient{}
 }
 
+var authorizeResponse *bool
+
+func SetAuthorizationResponse(response bool) {
+	authorizeResponse = &response
+}
+
 func MockAuthorizationResponse() *auth_proto.AuthorizationResponse {
 	return &auth_proto.AuthorizationResponse{
-		IsAuthorized: true, // or false, depending on what you want to mock
+		IsAuthorized: *authorizeResponse, 
 	}
 }
 
@@ -30,9 +36,15 @@ func (c *MockAuthServiceClient) Authorization(ctx context.Context, in *auth_prot
 	return MockAuthorizationResponse(), nil
 }
 
+var verifyUsernameResponse *bool
+
+func SetVerifyUsernameResponse(response bool) {
+	verifyUsernameResponse = &response
+}
+
 func MockVerifyUsernameResponse() *auth_proto.VerifyUsernameResponse {
 	return &auth_proto.VerifyUsernameResponse{
-		IsVerified: true, // or false, depending on what you want to mock
+		IsVerified: *verifyUsernameResponse, 
 	}
 }
 

@@ -27,7 +27,11 @@ func (u *UsecaseImpl) InsertRating(rating *models.Rating) (*models.Rating, error
 		Comment:  rating.Comment,
 	}
 
-	u.ratingsRepository.InsertRating(ratingEntity)
+	_, err := u.ratingsRepository.InsertRating(ratingEntity)
+
+	if err != nil {
+		return nil, err
+	}
 
 	ratingModels := &models.Rating{
 		RatingID: &ratingID,

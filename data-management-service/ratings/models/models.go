@@ -13,3 +13,10 @@ type (
 		Percentage   float64 `json:"percentage_rating"`
 	}
 )
+
+func (r *Rating) MockRating() {
+	mockRatingID := "1234567890"
+	r.RatingID = &mockRatingID
+	r.Stars = 5
+	r.Comment = "Good"
+}

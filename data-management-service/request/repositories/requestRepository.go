@@ -12,17 +12,17 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type requestRepositories struct {
+type repositoryImpl struct {
 	mongo                    *mongo.Client
 	requestCollection        *mongo.Collection
 	requestCounterCollection *mongo.Collection
 	communicationClient      communication.Communication
 }
 
-func NewRequestRepositories(mongo *mongo.Client, c *communication.Communication) Repositories {
+func NewRepositories(mongo *mongo.Client, c *communication.Communication) Repositories {
 	requestCollection := mongo.Database("data").Collection("request")
 	requestCounterCollection := mongo.Database("data").Collection("counters")
-	return &requestRepositories{
+	return &repositoryImpl{
 		mongo:                    mongo,
 		requestCollection:        requestCollection,
 		requestCounterCollection: requestCounterCollection,
@@ -43,7 +43,7 @@ func NewRequestRepositories(mongo *mongo.Client, c *communication.Communication)
 //
 //	[]*entities.Request: A slice of pointers to the matching requests. If no requests match the filter, the slice will be empty.
 //	error: An error that occurred during the operation, if any.
-func (r *requestRepositories) GetRequest(filter bson.M) ([]*entities.Request, error) {
+func (r *repositoryImpl) GetRequest(filter bson.M) ([]*entities.Request, error) {
 	var requests []*entities.Request
 
 	cursor, err := r.requestCollection.Find(context.Background(), filter)
@@ -71,11 +71,11 @@ func (r *requestRepositories) GetRequest(filter bson.M) ([]*entities.Request, er
 // Usage:
 //
 //	Request := &entities.Request{...}
-//	err := RequestRepositories.InsertRequest(Request)
+//	err := repositoryImpl.InsertRequest(Request)
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
-func (r *requestRepositories) InsertRequest(request *entities.Request) (string, error) {
+func (r *repositoryImpl) InsertRequest(request *entities.Request) (string, error) {
 	result, err := r.requestCollection.InsertOne(context.TODO(), request)
 	if err != nil {
 		return "", err
@@ -120,7 +120,7 @@ func (r *requestRepositories) InsertRequest(request *entities.Request) (string, 
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
-func (r *requestRepositories) UpdateRequest(request *entities.Request) error {
+func (r *repositoryImpl) UpdateRequest(request *entities.Request) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
