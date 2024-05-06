@@ -65,7 +65,7 @@ func (g *ginServer) Start() {
 
 func (g *ginServer) initializeRequestHttpHandler() {
 	database := *g.db
-	requestRepository := requestRepositories.NewRequestRepositories(database.GetDb(), &g.comm)
+	requestRepository := requestRepositories.NewRepositories(database.GetDb(), &g.comm)
 
 	requestUsecase := requestUsecases.NewRequestUsecase(&requestRepository, g.validator)
 

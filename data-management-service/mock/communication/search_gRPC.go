@@ -1,4 +1,4 @@
-package mock
+package mock_communication
 
 import (
 	"context"
@@ -19,9 +19,15 @@ func NewMockSearchServiceClient() MockSearchServiceClientInterface {
 	return &MockSearchClient{}
 }
 
+var searchResponse *bool
+
+func SetSearchResponse(response bool) {
+	searchResponse = &response
+}
+
 func MockVSearchRecordResponse() *search_proto.SearchResponse {
 	return &search_proto.SearchResponse{
-		IsFounded: true, // or false, depending on what you want to mock
+		IsFounded: *searchResponse, // or false, depending on what you want to mock
 	}
 }
 

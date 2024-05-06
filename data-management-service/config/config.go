@@ -1,6 +1,8 @@
 package config
 
 import (
+	"os"
+
 	"github.com/spf13/viper"
 )
 
@@ -36,7 +38,10 @@ type (
 	}
 )
 
-func InitializeViper(path string) error {
+func LoadConfig(path string) error {
+	if _, err := os.Stat(path + "/app.env"); os.IsNotExist(err) {
+		return err
+	}
 	viper.AddConfigPath(path)
 	viper.SetConfigName("app")
 	viper.SetConfigType("env")
@@ -46,10 +51,6 @@ func InitializeViper(path string) error {
 		return err
 	}
 
-	return nil
-}
-
-func ReadConfig() {
 	cfg = &Config{
 		App: App{
 			Port:           viper.GetInt("APP_PORT"),
@@ -74,8 +75,14 @@ func ReadConfig() {
 			Dbname:   viper.GetString("MONGO_DB_NAME"),
 		},
 	}
+
+	return nil
 }
 
-func GetConfig() Config {
-	return *cfg
+func SetConfig(config *Config) {
+	cfg = config
+}
+
+func GetConfig() *Config {
+	return cfg
 }

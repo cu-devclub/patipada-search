@@ -1,14 +1,17 @@
-package event
+package rabbitmq
 
 import (
 	"context"
-	"data-management/config"
 	"data-management/constant"
 	"log"
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
+
+type EmitterInterface interface {
+	Emit(message string, key string) error
+}
 
 type Emitter struct {
 	conn *amqp.Connection
@@ -21,10 +24,10 @@ func (e *Emitter) setup() error {
 	}
 	defer channel.Close()
 
-	return declareExchange(channel, constant.RECORD_EXCHANGE)
+	return DeclareExchange(channel, constant.RECORD_EXCHANGE)
 }
 
-func NewEmitter(conn *amqp.Connection, cfg *config.Config) (*Emitter, error) {
+func NewEmitter(conn *amqp.Connection) (EmitterInterface, error) {
 	log.Println("Creating new emitter.....")
 	emitter := &Emitter{
 		conn: conn,

@@ -5,7 +5,6 @@
 package main
 
 import (
-	"data-management/communication"
 	"data-management/config"
 	"data-management/database"
 	"data-management/logging"
@@ -19,16 +18,15 @@ import (
 func main() {
 	logging.NewSLogger()
 
-	if err := config.InitializeViper("./"); err != nil {
+	if err := config.LoadConfig("./"); err != nil {
 		slog.Error("failed to initialize viper %w", err)
 		return
 	}
 	slog.Info("Viper initialized successfully!")
 
-	config.ReadConfig()
 	cfg := config.GetConfig()
 
-	db, err := database.NewMongoDatabase(&cfg)
+	db, err := database.NewMongoDatabase(cfg)
 	if err != nil {
 		slog.Error("Failed to connect to database", slog.String("err", err.Error()))
 		return
@@ -37,18 +35,12 @@ func main() {
 
 	validate := validator.NewValidator()
 
-	grpc := mock.NewMockgRPC()
-	slog.Info("Connect to gRPC successfully!")
+	comm := mock.MockCommunication()
 
-	rabbit := mock.MockRabbitMQ()
-	slog.Info("Connect to RabbitMQ successfully!")
-
-	comm := communication.NewCommunicationImpl(grpc, rabbit)
-
-	serv := server.NewGinServer(&cfg, &db, &validate, &comm)
+	serv := server.NewGinServer(cfg, &db, &validate, &comm)
 	slog.Info("Server initialized successfully!")
 
-	if err = migration.Migration(&cfg, &db, &serv); err != nil {
+	if err = migration.Migration(cfg, &db, &serv); err != nil {
 		slog.Error("failed to migrate %w", err)
 		return
 	}

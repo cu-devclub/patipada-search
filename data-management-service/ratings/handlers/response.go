@@ -6,6 +6,28 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type ResponseOptions struct {
+	Response         any
+	OptionalResponse any
+}
+
+type Response struct {
+	Code int
+	Body any
+}
+
+type RatingsLog struct {
+	Amount int
+}
+
+func (r Response) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.Int("Code", r.Code),
+		slog.Any("Body", r.Body),
+	)
+}
+
+
 func (r *ratingHandler) successResponse(c *gin.Context, handlerOpts HandlerOpts, responseCode int, resp ResponseOptions) {
 	var body interface{}
 	if resp.OptionalResponse == nil {

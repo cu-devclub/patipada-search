@@ -57,6 +57,7 @@ type (
 )
 
 func (r *Request) MockData() {
+	r.RequestID = "REQ1"
 	r.Index = "asdads-3"
 	r.YoutubeURL = "https://www.youtube.com/watch?v=JGwWNGJdvx8"
 	r.Question = "What is the name of the main character?"

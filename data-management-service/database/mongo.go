@@ -13,12 +13,6 @@ type mongoDatabase struct {
 	Db *mongo.Client
 }
 
-func NewMockMongoDatabase() Database {
-	return &mongoDatabase{
-		Db: &mongo.Client{},
-	}
-}
-
 func NewMongoDatabase(cfg *config.Config) (Database, error) {
 	// create a connection to mongo db
 	clientOptions := options.Client().ApplyURI(
