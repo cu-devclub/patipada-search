@@ -39,6 +39,15 @@ func TestGetRequest(t *testing.T) {
 
 		assert.Equal(t, 200, w.Code)
 	})
+
+	t.Run("Success Get Request with RequestID filter : 200 OK", func(t *testing.T) {
+		req := testutil.CreateNewRequest("GET", "/requests?requestID=mock", nil)
+		w := httptest.NewRecorder()
+
+		g.ServeHTTP(w, req)
+
+		assert.Equal(t, 200, w.Code)
+	})
 }
 
 func TestGetLastestRequestOfRecord(t *testing.T) {

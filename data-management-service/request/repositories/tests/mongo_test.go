@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func setupMongoRepoTest() (repositories.Repositories,func()) {
+func setupMongoRepoTest() (repositories.Repositories, func()) {
 	// setup
 	db, cleanup, err := test_container_database.NewMockMongoClient()
 	if err != nil {
@@ -20,11 +20,11 @@ func setupMongoRepoTest() (repositories.Repositories,func()) {
 	comm := mock_communication.MockCommunication()
 
 	repo := repositories.NewRepositories(db, &comm)
-	return repo,cleanup
+	return repo, cleanup
 }
 
 func TestMongoRepo(t *testing.T) {
-	repo,cleanup := setupMongoRepoTest()
+	repo, cleanup := setupMongoRepoTest()
 	defer cleanup()
 
 	t.Run("Get Request no value", func(t *testing.T) {
@@ -58,7 +58,9 @@ func TestMongoRepo(t *testing.T) {
 		assert.Nil(t, err)
 
 		// get the request
-		filter := entities.Filter{}
+		filter := entities.Filter{
+			RequestID: expectedRequest.RequestID,
+		}
 		filterBson, err := filter.ConvertToBsonM()
 		assert.Nil(t, err)
 
@@ -133,6 +135,11 @@ func TestMongoRepo(t *testing.T) {
 		assert.Nil(t, err)
 
 		assert.Equal(t, 1, counter)
+	})
+
+	t.Run("Get Record counter", func(t *testing.T) {
+		_, err := repo.GetRecordCounter()
+		assert.Nil(t, err)
 	})
 
 	t.Run("Upsert Record Counter", func(t *testing.T) {

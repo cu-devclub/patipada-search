@@ -67,6 +67,9 @@ func (r *repositoryImpl) GetRecordCounter() (*entities.RecordCounter, error) {
 		bson.M{"_id": "record"},
 	).Decode(&counter)
 	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			return nil,nil
+		}
 		return counter, err
 	}
 	return counter, nil

@@ -7,6 +7,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+var searchResponse *bool
+
+func init() {
+	b := true
+	searchResponse = &b
+}
+
 type MockSearchServiceClientInterface interface {
 	SearchRecord(ctx context.Context, in *search_proto.SearchRequest, opts ...grpc.CallOption) (*search_proto.SearchResponse, error)
 }
@@ -19,7 +26,7 @@ func NewMockSearchServiceClient() MockSearchServiceClientInterface {
 	return &MockSearchClient{}
 }
 
-var searchResponse *bool
+
 
 func SetSearchResponse(response bool) {
 	searchResponse = &response
