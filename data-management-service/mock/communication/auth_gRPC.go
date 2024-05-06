@@ -7,6 +7,16 @@ import (
 	"google.golang.org/grpc"
 )
 
+var authorizeResponse *bool
+
+var verifyUsernameResponse *bool
+
+func init() {
+	b := true
+	authorizeResponse = &b
+	verifyUsernameResponse = &b
+}
+
 type MockAuthServiceClientInterface interface {
 	Authorization(ctx context.Context, in *auth_proto.AuthorizationRequest, opts ...grpc.CallOption) (*auth_proto.AuthorizationResponse, error)
 	VerifyUsername(ctx context.Context, in *auth_proto.VerifyUsernameRequest, opts ...grpc.CallOption) (*auth_proto.VerifyUsernameResponse, error)
@@ -20,7 +30,6 @@ func NewMockAuthServiceClient() MockAuthServiceClientInterface {
 	return &MockAuthServiceClient{}
 }
 
-var authorizeResponse *bool
 
 func SetAuthorizationResponse(response bool) {
 	authorizeResponse = &response
@@ -36,7 +45,6 @@ func (c *MockAuthServiceClient) Authorization(ctx context.Context, in *auth_prot
 	return MockAuthorizationResponse(), nil
 }
 
-var verifyUsernameResponse *bool
 
 func SetVerifyUsernameResponse(response bool) {
 	verifyUsernameResponse = &response

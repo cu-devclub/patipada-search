@@ -92,7 +92,7 @@ func (r *requestUsecase) SyncRequestRecord(request *models.SyncRequestRecord) er
 	}
 
 	if len(requests) == 0 {
-		return errors.CreateError(400, messages.BAD_REQUEST)
+		return errors.CreateError(404, messages.NOT_FOUND)
 	}
 
 	if len(requests) > 1 {

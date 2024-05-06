@@ -43,6 +43,13 @@ func (r *requestUsecase) SummaryData() (*models.Summary, error) {
 		return nil, err
 	}
 
+	if recordsCounter == nil {
+		recordsCounter = &entities.RecordCounter{
+			RecordAmount:      0,
+			YoutubeClipAmount: 0,
+		}
+	}
+
 	recordSummary := &models.RecordSummary{
 		RecordAmount:      recordsCounter.RecordAmount,
 		YouTubeClipAmount: recordsCounter.YoutubeClipAmount,
