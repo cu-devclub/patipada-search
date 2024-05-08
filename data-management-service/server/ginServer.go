@@ -210,5 +210,5 @@ func (g *ginServer) initializedRatingRoutes(handler ratingHandlers.Handlers) {
 	// Responses:
 	// - 200 OK: The operation was successful. The response body contains the average rating.
 	// - 500 Internal Server Error: The server encountered an unexpected condition which prevented it from fulfilling the request.
-	ratingRoutes.GET("/average", handler.GetAverageRatings)
+	ratingRoutes.GET("/average", handler.GetSummaryRatings)
 }

@@ -45,5 +45,5 @@ func (h HandlerOpts) LogValue() slog.Value {
 type Handlers interface {
 	InsertRating(c *gin.Context)
 	GetRatings(c *gin.Context)
-	GetAverageRatings(c *gin.Context)
+	GetSummaryRatings(c *gin.Context)
 }

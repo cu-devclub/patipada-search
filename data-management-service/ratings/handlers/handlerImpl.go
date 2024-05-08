@@ -80,11 +80,11 @@ func (h *ratingHandler) GetRatings(c *gin.Context) {
 	h.successResponse(c, *handlerOpts, 200, resp)
 }
 
-func (h *ratingHandler) GetAverageRatings(c *gin.Context) {
+func (h *ratingHandler) GetSummaryRatings(c *gin.Context) {
 	handlerOpts := NewHandlerOpts(c)
 
 	// call usecase
-	average, err := h.ratingsUsecase.GetAverageRatings()
+	value, err := h.ratingsUsecase.GetSummaryRatings()
 	if err != nil {
 		if er, ok := err.(*errors.RequestError); ok {
 			h.errorResponse(c, handlerOpts, er.StatusCode, er.Error())
@@ -97,7 +97,7 @@ func (h *ratingHandler) GetAverageRatings(c *gin.Context) {
 
 	// return response
 	resp := ResponseOptions{
-		Response: average,
+		Response: value,
 	}
 
 	h.successResponse(c, *handlerOpts, 200, resp)

@@ -5,6 +5,7 @@ import (
 	"data-management/ratings/models"
 	"data-management/ratings/repositories"
 	"data-management/util"
+	"math"
 )
 
 type UsecaseImpl struct {
@@ -57,7 +58,7 @@ func (u *UsecaseImpl) GetRatings() ([]*models.Rating, error) {
 	return ratingModels, nil
 }
 
-func (u *UsecaseImpl) GetAverageRatings() (*models.SummaryRating, error) {
+func (u *UsecaseImpl) GetSummaryRatings() (*models.SummaryRating, error) {
 	ratings, err := u.ratingsRepository.GetRatings()
 	if err != nil {
 		return &models.SummaryRating{}, err
@@ -69,10 +70,14 @@ func (u *UsecaseImpl) GetAverageRatings() (*models.SummaryRating, error) {
 	}
 
 	averageStars := float64(totalStars) / float64(len(ratings))
+	averageStarsTwoDecimal := math.Round(averageStars*100) / 100
+	percentage := averageStars * 20
+	percentageTwoDecimal := math.Round(percentage*100) / 100
 
 	summary := &models.SummaryRating{
-		AverageStars: averageStars,
+		AverageStars: averageStarsTwoDecimal,
 		TotalRatings: len(ratings),
+		Percentage:   percentageTwoDecimal,
 	}
 
 	return summary, nil

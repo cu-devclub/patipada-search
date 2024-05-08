@@ -13,7 +13,7 @@ export const insertRatingsService = async (data: Rating) => {
   }
 };
 
-export const getAverageRatingsService = async () => {
+export const getSummaryRatingsService = async () => {
   try {
     const response = await axios.get(`${dataURL}/ratings/average`);
     return response.data;

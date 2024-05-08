@@ -8,7 +8,7 @@ import { insertRequestService } from "./insertRequest";
 
 import { updateRequestService } from "./updateRequest";
 
-import { insertRatingsService, getAverageRatingsService } from "./ratings";
+import { insertRatingsService, getSummaryRatingsService } from "./ratings";
 
 import { syncRequestRecordService, syncAllRequestRecordService } from "./sync";
 
@@ -18,7 +18,7 @@ export {
   getRequestByParamsService,
   updateRequestService,
   insertRatingsService,
-  getAverageRatingsService,
+  getSummaryRatingsService,
   getDataSummaryService,
   syncRequestRecordService,
   syncAllRequestRecordService,
