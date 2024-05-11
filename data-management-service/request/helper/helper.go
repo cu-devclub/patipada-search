@@ -1,21 +1,18 @@
 package helper
 
 import (
+	"data-management/constant"
 	"data-management/request/entities"
 	"data-management/request/models"
-	"data-management/request/repositories"
 	"fmt"
+	"time"
 )
 
 // This will generate a unique RequestID for each new record, like "REQ1", "REQ2", etc.
 // using IncrementRecordCounter() from repositories
-func GenerateRequestID(r repositories.Repositories) (string, error) {
-	nextSeq, err := r.GetNextRequestCounter()
-	if err != nil {
-		return "", err
-	}
+func GenerateRequestID(nextSeq int) string {
 	nextRequestID := fmt.Sprintf("REQ%d", nextSeq)
-	return nextRequestID, nil
+	return nextRequestID
 }
 
 func ModelsToEntity(m *models.Request) (e *entities.Request) {
@@ -65,4 +62,24 @@ func RequestToRecordsEntity(r *entities.Request) *entities.Record {
 		StartTime:  r.StartTime,
 		EndTime:    r.EndTime,
 	}
+}
+
+func UpdatePreviousRequestsStatus(requests []*models.Request, sourceRequest *models.Request) []*entities.Request {
+	neededUpdateRequest := make([]*entities.Request, 0)
+	// ---  Update all request that come before the current request by setting status to "reviewed"
+	for _, req := range requests {
+		if req.UpdatedAt.After(sourceRequest.UpdatedAt) {
+			continue
+		}
+
+		if req.Index != sourceRequest.Index || req.RequestID == sourceRequest.RequestID || req.Status == constant.REQUEST_STATUS_REVIEWED {
+			continue
+		}
+
+		req.Status = constant.REQUEST_STATUS_REVIEWED
+		requestEntitiy := ModelsToEntity(req)
+		requestEntitiy.UpdatedAt = time.Now()
+		neededUpdateRequest = append(neededUpdateRequest, requestEntitiy)
+	}
+	return neededUpdateRequest
 }

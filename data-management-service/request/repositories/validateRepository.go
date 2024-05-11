@@ -1,7 +1,5 @@
 package repositories
 
-import "log"
-
 // ValidateRecordIndex checks if a record with the given recordID exists.
 // It communicates with the external service using the communicationClient to search for the record.
 // If an error occurs during the operation, the function returns false and the error.
@@ -16,9 +14,8 @@ import "log"
 //
 //	bool: A boolean indicating whether the record exists.
 //	error: An error that occurred during the operation, if any.
-func (r *requestRepositories) ValidateRecordIndex(recordID string) (bool, error) {
+func (r *repositoryImpl) ValidateRecordIndex(recordID string) (bool, error) {
 	if recordID == "" {
-		log.Println("Record ID is empty")
 		return false, nil
 	}
 	result, err := r.communicationClient.SearchRecord(recordID)
@@ -44,7 +41,7 @@ func (r *requestRepositories) ValidateRecordIndex(recordID string) (bool, error)
 //
 //	bool: A boolean indicating whether the username is valid. True if the username is valid, false otherwise.
 //	error: An error that occurred during the operation, if any.
-func (r *requestRepositories) ValidateUsername(username string) (bool, error) {
+func (r *repositoryImpl) ValidateUsername(username string) (bool, error) {
 	result, err := r.communicationClient.VerifyUsername(username)
 	if err != nil {
 		return false, err

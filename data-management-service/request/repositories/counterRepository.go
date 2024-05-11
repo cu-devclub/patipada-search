@@ -18,14 +18,14 @@ import (
 //
 // Usage:
 //
-//	nextSeq, err := RequestRepositories.GetNextRequestCounter()
+//	nextSeq, err := repositoryImpl.GetNextRequestCounter()
 //	if err != nil {
 //	    log.Fatal(err)
 //	}
 //	nextRequestID := fmt.Sprintf("REQ%d", nextSeq)
 //
 // This will generate a unique RequestID for each new Request, like "REQ1", "REQ2", etc.
-func (r *requestRepositories) GetNextRequestCounter() (int, error) {
+func (r *repositoryImpl) GetNextRequestCounter() (int, error) {
 	var counter struct {
 		Seq int `bson:"seq"`
 	}
@@ -41,7 +41,7 @@ func (r *requestRepositories) GetNextRequestCounter() (int, error) {
 	return counter.Seq, nil
 }
 
-func (r *requestRepositories) UpsertRecordCounter(recordCounter *entities.RecordCounter) error {
+func (r *repositoryImpl) UpsertRecordCounter(recordCounter *entities.RecordCounter) error {
 	_, err := r.requestCounterCollection.UpdateOne(
 		context.TODO(),
 		bson.M{"_id": "record"},
@@ -60,13 +60,16 @@ func (r *requestRepositories) UpsertRecordCounter(recordCounter *entities.Record
 	return nil
 }
 
-func (r *requestRepositories) GetRecordCounter() (*entities.RecordCounter, error) {
+func (r *repositoryImpl) GetRecordCounter() (*entities.RecordCounter, error) {
 	var counter *entities.RecordCounter
 	err := r.requestCounterCollection.FindOne(
 		context.TODO(),
 		bson.M{"_id": "record"},
 	).Decode(&counter)
 	if err != nil {
+		if err.Error() == "mongo: no documents in result" {
+			return nil,nil
+		}
 		return counter, err
 	}
 	return counter, nil

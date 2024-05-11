@@ -1,4 +1,4 @@
-package mock
+package mock_communication
 
 import (
 	"context"
@@ -6,6 +6,13 @@ import (
 
 	"google.golang.org/grpc"
 )
+
+var searchResponse *bool
+
+func init() {
+	b := true
+	searchResponse = &b
+}
 
 type MockSearchServiceClientInterface interface {
 	SearchRecord(ctx context.Context, in *search_proto.SearchRequest, opts ...grpc.CallOption) (*search_proto.SearchResponse, error)
@@ -19,9 +26,15 @@ func NewMockSearchServiceClient() MockSearchServiceClientInterface {
 	return &MockSearchClient{}
 }
 
+
+
+func SetSearchResponse(response bool) {
+	searchResponse = &response
+}
+
 func MockVSearchRecordResponse() *search_proto.SearchResponse {
 	return &search_proto.SearchResponse{
-		IsFounded: true, // or false, depending on what you want to mock
+		IsFounded: *searchResponse, // or false, depending on what you want to mock
 	}
 }
 

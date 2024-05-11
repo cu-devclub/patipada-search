@@ -51,6 +51,16 @@ There are 3 ways to run the service
       make up_build_data
       ```
 
+## Test
+-  to run all test cases
+```bash
+go test -v ./...
+```
+- integration test 
+```bash
+go test -v ./tests
+```
+- unit tests are inside each layer
 
 ## API Reference
 
@@ -79,7 +89,7 @@ This service imply [clean architecture](https://blog.cleancoder.com/uncle-bob/20
     ├── errors                  # Custom errors
     ├── messages                # Response Message
     ├── server
-    ├── tests                   # unit test & integration testing
+    ├── it                      # integration testing
     ├── structValidator         # validator
     ├── request
         ├── handlers

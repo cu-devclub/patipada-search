@@ -1,9 +1,8 @@
-package communication
+package rabbitmq
 
 import (
 	"data-management/config"
 	"data-management/constant"
-	"data-management/event"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -15,13 +14,14 @@ import (
 
 type RabbitMQInterface interface {
 	PublishUpdateRecordsToRabbitMQ(payloadName string, message interface{}) error
+	GetEmitter() EmitterInterface
+	GetConnection() *amqp.Connection
 	CloseConnection()
 }
 
 type RabbitMQStruct struct {
-	Conn         *amqp.Connection
-	Emitter      *event.Emitter
-	Rabbitconfig *config.RabbitMQ
+	Conn    *amqp.Connection
+	Emitter EmitterInterface
 }
 
 func ConnectToRabbitMQ(cfg *config.Config) (RabbitMQInterface, error) {
@@ -54,15 +54,14 @@ func ConnectToRabbitMQ(cfg *config.Config) (RabbitMQInterface, error) {
 	}
 
 	// Get the emitter
-	emitter, err := event.NewEmitter(connection, cfg)
+	emitter, err := NewEmitter(connection)
 	if err != nil {
 		return nil, err
 	}
 
 	return &RabbitMQStruct{
-		Conn:         connection,
-		Emitter:      emitter,
-		Rabbitconfig: &cfg.RabbitMQ,
+		Conn:    connection,
+		Emitter: emitter,
 	}, nil
 }
 
@@ -85,6 +84,13 @@ func (c *RabbitMQStruct) PublishUpdateRecordsToRabbitMQ(payloadName string, mess
 	return nil
 }
 
+func (c *RabbitMQStruct) GetConnection() *amqp.Connection {
+	return c.Conn
+}
+
+func (c *RabbitMQStruct) GetEmitter() EmitterInterface {
+	return c.Emitter
+}
 
 func (c *RabbitMQStruct) CloseConnection() {
 	if c.Conn != nil {

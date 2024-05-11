@@ -1,23 +1,39 @@
-package mock
+package mock_communication
 
 import (
-	"data-management/communication"
 	"data-management/config"
-	"data-management/event"
+	"data-management/rabbitmq"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+type MockEmitterStruct struct {
+	conn *amqp.Connection
+}
+
+func MockEmitter() rabbitmq.EmitterInterface {
+	return &MockEmitterStruct{
+		conn: nil,
+	}
+}
+
+func (e *MockEmitterStruct) Emit(message string, key string) error {
+	return nil
+}
+
 type MockRabbitMQStruct struct {
 	Conn         *amqp.Connection
-	Emitter      *event.Emitter
+	Emitter      rabbitmq.EmitterInterface
 	Rabbitconfig *config.RabbitMQ
 }
 
-func MockRabbitMQ() communication.RabbitMQInterface {
+func MockRabbitMQ() rabbitmq.RabbitMQInterface {
+	// Get the emitter
+	emitter := MockEmitter()
+
 	return &MockRabbitMQStruct{
 		Conn:         nil,
-		Emitter:      nil,
+		Emitter:      emitter,
 		Rabbitconfig: nil,
 	}
 }
@@ -26,6 +42,13 @@ func (r *MockRabbitMQStruct) PublishUpdateRecordsToRabbitMQ(payloadName string, 
 	return nil
 }
 
+func (r *MockRabbitMQStruct) GetConnection() *amqp.Connection {
+	return r.Conn
+}
+
+func (r *MockRabbitMQStruct) GetEmitter() rabbitmq.EmitterInterface {
+	return r.Emitter
+}
 
 func (r *MockRabbitMQStruct) CloseConnection() {
 	return

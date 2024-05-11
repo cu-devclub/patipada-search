@@ -7,7 +7,6 @@ import (
 	"data-management/request/entities"
 	"data-management/request/helper"
 	"data-management/request/models"
-	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -45,22 +44,9 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) error {
 	}
 
 	// ---  Update all request that come before the current request by setting status to "reviewed"
-	for _, req := range requests {
-		if req.UpdatedAt.After(request.UpdatedAt) {
-			continue
-		}
-
-		log.Println("Request: ", req, "Current Request: ", request)
-		log.Println("verifying", req.Index != request.Index, req.RequestID == request.RequestID, req.Status == constant.REQUEST_STATUS_REVIEWED)
-		if req.Index != request.Index || req.RequestID == request.RequestID || req.Status == constant.REQUEST_STATUS_REVIEWED {
-			continue
-		}
-
-		log.Println("Updating request: ", req.RequestID, " to reviewed")
-		req.Status = constant.REQUEST_STATUS_REVIEWED
-		requestEntitiy := helper.ModelsToEntity(req)
-		requestEntitiy.UpdatedAt = time.Now()
-		if err := r.requestRepositories.UpdateRequest(requestEntitiy); err != nil {
+	previousRequest := helper.UpdatePreviousRequestsStatus(requests, request)
+	for _, req := range previousRequest {
+		if err := r.requestRepositories.UpdateRequest(req); err != nil {
 			return err
 		}
 	}
@@ -88,6 +74,8 @@ func (r *requestUsecase) UpdateRequest(request *models.Request) error {
 	return nil
 }
 
+
+
 func (r *requestUsecase) SyncRequestRecord(request *models.SyncRequestRecord) error {
 	filter := &entities.Filter{
 		RequestID: request.RequestId,
@@ -104,7 +92,7 @@ func (r *requestUsecase) SyncRequestRecord(request *models.SyncRequestRecord) er
 	}
 
 	if len(requests) == 0 {
-		return errors.CreateError(400, messages.BAD_REQUEST)
+		return errors.CreateError(404, messages.NOT_FOUND)
 	}
 
 	if len(requests) > 1 {
@@ -167,3 +155,5 @@ func (r *requestUsecase) SyncAllRequestRecords() error {
 
 	return nil
 }
+
+

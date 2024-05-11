@@ -1,4 +1,4 @@
-package mock
+package mock_communication
 
 import (
 	"context"
@@ -6,6 +6,16 @@ import (
 
 	"google.golang.org/grpc"
 )
+
+var authorizeResponse *bool
+
+var verifyUsernameResponse *bool
+
+func init() {
+	b := true
+	authorizeResponse = &b
+	verifyUsernameResponse = &b
+}
 
 type MockAuthServiceClientInterface interface {
 	Authorization(ctx context.Context, in *auth_proto.AuthorizationRequest, opts ...grpc.CallOption) (*auth_proto.AuthorizationResponse, error)
@@ -20,9 +30,14 @@ func NewMockAuthServiceClient() MockAuthServiceClientInterface {
 	return &MockAuthServiceClient{}
 }
 
+
+func SetAuthorizationResponse(response bool) {
+	authorizeResponse = &response
+}
+
 func MockAuthorizationResponse() *auth_proto.AuthorizationResponse {
 	return &auth_proto.AuthorizationResponse{
-		IsAuthorized: true, // or false, depending on what you want to mock
+		IsAuthorized: *authorizeResponse, 
 	}
 }
 
@@ -30,9 +45,14 @@ func (c *MockAuthServiceClient) Authorization(ctx context.Context, in *auth_prot
 	return MockAuthorizationResponse(), nil
 }
 
+
+func SetVerifyUsernameResponse(response bool) {
+	verifyUsernameResponse = &response
+}
+
 func MockVerifyUsernameResponse() *auth_proto.VerifyUsernameResponse {
 	return &auth_proto.VerifyUsernameResponse{
-		IsVerified: true, // or false, depending on what you want to mock
+		IsVerified: *verifyUsernameResponse, 
 	}
 }
 
