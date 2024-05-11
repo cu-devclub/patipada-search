@@ -19,7 +19,7 @@ func setUpRatingHandler() *gin.Engine {
 	g := gin.Default()
 	g.POST("/ratings", handler.InsertRating)
 	g.GET("/ratings", handler.GetRatings)
-	g.GET("/ratings/average", handler.GetAverageRatings)
+	g.GET("/ratings/average", handler.GetSummaryRatings)
 
 	return g
 }

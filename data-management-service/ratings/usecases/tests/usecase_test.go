@@ -77,11 +77,12 @@ func TestGetAverageRating(t *testing.T) {
 
 		mock_ratings.SetMockRatingsValue([]*entities.Rating{expectedRating})
 
-		sumRating, err := usecase.GetAverageRatings()
+		sumRating, err := usecase.GetSummaryRatings()
 
 		assert.Nil(t, err)
 		assert.Equal(t, 1, sumRating.TotalRatings)
 		assert.Equal(t, float64(expectedRating.Stars), sumRating.AverageStars)
+		assert.Equal(t, 100.0, sumRating.Percentage)
 	})
 
 	t.Run("GetAverageRating multiple values", func(t *testing.T) {
@@ -91,10 +92,11 @@ func TestGetAverageRating(t *testing.T) {
 
 		mock_ratings.SetMockRatingsValue([]*entities.Rating{expectedRating1, expectedRating2})
 
-		sumRating, err := usecase.GetAverageRatings()
+		sumRating, err := usecase.GetSummaryRatings()
 
 		assert.Nil(t, err)
 		assert.Equal(t, 2, sumRating.TotalRatings)
 		assert.Equal(t, float64(expectedRating1.Stars+expectedRating2.Stars)/2, sumRating.AverageStars)
+		assert.Equal(t, 100.0, sumRating.Percentage)
 	})
 }

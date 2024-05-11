@@ -33,7 +33,7 @@ func (u *MockUsecase) GetRatings() ([]*models.Rating, error) {
 	return ratingModels, nil
 }
 
-func (u *MockUsecase) GetAverageRatings() (*models.SummaryRating, error) {
+func (u *MockUsecase) GetSummaryRatings() (*models.SummaryRating, error) {
 
 	summary := &models.SummaryRating{
 		AverageStars: 4.32,
