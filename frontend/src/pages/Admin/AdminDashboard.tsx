@@ -17,7 +17,7 @@ import { RecordSummary } from "../../models/qa";
 import { RequestSummary } from "../../models/request";
 import { RatingSummary } from "../../models/ratings";
 import {
-  getAverageRatingsService,
+  getSummaryRatingsService,
   getDataSummaryService,
 } from "../../service/data";
 function AdminDashboard() {
@@ -41,9 +41,10 @@ function AdminDashboard() {
     pendingAmount: 0,
   });
 
-  const [averageRating, setAverageRating] = useState<RatingSummary>({
+  const [summaryRating, setSummaryRating] = useState<RatingSummary>({
     average_stars: 0,
     total_ratings: 0,
+    percentage: 0,
   });
 
   useEffect(() => {
@@ -111,10 +112,10 @@ function AdminDashboard() {
     };
     getDataSum();
 
-    const getAverageRatingFunc = async () => {
-      await getAverageRatingsService()
+    const getSummaryRatingsFunc = async () => {
+      await getSummaryRatingsService()
         .then((res) => {
-          setAverageRating(res);
+          setSummaryRating(res);
         })
         .catch(() => {
           addToast({
@@ -123,7 +124,7 @@ function AdminDashboard() {
           });
         });
     };
-    getAverageRatingFunc();
+    getSummaryRatingsFunc();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -148,8 +149,9 @@ function AdminDashboard() {
           <GridItem area={"rating"}>
             <RatingStat
               label="คะแนนเฉลี่ย"
-              value={averageRating.average_stars}
-              helper={`จำนวนผู้ลงคะแนนทั้งหมด ${averageRating.total_ratings} คน`}
+              average={summaryRating.average_stars}
+              percentage={summaryRating.percentage}
+              helper={`จำนวนผู้ลงคะแนนทั้งหมด ${summaryRating.total_ratings} คน`}
             />
           </GridItem>
           <GridItem area={"record"}>

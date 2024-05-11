@@ -10,5 +10,6 @@ type (
 	SummaryRating struct {
 		AverageStars float64 `json:"average_stars"`
 		TotalRatings int     `json:"total_ratings"`
+		Percentage   float64 `json:"percentage_rating"`
 	}
 )

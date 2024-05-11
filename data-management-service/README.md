@@ -21,13 +21,13 @@ cd <your-path>/<project-root(where docker compose is)>
 ``` bash
 docker compose -f docker-compose.dev.yml up -d data-db
 ```
-4. Copy [data folder](../data/) to this directory and rename to `datasource`
+4. Copy [raw data](../data/record/raw-data.csv) then create datasource directory and paste the file
 
 #### Steps
 There are 3 ways to run the service 
   1. Using golang (Recommend for isolate service development)
       ``` bash
-      cd <your-path>/data-managment-service
+      cd <your-path>/data-management-service
       ```
       ```bash
       go mod tidy

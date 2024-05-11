@@ -6,6 +6,7 @@ export interface Rating {
 export interface RatingSummary {
   average_stars: number;
   total_ratings: number;
+  percentage: number;
 }
 
 export interface FullRating extends Rating {
