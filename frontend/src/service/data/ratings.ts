@@ -16,6 +16,8 @@ export const insertRatingsService = async (data: Rating) => {
 export const getSummaryRatingsService = async () => {
   try {
     const response = await axios.get(`${dataURL}/ratings/average`);
+    console.log("🚀 ~ getSummaryRatingsService ~ response:", response);
+
     return response.data;
   } catch (error: unknown) {
     const returnErr = CreateCustomError(error);

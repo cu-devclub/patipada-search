@@ -21,7 +21,6 @@ interface RatingStatProps {
 
 function RatingStat({ average, percentage, helper }: RatingStatProps) {
   const color = average >= 4 ? "green" : average >= 2 ? "orange" : "red";
-  // const valuePercentage = twoDecimal(average * 20);
 
   return (
     <Flex bg="gray.450" shadow="xl" h="full" w="full" justify="center">
@@ -52,9 +51,8 @@ function RatingStat({ average, percentage, helper }: RatingStatProps) {
               borderColor="gray.300"
               h="65%"
             >
-              <Stat textAlign="center">
+              <Stat textAlign="center" px={4}>
                 <StatNumber color="black" fontWeight="bold" p={4}>
-                  {/* {twoDecimal(value)} */}
                   {average}
                 </StatNumber>
                 <StatHelpText color="black">{helper}</StatHelpText>
