@@ -4,22 +4,48 @@ import {
   Center,
   Hide,
   Show,
-  IconButton,
   VStack,
-  Grid,
   Divider,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  IconButton,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { SignInButton, UserAvatar } from "../../user/index.ts";
 import Logo from "../../logo/Logo.tsx";
-import { HamburgerIcon } from "@chakra-ui/icons";
 import { getCookie } from "typescript-cookie";
-
+import { InfoIcon } from "@chakra-ui/icons";
 interface BaseHeaderProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  showDivider?: boolean;
 }
 
-function BaseHeader({ children }: BaseHeaderProps) {
+const LoginInfo = () => {
+  return (
+    <Popover>
+      <PopoverTrigger>
+        <IconButton
+          icon={<InfoIcon />}
+          aria-label="Login Information"
+          variant="ghost"
+        />
+      </PopoverTrigger>
+      <PopoverContent>
+        <PopoverArrow />
+        <PopoverCloseButton />
+        <PopoverHeader>ลงชื่อเข้าใช้</PopoverHeader>
+        <PopoverBody>ลงชื่อเข้าใช้สำหรับ Content Contributor</PopoverBody>
+      </PopoverContent>
+    </Popover>
+  );
+};
+
+function BaseHeader({ children, showDivider = false }: BaseHeaderProps) {
   const navigate = useNavigate();
   const token = getCookie("token");
   const username = getCookie("username");
@@ -27,8 +53,8 @@ function BaseHeader({ children }: BaseHeaderProps) {
   return (
     <VStack>
       <Flex
-        px={4}
-        pt={4}
+        px={2}
+        pt={2}
         direction="row"
         justify="space-between"
         alignItems="center"
@@ -37,7 +63,12 @@ function BaseHeader({ children }: BaseHeaderProps) {
         {/* Desktop */}
         <Hide below="md">
           <HStack w="full" gap={4}>
-            <Center w="7%" h="7%" onClick={() => navigate("/")}>
+            <Center
+              cursor="pointer"
+              w="7%"
+              h="7%"
+              onClick={() => navigate("/")}
+            >
               <Logo size={{ md: "6xs" }} />
             </Center>
 
@@ -46,48 +77,36 @@ function BaseHeader({ children }: BaseHeaderProps) {
           {token && username ? (
             <UserAvatar username={username} />
           ) : (
-            <SignInButton />
+            <Flex alignItems={"center"}>
+              <SignInButton />
+              <LoginInfo />
+            </Flex>
           )}
         </Hide>
         {/* ------------------------------- */}
         {/* Mobile */}
         <Show below="md">
-          <VStack w="full" gap={0}>
-            <Grid
-              templateColumns="repeat(3, 1fr)"
-              gap={6}
-              h="7xs"
-              alignItems="center"
-              w="full"
+          <HStack w="full" gap={4}>
+            <Center
+              cursor="pointer"
+              w="20%"
+              h="20%"
+              onClick={() => navigate("/")}
             >
-              <IconButton
-                w="10xs"
-                aria-label="Open Menu"
-                icon={<HamburgerIcon />}
-              />
-              <Center
-                w="full"
-                h="full"
-                cursor="pointer"
-                onClick={() => navigate("/")}
-              >
-                <Logo size={{ base: "8xs" }} />
-              </Center>
-              {token && username ? (
-                <Flex justify={"flex-end"}>
-                  <UserAvatar username={username} />
-                </Flex>
-              ) : (
-                <Flex justify={"flex-end"}>
-                  <SignInButton />
-                </Flex>
-              )}
-            </Grid>
+              <Logo size={{ md: "6xs" }} />
+            </Center>
             {children}
-          </VStack>
+          </HStack>
+          {token && username ? (
+            <Flex>
+              <UserAvatar username={username} />
+            </Flex>
+          ) : (
+            <SignInButton />
+          )}
         </Show>
       </Flex>
-      <Divider />
+      {showDivider && <Divider />}
     </VStack>
   );
 }

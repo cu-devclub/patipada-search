@@ -72,6 +72,7 @@ const LoginPage = () => {
       >
         ลงชื่อเข้าใช้งาน
       </Heading>
+      <Text color={"whiteAlpha.900"}>สำหรับ Content Contributor</Text>
       <HStack spacing={2}>
         <Text color={"whiteAlpha.900"} fontSize={"lg"}>
           ยังไม่มีบัญชีใช่ไหม ?

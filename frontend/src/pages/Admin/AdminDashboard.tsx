@@ -44,7 +44,7 @@ function AdminDashboard() {
   const [summaryRating, setSummaryRating] = useState<RatingSummary>({
     average_stars: 0,
     total_ratings: 0,
-    percentage: 0,
+    percentage_rating: 0,
   });
 
   useEffect(() => {
@@ -115,6 +115,7 @@ function AdminDashboard() {
     const getSummaryRatingsFunc = async () => {
       await getSummaryRatingsService()
         .then((res) => {
+          console.log("🚀 ~ .then ~ res:", res)
           setSummaryRating(res);
         })
         .catch(() => {
@@ -150,7 +151,7 @@ function AdminDashboard() {
             <RatingStat
               label="คะแนนเฉลี่ย"
               average={summaryRating.average_stars}
-              percentage={summaryRating.percentage}
+              percentage={summaryRating.percentage_rating}
               helper={`จำนวนผู้ลงคะแนนทั้งหมด ${summaryRating.total_ratings} คน`}
             />
           </GridItem>
