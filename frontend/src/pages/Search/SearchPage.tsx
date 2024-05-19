@@ -1,4 +1,4 @@
-import { Flex, VStack, AspectRatio } from "@chakra-ui/react";
+import {  VStack, AspectRatio, Grid, GridItem } from "@chakra-ui/react";
 import { SearchField } from "../../components/search";
 import { Header, Footer } from "../../components";
 import { useState } from "react";
@@ -36,21 +36,20 @@ const SearchPage = () => {
   };
 
   return (
-    <Flex
-      justify="space-between"
-      direction="column"
-      align="center"
+    <Grid
+      templateRows="0.2fr 2fr 0.2fr"
+      templateAreas={`" header"
+                        " main"
+                        " footer"`}
+      gap={4}
       w="full"
-      minH="100svh"
-      gap={16}
+      h="100svh"
     >
-      <VStack w="full" spacing={[4, 12]}>
+      <GridItem pl="2" area={"header"}>
         <Header />
-
+      </GridItem>
+      <GridItem pl="2" area={"main"}>
         <VStack w="full" spacing={8}>
-          {/* <Center bg="red">
-            <Logo size={["6xs", "4xs"]} />
-           </Center>  */}
           <AspectRatio w={{ base: "60%", md: "50%", lg: "30%" }} ratio={16 / 9}>
             <WordCloud />
           </AspectRatio>
@@ -61,11 +60,11 @@ const SearchPage = () => {
             performSearch={performSearch}
           />
         </VStack>
-      </VStack>
-      <Flex w="100%" h="8xs">
+      </GridItem>
+      <GridItem bg="red" area={"footer"} h="full">
         <Footer />
-      </Flex>
-    </Flex>
+      </GridItem>
+    </Grid>
   );
 };
 

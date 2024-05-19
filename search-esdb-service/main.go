@@ -29,6 +29,13 @@ func main() {
 
 	cfg.ReadMlConfig()
 
+	cnt,err := logging.CountExistingLogs()
+	if err != nil {
+		slog.Error("Failed to count existing logs", slog.String("err", err.Error()))
+		return
+	}
+	slog.Info("Total Search Amount:", slog.Int("count", cnt))
+
 	// If the usecase is bigger, this one can be an object
 	// right now it used only to set up the prometheus counter
 	monitoring.NewMonitoring()

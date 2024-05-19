@@ -74,6 +74,7 @@ func (r *recordHttpHandler) Search(c *gin.Context) {
 	if searchStatus == constant.SEARCH_STATUS_CONFIRM {
 		searchLogsPath := cfg.Static.SearchLogsConfirmPath
 		logging.WriteLogsToFile(cfg.Static.LogsPath, searchLogsPath, helper.SearchLogsMessage(handlerOpts.Time, query, offset, amount))
+		logging.IncrementAndPrintTotalSearch()
 	}
 
 	// monitor search

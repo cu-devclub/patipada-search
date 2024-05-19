@@ -37,7 +37,7 @@ function HeaderSearch({
   }, [searchParam]);
 
   return (
-    <BaseHeader>
+    <BaseHeader showDivider={true}>
       <SearchField
         searchParam={searchParams}
         setSearchParams={ChangeSearch}

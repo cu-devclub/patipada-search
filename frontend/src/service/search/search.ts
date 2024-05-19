@@ -29,8 +29,7 @@ export const searchService = async (
 ): Promise<SearchResultInterface> => {
   try {
     const response = await axios.get(
-      `${searchURL}/search?query=${query}&searchType=${searchType}
-      &searchStatus=${searchStatus}&offset=${offset}&amount=${amount}&countNeeded=${countNeeded}`
+      `${searchURL}/search?query=${query}&searchType=${searchType}&searchStatus=${searchStatus}&offset=${offset}&amount=${amount}&countNeeded=${countNeeded}`
     );
 
     const records: DataItem[] = response.data.results.map((item: DataItem) => {
