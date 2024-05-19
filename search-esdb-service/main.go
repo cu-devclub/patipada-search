@@ -60,12 +60,12 @@ func main() {
 	}
 	slog.Info("Migrate records successfully!")
 
-	grpc, err := communication.NewgRPC(&cfg)
-	if err != nil {
-		slog.Error("Failed to connect to gRPC", slog.String("err", err.Error()))
-		return
-	}
-	// grpc := communication.NewMockgRPC()
+	// grpc, err := communication.NewgRPC(&cfg)
+	// if err != nil {
+	// 	slog.Error("Failed to connect to gRPC", slog.String("err", err.Error()))
+	// 	return
+	// }
+	grpc := communication.NewMockgRPC()
 	slog.Info("Connect to gRPC successfully!")
 	comm := communication.NewCommunicationImpl(grpc)
 
