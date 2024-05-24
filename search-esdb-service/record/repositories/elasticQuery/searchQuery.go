@@ -71,15 +71,8 @@ func BuildKNNQuery(vectorSearchEntity *entities.VectorSearchStruct) (string, str
 		knnQuery = append(knnQuery, map[string]interface{}{
 			"field":          model.Name + "-question",
 			"query_vector":   model.Embedding,
-			"k":              5,
-			"num_candidates": 50,
-			"boost":          model.ScoreWeight,
-		})
-		knnQuery = append(knnQuery, map[string]interface{}{
-			"field":          model.Name + "-answer",
-			"query_vector":   model.Embedding,
 			"k":              10,
-			"num_candidates": 10,
+			"num_candidates": 2000,
 			"boost":          model.ScoreWeight,
 		})
 	}
@@ -143,15 +136,8 @@ func BuildHybridSearchQuery(hybridSearchEntity *entities.HybridSearchStruct) (st
 		knnQuery = append(knnQuery, map[string]interface{}{
 			"field":          model.Name + "-question",
 			"query_vector":   model.Embedding,
-			"k":              5,
-			"num_candidates": 50,
-			"boost":          model.ScoreWeight,
-		})
-		knnQuery = append(knnQuery, map[string]interface{}{
-			"field":          model.Name + "-answer",
-			"query_vector":   model.Embedding,
 			"k":              10,
-			"num_candidates": 10,
+			"num_candidates": 2000,
 			"boost":          model.ScoreWeight,
 		})
 	}
@@ -188,5 +174,4 @@ func BuildHybridSearchQuery(hybridSearchEntity *entities.HybridSearchStruct) (st
 	}
 
 	return string(queryJSON), string(countQueryJSON), nil
-
 }
