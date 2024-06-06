@@ -1,3 +1,4 @@
+import numpy as np
 from typing import List
 from app.services.stopWords_service import StopWordsService
 from app.services.tokenize_service import TokenizeService
@@ -26,15 +27,13 @@ class LDAServerice:
         text = StopWordsService.remove_stop_words_from_list(TokenizeService.tokenize_from_string(document))
 
         # word2vec
-        vector = LDAServerice.id2word.doc2bow(text)
+        vector = [0]*len(LDAServerice.id2word)
+        for word in text:
+            vector[LDAServerice.id2word[word]] += 1
+        vector = np.array(vector)
 
         # Perform LDA
-        sparse_lda_vector = LDAServerice.lda_model.get_document_topics(vector)
+        lda_vector = LDAServerice.lda_model.transform(vector).tolist()
 
-        # Convert the sparse LDA vector to a dense vector
-        dense_lda_vector = [0.0] * 30
-        for index, value in sparse_lda_vector:
-            dense_lda_vector[index] = value
-
-        return dense_lda_vector
+        return lda_vector[0]
     
