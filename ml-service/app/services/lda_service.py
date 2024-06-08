@@ -3,6 +3,7 @@ from typing import List
 from app.services.stopWords_service import StopWordsService
 from app.services.tokenize_service import TokenizeService
 import pickle
+import guidedlda
 
 class LDAServerice:
     id2word = pickle.load(open('model/id2word.pkl', 'rb'))
@@ -29,7 +30,10 @@ class LDAServerice:
         # word2vec
         vector = [0]*len(LDAServerice.id2word)
         for word in text:
-            vector[LDAServerice.id2word[word]] += 1
+            if word in LDAServerice.id2word:
+                vector[LDAServerice.id2word[word]] += 1
+            else :
+                continue
         vector = np.array(vector)
 
         # Perform LDA
