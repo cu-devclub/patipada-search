@@ -29,7 +29,7 @@ services:
       loggin_jobname: "containerlogs"
     networks:
       - dhammanava_network
-  
+
   ml-gateway-service:
     container_name: ml-gateway-container
     image: ${DOCKERHUB_USERNAME}/dhammanava-ml-gateway-image
@@ -56,7 +56,7 @@ services:
       - FLASK_RUN_HOST=0.0.0.0
       - FLASK_RUN_PORT=8084
     volumes:
-      - ./data/stopword:/app/stopWord
+      - ./data/stopword:/app/stopword
     ports:
       - 8084:8084
     labels:
@@ -74,8 +74,8 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=true
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-    volumes:
-      - ./volumes/database/elastic:/usr/share/elasticsearch/data
+    # volumes:
+    #   - ./volumes/database/elastic:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
     labels:
@@ -169,8 +169,8 @@ services:
     depends_on:
       - data-db
       - rabbitmq
-      - auth-service
-      - search-service
+      # - auth-service
+      # - search-service
     networks:
       - dhammanava_network
 
