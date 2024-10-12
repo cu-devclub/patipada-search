@@ -47,6 +47,28 @@ function SearchResultPage() {
         SetData(data);
         SetTokens(tokens);
         SetPageNums(numPages);
+      } else {
+        searchService(
+          query,
+          SEARCH_TYPE.DEFAULT,
+          SEARCH_STATUS.CONFIRM,
+          0,
+          SearchResultItemsPerPage,
+          true
+        )
+          .then((response: SearchResultInterface) => {
+            SetData(response.data);
+            SetTokens(response.tokens);
+            SetPageNums(response.numPages);
+            sessionStorage.setItem("response", JSON.stringify(response));
+          })
+          .catch(() => {
+            addToast({
+              description: "เกิดข้อผิดพลาดขณะทำการดึงข้อมูล",
+              status: ToastStatus.ERROR,
+            });
+          });
+
       }
     }
   }, [query]);

@@ -3,6 +3,7 @@
 .secrets
 .vscode
 volumes
+.idea
 todo
 logs
 patipada-search.code-workspace
