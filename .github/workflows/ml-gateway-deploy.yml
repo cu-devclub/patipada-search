@@ -19,7 +19,7 @@ jobs:
         working-directory: ./ml-gateway-service
         run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-          go build -o mlGateWayApp
+          go build -mod=mod -o mlGateWayApp
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
