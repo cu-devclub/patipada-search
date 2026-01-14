@@ -62,7 +62,7 @@ func (r *recordUsecaseImpl) keywordSearch(indexName string, tokens []string, con
 
 	keywordSearchStruct := &entities.KeywordSearchStruct{
 		Query:               searchQuery,
-		KeywordSearchFields: []string{"question", "answer"},
+		KeywordSearchFields: []string{"question"},
 		Config:              config,
 	}
 
@@ -103,7 +103,7 @@ func (r *recordUsecaseImpl) hybridSearch(indexName, query string, tokens []strin
 
 	hybridSearchStruct := &entities.HybridSearchStruct{
 		Query:                    keywordSearchQuery,
-		KeywordSearchFields:      []string{"question", "answer"},
+		KeywordSearchFields:      []string{"question"},
 		KeywordSearchScoreWeight: r.cfg.MlConfig.TfIDFScoreWeight,
 		VectorFields:             vectorResponses,
 		Config:                   config,
